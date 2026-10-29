@@ -64,3 +64,18 @@ def test_setpoints_may_be_constant_but_sensors_may_not():
                                         "t": "zone_air_temperature [degC]", "y": "other"}), "y")
     ids = {i.id for i in rep.issues}
     assert "stuck:t" in ids and "stuck:sp" not in ids
+
+
+def test_runs_and_spikes_never_span_gaps():
+    """Found on ROBOD (weekdays only): equal values either side of a weekend are not a stuck sensor,
+    and the first reading after a long gap is not a spike."""
+    from bemlops.cleaning import spike_mask, stuck_runs
+
+    rng = np.random.default_rng(1)
+    fri = pd.date_range("2021-09-17 18:00", "2021-09-17 23:55", freq="5min")
+    mon = pd.date_range("2021-09-20 00:00", "2021-09-20 05:55", freq="5min")
+    idx = fri.append(mon)
+    s = pd.Series(np.r_[20 + rng.normal(0, 0.1, len(fri) - 3), [1, 1, 1], [1, 1, 1], 26 + rng.normal(0, 0.1, len(mon) - 3)],
+                  index=idx)
+    assert stuck_runs(s, pd.Timedelta(hours=6), ignore_zero=False) == []
+    assert not spike_mask(s).iloc[len(fri) - 3:len(fri) + 3].any()

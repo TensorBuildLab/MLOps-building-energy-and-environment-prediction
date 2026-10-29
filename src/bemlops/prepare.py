@@ -95,7 +95,7 @@ def prepare(df: pd.DataFrame, specs: Mapping[str, ColumnSpec], target: str,
                          c, int(m.sum()))
         elif q.canonical_unit is not None:
             _log(log, "units_unchecked", f"No valid unit declared; values used as they are ({q.canonical_unit} assumed).", c)
-        if opts.mask_stuck and not q.may_be_constant:
+        if opts.mask_stuck and not (q.may_be_constant or spec.flat_ok):
             runs = stuck_runs(s, pd.Timedelta(hours=opts.stuck_hours), ignore_zero=q.zero_runs_ok)
             if runs:
                 m = stuck_mask(s, runs)

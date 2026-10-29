@@ -28,6 +28,9 @@ dependencies = [
 plots = ["matplotlib>=3.7"]
 dev = ["pytest>=7", "matplotlib>=3.7"]
 
+[project.scripts]
+bemlops = "bemlops.cli:main"
+
 [project.urls]
 Repository = "https://github.com/TensorBuildLab/MLOps-building-energy-and-environment-prediction"
 "Preliminary paper" = "https://arxiv.org/abs/2407.03469"

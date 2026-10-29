@@ -29,7 +29,10 @@ Install: `pip install bemlops` (or `pip install -e .` from this repository).
 ### 1. Pin down the task with the human
 
 Before touching data, make sure you know:
-- **Target**: which point, and in what unit.
+- **Target**: which point, and in what unit. Any trended point works: energy,
+  power, loads, temperatures, CO2, humidity, occupancy counts. Yes/no points
+  (occupied, equipment on) become classification tasks automatically when
+  declared as `occupancy_status` or `equipment_status`.
 - **Horizon**: how far ahead (e.g. 15 min for control, 1 h or 24 h for energy
   planning), or 0 for a virtual sensor (estimating a value from other sensors
   at the same moment).
@@ -133,13 +136,29 @@ Tell the human, in plain language:
 3. ASHRAE Guideline 14 verdict for energy-like targets.
 4. Limitations: period covered, seasons not seen, inputs missing.
 
-### 8. Use and monitor (deployment)
+### 8. Register, promote, use and monitor
+
+Production models go through the registry. Promotion is refused unless the
+run passes the gates: data errors resolved, beats the baseline, Guideline 14
+where it applies, no suspicious inputs, enough test data.
 
 ```python
-model = bemlops.load_model(folder / "model.joblib")
-forecast = model.predict(latest_raw_data)    # last `horizon` rows are the live forecast
-print(model.check_drift(last_two_weeks))     # recommends retraining when accuracy degrades
+reg = bemlops.Registry("models/")
+entry = reg.register(folder)                   # candidate version, gates evaluated
+reg.promote(p.name, entry["version"], reason="First model.")
+
+model = reg.load(p.name)                       # the production model
+forecast = model.predict(latest_raw_data)      # validates the live data first; last rows = live forecast
+print(model.check_drift(last_two_weeks))       # accuracy, input shift, new sensor faults
+bemlops.retrain(all_data, reg, p.name)         # challenger vs champion on unseen data; promotes only if better
 ```
+
+Never force a promotion past failed gates unless the human asks; if they
+do, `promote(..., force=True, reason="...")` records it.
+
+If `predict` raises `InvalidInputData`, the live feed has a problem (a unit
+changed, a sensor died, a column vanished). Report it; do not silence it with
+`on_error="warn"` unless the human agrees.
 
 ## Hard rules
 
@@ -210,5 +229,6 @@ from known-ahead inputs (calendars, schedules, forecasts).
 | CO2 | MAE in ppm | Look at occupied hours separately if comfort is the goal |
 | Relative humidity | MAE in % RH | |
 | Occupancy count | MAE in people | Many zeros: also check occupied hours |
+| Yes/no (occupied, equipment on) | Brier score, balanced accuracy | Skill is the Brier skill score vs "same as before" |
 
 Always compare with the baseline in the same unit.

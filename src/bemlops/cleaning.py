@@ -92,6 +92,15 @@ def range_mask(canonical: pd.Series, bounds: Tuple[float, float]) -> pd.Series:
     return pd.Series(bad & np.isfinite(v), index=canonical.index)
 
 
+def _gap_breaks(times: pd.Index, gap_factor: float = 3.0) -> np.ndarray:
+    """For consecutive timestamps, True where the step between them is a gap (> gap_factor x typical step)."""
+    if len(times) < 2:
+        return np.zeros(0, dtype=bool)
+    diffs = pd.Series(times[1:] - times[:-1])
+    step = diffs.median()
+    return np.asarray(diffs > gap_factor * step)
+
+
 @dataclass
 class Run:
     start: pd.Timestamp
@@ -109,24 +118,37 @@ def stuck_runs(s: pd.Series, min_duration: pd.Timedelta, ignore_zero: bool) -> L
     v = s.dropna()
     if len(v) < 3:
         return []
-    run_id = v.ne(v.shift()).cumsum().to_numpy()
-    times = pd.Series(v.index, index=v.index)
-    g = times.groupby(run_id)
-    first, last, count = g.first(), g.last(), g.count()
-    vals = v.groupby(run_id).first()
-    runs = []
-    for rid in first.index:
-        dur = last[rid] - first[rid]
-        if count[rid] >= 3 and dur >= min_duration and not (ignore_zero and vals[rid] == 0):
-            runs.append(Run(first[rid], last[rid], float(vals[rid]), int(count[rid])))
-    return runs
+    vals = v.to_numpy(dtype=float)
+    times = v.index
+    # A run never spans a gap in the data: equal values on Friday night and Monday
+    # morning, with no rows in between, are not a stuck sensor.
+    breaks = _gap_breaks(times)
+    # Vectorised run-length encoding: fast even for millions of rows.
+    starts = np.flatnonzero(np.r_[True, (vals[1:] != vals[:-1]) | breaks])
+    ends = np.r_[starts[1:] - 1, len(vals) - 1]
+    counts = ends - starts + 1
+    long_enough = (times[ends] - times[starts]) >= min_duration
+    sel = (counts >= 3) & np.asarray(long_enough)
+    if ignore_zero:
+        sel &= vals[starts] != 0
+    return [Run(times[a], times[b], float(vals[a]), int(c))
+            for a, b, c in zip(starts[sel], ends[sel], counts[sel])]
 
 
 def stuck_mask(s: pd.Series, runs: List[Run]) -> pd.Series:
-    mask = pd.Series(False, index=s.index)
+    mask = np.zeros(len(s), dtype=bool)
+    if not runs:
+        return pd.Series(mask, index=s.index)
+    values = s.to_numpy(dtype=float)
+    idx = s.index
+    ordered = idx.is_monotonic_increasing
     for r in runs:
-        mask |= (s.index >= r.start) & (s.index <= r.end) & (s == r.value)
-    return mask
+        if ordered:
+            a, b = idx.searchsorted(r.start, "left"), idx.searchsorted(r.end, "right")
+            mask[a:b] |= values[a:b] == r.value
+        else:
+            mask |= np.asarray((idx >= r.start) & (idx <= r.end)) & (values == r.value)
+    return pd.Series(mask, index=s.index)
 
 
 def spike_mask(s: pd.Series, k: float = 8.0) -> pd.Series:
@@ -137,7 +159,9 @@ def spike_mask(s: pd.Series, k: float = 8.0) -> pd.Series:
     if len(pos) < 20:
         return pd.Series(out, index=s.index)
     v = pd.Series(arr[pos])
-    med = v.rolling(5, center=True, min_periods=3).median()
+    # Compare each reading only with neighbours from the same unbroken stretch of data.
+    segment = np.r_[0, np.cumsum(_gap_breaks(s.index[pos]))]
+    med = v.groupby(segment).transform(lambda x: x.rolling(5, center=True, min_periods=3).median())
     resid = (v - med).to_numpy()
     finite = np.isfinite(resid)
     if not finite.any():

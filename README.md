@@ -3,7 +3,10 @@
 **`bemlops`** is a Python package for building trustworthy prediction models
 for buildings from real, messy BAS/BMS data: energy, electric power, cooling
 and heating load, zone temperature, CO2, humidity, occupancy, or any other
-point you trend.
+point you trend. Numeric targets are forecast or estimated (regression);
+yes/no targets such as "occupied" or "equipment on" are handled as
+classification. It covers the full MLOps lifecycle, from data checks to
+gated deployment, monitoring and retraining ([checklist](docs/mlops.md)).
 
 It is built for a world where an AI agent does much of the data-science work:
 
@@ -53,12 +56,20 @@ print(p.fit())
 # Chosen: random_forest. Test: RMSE 0.118 kW, CV(RMSE) 20.0%, NMBE -8.8%.
 # Skill vs persistence: 0.58
 # ASHRAE Guideline 14 (hourly): CV(RMSE) 17.9% (limit 30%), NMBE -8.9% (limit +/-10%): passes.
-p.save_run("runs/")   # report.md, run.json (full audit record), model.joblib, predictions, plots
+folder = p.save_run("runs/")   # report, model card, full audit record, model, predictions, plots
 
-model = bemlops.load_model("runs/.../model.joblib")
-model.predict(latest_data)        # live forecast
-model.check_drift(last_two_weeks) # tells you when to retrain
+reg = bemlops.Registry("models/")
+v = reg.register(folder)["version"]   # promotion gates evaluated and stored
+reg.promote(p.name, v, reason="First production model.")   # refused if a gate fails
+
+model = reg.load(p.name)
+model.predict(latest_data)            # checks the live data first, then forecasts
+model.check_drift(last_two_weeks)     # accuracy, input shift, new sensor faults
+bemlops.retrain(history, reg, p.name) # challenger vs champion on unseen data; promotes only if better
 ```
+
+The same steps run from the command line for scheduled jobs:
+`bemlops train | predict | monitor | retrain | reproduce`.
 
 Run the full example on a synthetic messy BAS export: `python examples/quickstart.py`.
 
@@ -69,9 +80,27 @@ Run the full example on a synthetic messy BAS export: `python examples/quickstar
 - **Sensor faults**: stuck/flatlined sensors (but not setpoints, which are allowed to be constant), single-sample spikes, placeholder values like `-999`, `9999`, `32767`
 - **Export problems**: text in number columns (`OFFLINE`, `N/A`, `72.5 °F`, `1,234`), status words (`On`/`Off`), duplicate timestamps, out-of-order rows, irregular change-of-value logging, gaps
 - **Leakage**: any input that would use information not available at prediction time; inputs that are near-copies of the target
+- **Live data** (every prediction): the same checks, plus a comparison with the training data that catches what range checks cannot, such as an outdoor-temperature feed that switched from degF to degC
 
-Errors block fitting until they are fixed or accepted with a written reason.
-Warnings are handled by a standard, logged preparation step.
+Errors block fitting (and live predictions) until they are fixed or accepted
+with a written reason. Warnings are handled by a standard, logged preparation step.
+
+## MLOps, end to end
+
+| Stage | What bemlops does |
+|---|---|
+| Data validation | Blocking checks; same checks on live data |
+| Preparation and features | Logged, deterministic, identical in training and serving |
+| Training and tuning | Time-ordered splits and cross-validation; baselines always included |
+| Evaluation | Skill vs baseline, Guideline 14, physical-unit errors, Brier/F1/AUC for yes/no |
+| Versioning and metadata | Data fingerprints, code commit, full config and results in every run |
+| Registry and deployment | Versions, stages, promotion gates, rollback |
+| Monitoring | Accuracy drift, input shift, new sensor faults |
+| Continuous training | Champion vs challenger on unseen data |
+| Reproducibility | `reproduce()` re-runs a record and checks every metric matches |
+
+See [docs/mlops.md](docs/mlops.md) for the principle-by-principle checklist
+against a published MLOps definition.
 
 ## Use it with an AI agent
 

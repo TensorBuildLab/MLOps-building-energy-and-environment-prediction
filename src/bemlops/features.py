@@ -95,7 +95,9 @@ def build_features(data: pd.DataFrame, target: str, specs: Mapping[str, ColumnSp
         "is_weekend": (dow >= 5).astype(float),
     }
     if include_doy is None:
-        include_doy = bool(len(idx)) and (idx[-1] - idx[0]) > pd.Timedelta(days=60)
+        # Seasonal (day-of-year) inputs only with a full year of history; with less, they merely
+        # label "which part of the record" and extrapolate badly into months never seen.
+        include_doy = bool(len(idx)) and (idx[-1] - idx[0]) >= pd.Timedelta(days=365)
     if include_doy:
         doy = idx.day_of_year
         calendar["doy_sin"] = np.sin(2 * np.pi * doy / 365.25)

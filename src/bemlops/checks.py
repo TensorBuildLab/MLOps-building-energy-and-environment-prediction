@@ -203,7 +203,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
         issues.append(Issue(f"sentinel:{name}", "warning", name,
                             f"{int(sent.sum())} readings are placeholder values ({_examples(v[sent])}) that "
                             f"controllers write when a reading is missing.",
-                            "prepare() treats them as missing."))
+                            "prepare() treats them as missing.", {"n": int(sent.sum())}))
     v = v.mask(sent)
 
     unit_ok = q.canonical_unit is None
@@ -246,22 +246,34 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
                    f"({lo:g} to {hi:g} {q.canonical_unit}), e.g. {_examples(v[oor])} {spec.unit}.")
             if frac > 0.05:
                 issues.append(Issue(f"out_of_range:{name}", "error", name, msg,
-                                    "That is too many to be sensor glitches: check the declaration."))
+                                    "That is too many to be sensor glitches: check the declaration.",
+                                    {"n": int(oor.sum())}))
             else:
                 issues.append(Issue(f"out_of_range:{name}", "warning", name, msg,
-                                    "prepare() treats them as missing."))
+                                    "prepare() treats them as missing.", {"n": int(oor.sum())}))
             v = v.mask(oor)
 
-    if not q.may_be_constant:
+    if not (q.may_be_constant or spec.flat_ok):
         runs = stuck_runs(v, pd.Timedelta(hours=stuck_hours), ignore_zero=q.zero_runs_ok)
         if runs:
             longest = max(runs, key=lambda r: r.duration)
             total = sum((r.duration for r in runs), pd.Timedelta(0))
-            issues.append(Issue(
-                f"stuck:{name}", "warning", name,
-                f"Sensor repeats exactly {longest.value:g} for {fmt_td(longest.duration)} "
-                f"({longest.start} to {longest.end}); {len(runs)} such stretch(es), {fmt_td(total)} in total.",
-                "prepare() treats these stretches as missing.", {"n_runs": len(runs)}))
+            msg = (f"Sensor repeats exactly {longest.value:g} for {fmt_td(longest.duration)} "
+                   f"({longest.start} to {longest.end}); {len(runs)} such stretch(es), {fmt_td(total)} in total.")
+            fix = "prepare() treats these stretches as missing."
+            # Change-of-value logging (a new value only when it moves past a deadband) produces long flat
+            # stretches that are not faults. Found on real data (Aalborg CO2: 95% of steps unchanged).
+            d = v.dropna().diff().dropna()
+            unchanged = float((d == 0).mean()) if len(d) else 0.0
+            if unchanged > 0.7 and (d != 0).any():
+                typical = float(d[d != 0].abs().quantile(0.1))
+                msg += (f" The value is unchanged in {unchanged:.0%} of steps and changes by at least ~{typical:g} "
+                        f"when it does: this looks like change-of-value logging with a deadband.")
+                fix = ("If so, flat stretches are normal: declare the column with flat_ok=True and note why. "
+                       "Otherwise prepare() treats them as missing.")
+            issues.append(Issue(f"stuck:{name}", "warning", name, msg, fix,
+                                {"n_runs": len(runs), "n": int(total.total_seconds() // 60),
+                                 "unchanged_share": unchanged}))
         if v.nunique(dropna=True) <= 1:
             issues.append(Issue(f"constant:{name}", "warning", name,
                                 "Column never changes, so it carries no information.",
@@ -273,7 +285,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
             t0 = v.index[spikes.to_numpy()][0]
             issues.append(Issue(f"spikes:{name}", "warning", name,
                                 f"{int(spikes.sum())} single-sample spike(s), e.g. {_examples(v[spikes])} at {t0}.",
-                                "prepare() treats them as missing."))
+                                "prepare() treats them as missing.", {"n": int(spikes.sum())}))
 
     if q.kind == "interval":
         d = v.dropna().diff().dropna()

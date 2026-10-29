@@ -23,6 +23,11 @@ class ColumnSpec:
     advance (a weather forecast, an occupancy schedule, a planned setpoint).
     Leave False for measured values: then only past values are used, which is
     what keeps forecasts honest.
+
+    flat_ok: True when long flat stretches are normal for this particular sensor,
+    e.g. a CO2 sensor that reports a floor of exactly 400 ppm in an empty room.
+    Turns off the stuck-sensor check and masking for this column only. A judgment
+    call: record why with Project.note().
     """
 
     name: str
@@ -30,6 +35,7 @@ class ColumnSpec:
     unit: Optional[str] = None
     known_ahead: bool = False
     description: str = ""
+    flat_ok: bool = False
 
     def __post_init__(self) -> None:
         self.quantity = resolve_quantity_name(self.quantity)
@@ -118,7 +124,8 @@ def parse_spec(name: str, value: Union[str, Mapping[str, Any], ColumnSpec]) -> C
     """
     if isinstance(value, ColumnSpec):
         if value.name != name:
-            value = ColumnSpec(name, value.quantity, value.unit, value.known_ahead, value.description)
+            value = ColumnSpec(name, value.quantity, value.unit, value.known_ahead, value.description,
+                               value.flat_ok)
         return value
     if isinstance(value, Mapping):
         return ColumnSpec(name=name, **dict(value))
@@ -133,3 +140,37 @@ def parse_spec(name: str, value: Union[str, Mapping[str, Any], ColumnSpec]) -> C
 
 def parse_columns(columns: Mapping[str, Union[str, Mapping[str, Any], ColumnSpec]]) -> Dict[str, ColumnSpec]:
     return {name: parse_spec(name, value) for name, value in columns.items()}
+
+
+def to_time_index(data, timestamp: Optional[str] = None, timestamp_format: Optional[str] = None):
+    """Return a copy of `data` indexed by time, plus a note on anything worth logging.
+
+    Used identically in training and in deployment, so live data is read the same way.
+    """
+    import warnings
+
+    import pandas as pd
+
+    df = data.copy()
+    note = ""
+    if timestamp is not None and timestamp in df.columns:
+        if timestamp_format:
+            ts = pd.to_datetime(df[timestamp], format=timestamp_format, errors="coerce")
+        else:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", UserWarning)
+                ts = pd.to_datetime(df[timestamp], errors="coerce")
+            note = "Timestamp format was guessed; pass timestamp_format to be sure. "
+        bad = int(ts.isna().sum())
+        df = df.drop(columns=[timestamp])
+        df.index = pd.DatetimeIndex(ts)
+        if bad:
+            df = df[df.index.notna()]
+            note += f"{bad} rows had unreadable timestamps and were dropped."
+    elif not isinstance(df.index, pd.DatetimeIndex):
+        try:
+            df.index = pd.to_datetime(df.index)
+        except (ValueError, TypeError) as exc:
+            raise ValueError("The data needs a time index. Pass timestamp='<time column>' "
+                             "or set a DatetimeIndex first.") from exc
+    return df, note.strip()

@@ -84,7 +84,8 @@ _register(Quantity("zone_air_temperature", "degC", _TEMP, plausible=(0, 50), typ
 _register(Quantity("outdoor_air_temperature", "degC", _TEMP, plausible=(-60, 60), typical=(-45, 52),
                    brick="Outside_Air_Temperature_Sensor", description="Outdoor dry-bulb temperature"))
 _register(Quantity("supply_air_temperature", "degC", _TEMP, plausible=(-10, 80), typical=(5, 60),
-                   brick="Supply_Air_Temperature_Sensor"))
+                   spike_check=False, brick="Supply_Air_Temperature_Sensor",
+                   description="Jumps are real when fans and coils cycle on and off"))
 _register(Quantity("return_air_temperature", "degC", _TEMP, plausible=(0, 50), typical=(10, 35),
                    brick="Return_Air_Temperature_Sensor"))
 _register(Quantity("mixed_air_temperature", "degC", _TEMP, plausible=(-40, 60), typical=(-20, 45),
@@ -99,9 +100,11 @@ _register(Quantity("relative_humidity", "%", _PERCENT, plausible=(0, 100), typic
 _register(Quantity("co2", "ppm", {"ppm": _identity}, plausible=(250, 10000), typical=(300, 5000),
                    brick="CO2_Sensor", description="Carbon dioxide concentration"))
 _register(Quantity("pm25", "ug/m3", {"ug/m3": _identity, "mg/m3": _scale(1e3)}, plausible=(0, 2000),
-                   typical=(0, 500), zero_runs_ok=True, brick="PM2.5_Sensor"))
+                   typical=(0, 500), zero_runs_ok=True, spike_check=False, brick="PM2.5_Sensor",
+                   description="Short spikes are often real (cooking, cleaning, a passing truck)"))
 _register(Quantity("illuminance", "lux", {"lux": _identity, "fc": _scale(10.7639)}, plausible=(0, 150000),
-                   zero_runs_ok=True, brick="Illuminance_Sensor"))
+                   zero_runs_ok=True, spike_check=False, brick="Illuminance_Sensor",
+                   description="Jumps are real (lights switching, sun patches)"))
 _register(Quantity("electric_power", "kW", _POWER, plausible=(0, INF), zero_runs_ok=True, spike_check=False,
                    headline_metric="cvrmse", brick="Electric_Power_Sensor",
                    description="Electric demand; use net_electric_power for meters with on-site PV"))
@@ -114,7 +117,8 @@ _register(Quantity("energy", "kWh", _ENERGY, plausible=(0, INF), kind="interval"
                    spike_check=False, aggregate="sum", headline_metric="cvrmse", brick="Energy_Sensor",
                    description="Energy used per interval (not a cumulative meter reading)"))
 _register(Quantity("solar_irradiance", "W/m2", {"W/m2": _identity, "Btu/h-ft2": _scale(3.154591)},
-                   plausible=(0, 1500), zero_runs_ok=True, brick="Solar_Radiance_Sensor"))
+                   plausible=(0, 1500), zero_runs_ok=True, spike_check=False, brick="Solar_Radiance_Sensor",
+                   description="Jumps are real under broken clouds"))
 _register(Quantity("wind_speed", "m/s", {"m/s": _identity, "mph": _scale(0.44704), "km/h": _scale(1 / 3.6)},
                    plausible=(0, 80), zero_runs_ok=True))
 _register(Quantity("occupancy_count", "count", {"count": _identity}, plausible=(0, INF), kind="count",

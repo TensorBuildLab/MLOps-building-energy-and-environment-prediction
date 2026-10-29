@@ -22,6 +22,7 @@ OFFICE_POINTS = {
     "RM204_ZN_SP": "temperature_setpoint [degF]",
     "RM204_CO2": "co2 [ppm]",
     "RM204_OCC": "occupancy_count [count]",
+    "RM204_OCC_STS": "occupancy_status",
     "AHU1_CLG_KW": "electric_power [kW]",
 }
 
@@ -99,6 +100,9 @@ def messy_office(days: int = 60, seed: int = 0, start: str = "2025-09-15") -> Tu
     out["RM204_ZN_SP"] = f(sim["setpoint_c"]).round(1)
     out["RM204_CO2"] = sim["co2_ppm"].round(0).astype(object)
     out["RM204_OCC"] = sim["occupants"].astype(int)
+    # A motion sensor reporting words, with occasional misses (people sitting still).
+    seen = (sim["occupants"] > 0) & (rng.random(len(sim)) > 0.03)
+    out["RM204_OCC_STS"] = np.where(seen, "Occupied", "Unoccupied")
     out["AHU1_CLG_KW"] = sim["cooling_kw"].round(2)
     out["AHU1_ALARM"] = np.where(rng.random(len(out)) < 0.01, "Alarm", "Normal")
     n = len(out)
@@ -126,7 +130,9 @@ def messy_office(days: int = 60, seed: int = 0, start: str = "2025-09-15") -> Tu
     # Electrical noise: a few single-sample zone temperature spikes.
     pos = rng.choice(np.arange(10, n - 10), 8, replace=False)
     out.iloc[pos, out.columns.get_loc("RM204_ZN_T")] = out["RM204_ZN_T"].iloc[pos] + 25.0
-    truth["zone_spikes"] = 8
+    spike = np.zeros(n, dtype=bool)
+    spike[pos] = True
+    out["_spike"] = spike  # tracked so the truth below counts only spikes that survive the export
 
     # A 7-hour controller outage, plus randomly dropped rows.
     o0 = out.index[22 * 288 + 12]
@@ -144,6 +150,13 @@ def messy_office(days: int = 60, seed: int = 0, start: str = "2025-09-15") -> Tu
     b0 = len(out) // 2
     block = out.iloc[b0:b0 + 20].iloc[::-1]
     out = pd.concat([out.iloc[:b0], block, out.iloc[b0 + 20:]])
+
+    # Count what actually made it into the export (dropped rows take some planted problems with them).
+    truth["co2_offline"] = int((out["RM204_CO2"] == "OFFLINE").sum())
+    truth["kw_sentinels"] = int((out["AHU1_CLG_KW"] == -999.0).sum())
+    truth["zone_spikes"] = int(out["_spike"].sum())
+    truth["oat_text_numbers"] = int(out["OAT"].astype(str).str.contains("°F").sum())
+    out = out.drop(columns="_spike")
 
     export = out.reset_index(names="Timestamp")
     export["Timestamp"] = export["Timestamp"].dt.strftime("%m/%d/%Y %I:%M:%S %p")
