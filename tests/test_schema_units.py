@@ -46,3 +46,31 @@ def test_coerce_text_numbers_words_and_junk():
     assert co.unparseable == {"OFFLINE": 1, "N/A": 1}
     status = coerce_numeric(pd.Series(["On", "OFF", "Occupied", "1"]), binary=True)
     assert status.values.tolist() == [1.0, 0.0, 1.0, 1.0]
+
+
+def test_decimal_commas_are_never_guessed():
+    co = coerce_numeric(pd.Series(["21,5", "1,234", "1.234,5", "22.0"]))
+    assert np.isnan(co.values.iloc[0]) and co.values.iloc[1] == 1234.0 and np.isnan(co.values.iloc[2])
+    assert set(co.decimal_comma) == {"21,5", "1.234,5"}
+
+
+def test_timestamps_dst_offsets_and_bad_formats():
+    from bemlops.schema import to_time_index
+
+    df = pd.DataFrame({"t": ["2023-03-26T01:55:00+0100", "2023-03-26T03:00:00+0200", "2023-03-26T03:05:00+0200"],
+                       "v": [1, 2, 3]})
+    out, _ = to_time_index(df, "t", "%Y-%m-%dT%H:%M:%S%z", tz="Europe/Copenhagen")
+    assert str(out.index.tz) == "Europe/Copenhagen" and out.index[1].hour == 3
+    day_first = pd.DataFrame({"t": [f"{d:02d}/03/2024 10:00" for d in range(1, 29)], "v": range(28)})
+    with pytest.raises(ValueError, match="could not be read"):
+        to_time_index(day_first, "t", "%m/%d/%Y %H:%M")
+    with pytest.raises(ValueError, match="numeric index"):
+        to_time_index(pd.DataFrame({"v": [1, 2]}))
+    with pytest.raises(ValueError, match="not found"):
+        to_time_index(pd.DataFrame({"v": [1, 2]}), "Timestamp")
+
+
+def test_shorthand_flags():
+    s = parse_spec("c", "co2 [ppm] flat_ok")
+    assert s.flat_ok and s.unit == "ppm"
+    assert parse_spec("o", "outdoor temperature [degC], known_ahead").known_ahead

@@ -27,9 +27,15 @@ do. It checks the result.
 | Inputs are lagged by at least the horizon unless declared `known_ahead` | A live model cannot see measured values from the future. |
 | Feature selection and tuning use the training set only | Selecting features on the full data leaks test information (another 2024 issue). |
 | Input gaps are forward-filled only; the target is never filled | Interpolation uses future values; filled targets invent answers. |
-| A baseline is always reported (persistence or training mean) | Accuracy numbers mean little without a no-skill reference. |
+| Cleaning decisions (spikes, stuck stretches) use only earlier readings | Otherwise later data decides what earlier data looked like, and live serving cannot reproduce training. Found by the pilot agents and the code review. |
+| Interval totals with missing readings become missing | A total over an incomplete interval is too small; using it would fill missing targets with zeros. |
+| Decimal commas and unreadable timestamps stop the project | Guessing turns "21,5" into 21 and swaps day and month without a trace. |
+| Skill is measured against the strongest no-ML baseline: persistence, same time yesterday, or the time-of-day profile | Accuracy numbers mean little without a no-skill reference, and a weak reference flatters a model; for scheduled loads, persistence is weak. |
+| A rolling-origin backtest is reported next to the single test period | One unusual test period (a holiday, a schedule change) should not decide the verdict alone. |
+| A 90% prediction interval, with its coverage checked on the test period | Operators need a range, and a range is only useful if it is honest. |
 | Guideline 14 for energy-like targets, MAE in physical units for indoor environment | CV(RMSE) divides by the mean, which makes temperature errors look tiny. |
 | Every run writes data fingerprints, decisions, settings, versions and results | Industry use needs an audit trail; research needs reproducibility. |
+| Acceptances made on earlier data never approve errors on new data | Accepting "column RH missing" must not silently cover "OAT and RH missing" in an automated retrain. |
 
 ## Definitions
 

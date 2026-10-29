@@ -63,7 +63,7 @@ raw = p.raw  # in operation this would be the latest trend-log pull
 end = raw.index.max()
 forecast = model.predict(raw.loc[raw.index >= end - pd.Timedelta(days=10)])
 print("Live forecast (next hour):")
-print(forecast.tail(model.horizon)[["predicted", "forecast_made_at"]], "\n")
+print(forecast.tail(model.horizon)[["predicted", "lower", "upper", "forecast_available_at", "inputs_missing"]], "\n")
 print("Drift check on the last two weeks:", model.check_drift(raw.loc[raw.index >= end - pd.Timedelta(days=14)]))
 
 # Same workflow, different target: zone CO2, 30 minutes ahead -----------------

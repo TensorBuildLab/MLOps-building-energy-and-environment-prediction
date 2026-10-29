@@ -30,12 +30,13 @@ from sklearn.base import clone
 from ._version import __version__
 from .checks import DataReport, check_data, fmt_td
 from .deploy import ForecastModel
-from .features import audit, build_features, steps_in, suspicious_inputs, target_shifts
+from .features import audit, build_features, input_drivers, steps_in, suspicious_inputs, target_shifts
 from .metrics import PRIMARY_METRIC, evaluate, guideline14, skill_score
 from .models import (
     DEFAULT_MODELS,
     Persistence,
     PersistenceClassifier,
+    ProfileBaseline,
     ShareOfOnes,
     TrainMean,
     candidates,
@@ -70,6 +71,9 @@ class Results:
     model: ForecastModel
     warnings: List[str] = field(default_factory=list)
     leakage_warnings: List[str] = field(default_factory=list)
+    interval: Optional[Dict[str, float]] = None  # nominal 90% prediction interval and its test coverage
+    drivers: List[Dict[str, Any]] = field(default_factory=list)  # share of accuracy owed to each input
+    backtest: Optional[Dict[str, Any]] = None  # rolling-origin blocks: per-block and pooled skill
 
     def summary(self) -> str:
         t, u = self.task, self.task.get("unit") or ""
@@ -100,6 +104,18 @@ class Results:
             lines.append(f"ASHRAE Guideline 14 ({g['resolution']}): CV(RMSE) {g['cvrmse_pct']:.1f}% "
                          f"(limit {g['cvrmse_limit']:.0f}%), NMBE {g['nmbe_pct']:.1f}% "
                          f"(limit +/-{g['nmbe_limit']:.0f}%): {verdict}.")
+        if self.interval:
+            iv = self.interval
+            lines.append(f"90% prediction interval: +/-{iv['half_width']:.3g} {u}; it contained "
+                         f"{iv['test_coverage']:.0%} of test values.")
+        if self.backtest:
+            b = self.backtest
+            per = ", ".join(f"{x['skill']:.2f}" for x in b["blocks"])
+            lines.append(f"Backtest ({len(b['blocks'])} later blocks, refit before each): pooled skill "
+                         f"{b['pooled_skill']:.2f} (per block {per}).")
+        if self.drivers:
+            top = ", ".join(f"{d['input']} {d['share']:.0%}" for d in self.drivers[:4])
+            lines.append(f"Main drivers of accuracy: {top}.")
         for w in self.leakage_warnings + self.warnings:
             lines.append(f"Warning: {w}")
         return "\n".join(lines)
@@ -113,7 +129,8 @@ class Project:
                  columns: Mapping[str, Union[str, Mapping[str, Any], ColumnSpec]],
                  horizon: Union[int, str, pd.Timedelta] = 0, timestamp: Optional[str] = None,
                  timestamp_format: Optional[str] = None, name: Optional[str] = None,
-                 task: Optional[str] = None, intended_use: str = ""):
+                 task: Optional[str] = None, intended_use: str = "",
+                 holidays: Optional[Sequence[Any]] = None, tz: Optional[str] = None):
         """
         data:      the building data, indexed by time (or pass `timestamp` = the time column).
         target:    the column to predict: any declared numeric or yes/no point.
@@ -125,24 +142,34 @@ class Project:
         timestamp_format: e.g. "%m/%d/%Y %I:%M:%S %p". Recommended: avoids day/month mix-ups.
         task:      "regression" or "classification"; by default chosen from the target's quantity.
         intended_use: one sentence on what the predictions are for (goes into the model card).
+        holidays:  dates the building runs as on a holiday (closures, public holidays). Becomes an
+                   input known in advance. Deciding which dates count is a judgment call.
+        tz:        the building's time zone, e.g. "Europe/Copenhagen". Needed when timestamps carry
+                   UTC offsets that change with daylight saving.
         """
         self.name = name or f"{target}"
         self.log: List[Dict[str, Any]] = []
-        self.timestamp, self.timestamp_format = timestamp, timestamp_format
-        self.raw, event = to_time_index(data, timestamp, timestamp_format)
+        self.timestamp, self.timestamp_format, self.tz = timestamp, timestamp_format, tz
+        self.raw, event = to_time_index(data, timestamp, timestamp_format, tz=tz)
         if event:
             self._event("timestamps", event)
         self.specs: Dict[str, ColumnSpec] = parse_columns(columns)
         if target not in self.specs:
             raise ValueError(f"Declare the target too, e.g. columns={{'{target}': '<quantity> [<unit>]', ...}}.")
         self.target = target
+        h = horizon
+        negative = (h < 0) if isinstance(h, (int, np.integer)) else (pd.Timedelta(h) < pd.Timedelta(0))
+        if negative:
+            raise ValueError("The horizon cannot be negative.")
         self.horizon = horizon
         inferred = "classification" if self.specs[target].q.kind == "binary" else "regression"
         if task not in (None, "regression", "classification"):
             raise ValueError("task must be 'regression' or 'classification'.")
         self.task = task or inferred
         self.intended_use = intended_use
+        self.holidays = sorted({pd.Timestamp(d).strftime("%Y-%m-%d") for d in (holidays or [])})
         self.accepted: Dict[str, str] = {}
+        self.previous_acceptances: Dict[str, str] = {}  # decisions taken on earlier data (informational)
         self.notes: List[str] = []
         self.report_: Optional[DataReport] = None
         self.data: Optional[pd.DataFrame] = None
@@ -164,7 +191,9 @@ class Project:
             "columns": {k: v.to_dict() for k, v in self.specs.items()},
             "timestamp": self.timestamp,
             "timestamp_format": self.timestamp_format,
+            "tz": self.tz,
             "intended_use": self.intended_use,
+            "holidays": list(self.holidays),
             "prepare": self.prepare_options.to_dict() if self.prepare_options else None,
             "fit": dict(self.fit_options),
             "accepted": dict(self.accepted),
@@ -172,22 +201,29 @@ class Project:
         }
 
     @classmethod
-    def from_config(cls, data: pd.DataFrame, config: Mapping[str, Any], carry_decisions: bool = True) -> "Project":
+    def from_config(cls, data: pd.DataFrame, config: Mapping[str, Any], carry_decisions: bool = True,
+                    trust_accepted: bool = False) -> "Project":
         """Rebuild a project from `config()` output (or a run record's "config").
 
-        carry_decisions: keep accepted issues and notes. They are marked as carried over
-        in the new record, so a reviewer can see they were decided on earlier data.
+        carry_decisions: keep notes (marked as carried over) and show earlier acceptances.
+        trust_accepted: re-apply earlier acceptances. Only for the same data (reproduction). On new
+            data every error must be decided again: accepting "column RH missing" must not
+            silently cover "columns OAT and RH missing".
         """
         columns = {k: {kk: vv for kk, vv in v.items() if kk != "name"} for k, v in config["columns"].items()}
         p = cls(data, config["target"], columns, horizon=config["horizon"], timestamp=config.get("timestamp"),
                 timestamp_format=config.get("timestamp_format"), name=config.get("name"),
-                task=config.get("task"), intended_use=config.get("intended_use", ""))
+                task=config.get("task"), intended_use=config.get("intended_use", ""),
+                holidays=config.get("holidays"), tz=config.get("tz"))
         if config.get("prepare"):
             p.prepare_options = PrepareOptions(**config["prepare"])
         p.fit_options = dict(config.get("fit") or {})
+        for k, v in (config.get("accepted") or {}).items():
+            if trust_accepted:
+                p.accepted[k] = v
+            elif carry_decisions:
+                p.previous_acceptances[k] = v
         if carry_decisions:
-            for k, v in (config.get("accepted") or {}).items():
-                p.accepted[k] = v if v.startswith("[carried over]") else f"[carried over] {v}"
             for n in config.get("notes") or []:
                 p.notes.append(n if n.startswith("[carried over]") else f"[carried over] {n}")
         p._event("config", "Project rebuilt from a saved configuration.")
@@ -276,15 +312,26 @@ class Project:
         return [i for i in self.report_.errors if i.id not in self.accepted]
 
     def fit(self, models: Optional[Sequence[str]] = None, n_iter: Optional[int] = None,
-            fractions=None, random_state: Optional[int] = None) -> Results:
+            fractions=None, random_state: Optional[int] = None,
+            custom_models: Optional[Mapping[str, Any]] = None, backtest_blocks: Optional[int] = None) -> Results:
+        """Choose and evaluate a model.
+
+        custom_models: {name: (estimator, search_space)} added to the candidates, e.g. a model the
+            agent built. It is evaluated under exactly the same rules as the built-in ones.
+        backtest_blocks: also refit the chosen model before each of this many later blocks and score
+            each block (rolling origin), so one unusual test period cannot decide the verdict alone.
+        """
         # Saved fit options (e.g. from a configuration) fill in anything not given here.
         saved = self.fit_options
-        models = tuple(models or saved.get("models") or DEFAULT_MODELS[self.task])
+        explicit = models or saved.get("models")
+        models = tuple(explicit or DEFAULT_MODELS[self.task])
+        backtest_blocks = backtest_blocks if backtest_blocks is not None else saved.get("backtest_blocks", 3)
         n_iter = n_iter if n_iter is not None else saved.get("n_iter", 10)
         fractions = tuple(fractions or saved.get("fractions") or (0.7, 0.15, 0.15))
         random_state = random_state if random_state is not None else saved.get("random_state", 0)
-        self.fit_options = {"models": list(models), "n_iter": n_iter, "fractions": list(fractions),
-                            "random_state": random_state}
+        self.fit_options = {"models": list(models) if explicit else None, "n_iter": n_iter,
+                            "fractions": list(fractions), "random_state": random_state,
+                            "backtest_blocks": backtest_blocks}
 
         blocking = self.unresolved()
         if blocking:
@@ -300,7 +347,8 @@ class Project:
         data, step, h, target, task = self.data, self.step, self.horizon_steps, self.target, self.task
         cls = task == "classification"
         lags = target_shifts(h, step, len(data)) if h > 0 else []
-        X, y, feats = build_features(data, target, self.specs, h, step, target_lags=lags)
+        X, y, feats = build_features(data, target, self.specs, h, step, target_lags=lags,
+                                     holidays=self.holidays)
         audit(feats, target, h)
         leak_warnings = suspicious_inputs(X, y, feats, target)
         warnings_: List[str] = []
@@ -316,6 +364,9 @@ class Project:
         Xtr, ytr, Xva, yva, Xte, yte = Xu[sp.train], yu[sp.train], Xu[sp.val], yu[sp.val], Xu[sp.test], yu[sp.test]
         if cls and min(ytr.nunique(), yva.nunique()) < 2:
             raise ValueError("Training or validation data contain only one class; use more data.")
+        for part, n_rows in (("validation", len(yva)), ("test", len(yte))):
+            if n_rows < 100:
+                warnings_.append(f"Only {n_rows} {part} rows: results are noisy. Use more data or a shorter horizon.")
 
         if h > 0:
             P = PersistenceClassifier if cls else Persistence
@@ -323,19 +374,25 @@ class Project:
             day = steps_in("1D", step)
             if f"{target}__t-{day}" in X.columns:
                 baselines["same_time_yesterday"] = P(f"{target}__t-{day}")
-            ref_name = "persistence"
         else:
             baselines = {"share_of_ones" if cls else "training_mean": ShareOfOnes() if cls else TrainMean()}
-            ref_name = next(iter(baselines))
+        if not cls:
+            baselines["time_of_day_profile"] = ProfileBaseline()
 
         primary = PRIMARY_METRIC[task]
-        rows, fitted = [], {}
+        rows, fitted, val_models = [], {}, {}
         for name, est in baselines.items():
             est.fit(Xtr, ytr)
             rows.append({"model": name, "type": "baseline", **evaluate(yva, scores(est, Xva, task), task),
                          "params": {}})
             fitted[name] = (est, {})
-        pool = candidates(random_state, task)
+            val_models[name] = est
+        anchor = f"{target}__t-{h}" if (h > 0 and not cls) else None
+        pool = candidates(random_state, task, anchor=anchor)
+        pool.update(dict(custom_models or {}))
+        if not explicit:
+            models = tuple(m for m in models if m in pool) + tuple(
+                k for k in (custom_models or {}) if k not in models)
         for name in models:
             if name not in pool:
                 raise ValueError(f"Unknown model '{name}' for {task}. Available: {sorted(pool)}")
@@ -345,7 +402,10 @@ class Project:
             rows.append({"model": name, "type": "ml", **evaluate(yva, scores(best, Xva, task), task),
                          "cv_score": cv_score, "params": params})
             fitted[name] = (est, params)
+            val_models[name] = best
         validation = pd.DataFrame(rows).sort_values(primary).reset_index(drop=True)
+        # Skill is measured against the strongest no-ML baseline on validation data.
+        ref_name = str(validation[validation["type"] == "baseline"].iloc[0]["model"])
         chosen = str(validation.iloc[0]["model"])
         base_est, params = fitted[chosen]
 
@@ -363,6 +423,24 @@ class Project:
         g14 = None
         col = "probability" if cls else "predicted"
         predictions = pd.DataFrame({"actual": yte, col: pred, ref_name: ref_pred}, index=Xte.index)
+        interval = None
+        if not cls:
+            # Split-conformal style: the width comes from validation errors of the chosen model trained
+            # on the training period only; its coverage is then checked on the untouched test period.
+            resid = np.abs(np.asarray(yva, dtype=float) - scores(val_models[chosen], Xva, task))
+            half = float(np.nanquantile(resid, 0.9))
+            lo_b, hi_b = q.plausible
+            # Clip to the physically plausible range, but never so far that the interval excludes the
+            # prediction itself (a model can predict slightly below zero power).
+            lower = np.minimum(np.maximum(pred - half, lo_b), pred)
+            upper = np.maximum(np.minimum(pred + half, hi_b), pred)
+            yt = np.asarray(yte, dtype=float)
+            interval = {"nominal": 0.9, "half_width": half,
+                        "test_coverage": float(np.mean((yt >= lower) & (yt <= upper)))}
+            predictions["lower"], predictions["upper"] = lower, upper
+        drivers = input_drivers(final, Xte, yte, feats, target, task, random_state)
+        backtest = (self._backtest(Xu, yu, sp, base_est, params, baselines[ref_name], task, primary, gap,
+                                   backtest_blocks) if backtest_blocks else None)
         if not cls and q.headline_metric == "cvrmse" and step <= pd.Timedelta("1h"):
             # Guideline 14's hourly criteria, applied to hourly totals or means.
             g14 = guideline14(predictions["actual"], predictions["predicted"], aggregate=q.aggregate)
@@ -393,7 +471,9 @@ class Project:
             input_ranges=ranges, test_error=test_m[primary], train_end=sp.bounds["val"][1],
             version=__version__, trained_at=_dt.datetime.now().isoformat(timespec="seconds"), unit=unit,
             task=task, timestamp=self.timestamp, timestamp_format=self.timestamp_format,
-            config=self.config(), train_start=sp.bounds["train"][0], target_range=target_range)
+            config=self.config(), train_start=sp.bounds["train"][0], target_range=target_range,
+            holidays=list(self.holidays), interval_half_width=interval["half_width"] if interval else None,
+            tz=self.tz, index_tz=None if self.raw.index.tz is None else str(self.raw.index.tz))
         self.results = Results(
             task=task_info,
             split={"sizes": sp.sizes(), "gap": fmt_td(gap),
@@ -401,9 +481,43 @@ class Project:
             validation=validation, chosen=chosen, chosen_params=params, test=test_m,
             baseline_name=ref_name, test_baseline=ref_m, skill=skill, guideline14=g14,
             predictions=predictions, features=[f.to_dict() for f in feats], model=model,
-            warnings=warnings_, leakage_warnings=leak_warnings)
+            warnings=warnings_, leakage_warnings=leak_warnings, interval=interval, drivers=drivers,
+            backtest=backtest)
         self._event("fit", f"chosen {chosen}, test {primary} {test_m[primary]:.4g}")
         return self.results
+
+    @staticmethod
+    def _backtest(Xu, yu, sp, base_est, params, baseline, task, primary, gap, k) -> Optional[Dict[str, Any]]:
+        """Rolling origin over the period after training: k blocks, refitting before each on all earlier
+        rows (minus the horizon gap). The validation period, used to choose the model, is part of these
+        blocks; the untouched single test period remains the primary result."""
+        times = Xu.index
+        later = np.flatnonzero(np.asarray(times > sp.bounds["train"][1]))
+        if len(later) < 50 * k:
+            return None
+        blocks, ys, ms, bs = [], [], [], []
+        for chunk in np.array_split(later, k):
+            t0 = times[chunk[0]]
+            train = np.asarray(times < t0 - gap)
+            if train.sum() < 100:
+                continue
+            m = clone(base_est).set_params(**params) if params else clone(base_est)
+            m.fit(Xu[train], yu[train])
+            b = clone(baseline).fit(Xu[train], yu[train])
+            yb = yu.iloc[chunk]
+            pm, pb = scores(m, Xu.iloc[chunk], task), scores(b, Xu.iloc[chunk], task)
+            em, eb = evaluate(yb, pm, task)[primary], evaluate(yb, pb, task)[primary]
+            blocks.append({"from": str(t0), "to": str(times[chunk[-1]]), "rows": int(len(chunk)),
+                           primary: em, f"baseline_{primary}": eb, "skill": skill_score(em, eb)})
+            ys.append(yb.to_numpy())
+            ms.append(pm)
+            bs.append(pb)
+        if not blocks:
+            return None
+        y_all, m_all, b_all = np.concatenate(ys), np.concatenate(ms), np.concatenate(bs)
+        em, eb = evaluate(y_all, m_all, task)[primary], evaluate(y_all, b_all, task)[primary]
+        return {"blocks": blocks, f"pooled_{primary}": em, f"pooled_baseline_{primary}": eb,
+                "pooled_skill": skill_score(em, eb)}
 
     def save_run(self, out_dir: Union[str, Path] = "runs") -> Path:
         """Write the report, model card, model, test predictions and the full audit record to a new folder."""

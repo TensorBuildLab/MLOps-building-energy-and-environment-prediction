@@ -54,9 +54,14 @@ def target_shifts(horizon: int, step: pd.Timedelta, n_rows: int) -> List[int]:
 
 def build_features(data: pd.DataFrame, target: str, specs: Mapping[str, ColumnSpec], horizon: int,
                    step: pd.Timedelta, target_lags: Optional[List[int]] = None,
-                   include_doy: Optional[bool] = None) -> Tuple[pd.DataFrame, pd.Series, List[Feature]]:
+                   include_doy: Optional[bool] = None,
+                   holidays: Optional[List[str]] = None,
+                   drop_constant: bool = True) -> Tuple[pd.DataFrame, pd.Series, List[Feature]]:
     """Build inputs. `target_lags` and `include_doy` default to automatic choices;
-    a deployed model passes the choices it was trained with."""
+    a deployed model passes the choices it was trained with, and drop_constant=False so that an
+    input which happens to be constant in a short live window is still used (not imputed)."""
+    if horizon < 0:
+        raise LeakageError("The horizon cannot be negative: that would forecast the past from the future.")
     y = data[target]
     cols: Dict[str, pd.Series] = {}
     feats: List[Feature] = []
@@ -77,7 +82,7 @@ def build_features(data: pd.DataFrame, target: str, specs: Mapping[str, ColumnSp
         if c == target or c not in data.columns:
             continue
         s = data[c]
-        if s.nunique(dropna=True) <= 1:
+        if drop_constant and s.nunique(dropna=True) <= 1:
             continue
         if spec.known_ahead:
             add(c, s, c, 0, "known_ahead")
@@ -94,6 +99,8 @@ def build_features(data: pd.DataFrame, target: str, specs: Mapping[str, ColumnSp
         "dow_sin": np.sin(2 * np.pi * dow / 7), "dow_cos": np.cos(2 * np.pi * dow / 7),
         "is_weekend": (dow >= 5).astype(float),
     }
+    if holidays:
+        calendar["is_holiday"] = pd.Index(idx.strftime("%Y-%m-%d")).isin(set(holidays)).astype(float)
     if include_doy is None:
         # Seasonal (day-of-year) inputs only with a full year of history; with less, they merely
         # label "which part of the record" and extrapolate badly into months never seen.
@@ -111,7 +118,11 @@ def build_features(data: pd.DataFrame, target: str, specs: Mapping[str, ColumnSp
 
 def audit(feats: List[Feature], target: str, horizon: int) -> None:
     """Refuse any input that would not be available when the prediction is made."""
+    if horizon < 0:
+        raise LeakageError("The horizon cannot be negative.")
     for f in feats:
+        if f.shift < 0:
+            raise LeakageError(f"'{f.name}' reaches {-f.shift} steps into the future.")
         if f.source == target and horizon == 0:
             raise LeakageError(f"'{f.name}' uses the target itself in estimation mode.")
         if f.kind in ("target_lag", "target_rolling", "input_lag") and f.shift < horizon:
@@ -139,3 +150,49 @@ def suspicious_inputs(X: pd.DataFrame, y: pd.Series, feats: List[Feature], targe
                 warnings.append(f"Input '{f.name}' is almost identical to the target (correlation {r:.3f}). "
                                 f"Make sure it is not the target in disguise.")
     return warnings
+
+
+def input_drivers(estimator, X: pd.DataFrame, y: pd.Series, feats: List[Feature], target: str, task: str,
+                  random_state: int = 0, max_rows: int = 3000, n_repeats: int = 3) -> List[Dict[str, object]]:
+    """How much of the model's accuracy each input carries, on the test period.
+
+    Grouped permutation importance: all columns built from one input (its lags) are scrambled
+    together with the same row permutation, and the increase in error is recorded. Shares are
+    normalised to sum to one; inputs below 0.5% are not listed.
+    """
+    from .metrics import PRIMARY_METRIC, evaluate
+    from .models import scores
+
+    if len(X) < 30:
+        return []
+    if len(X) > max_rows:
+        pick = np.sort(np.random.default_rng(random_state).choice(len(X), max_rows, replace=False))
+        X, y = X.iloc[pick], y.iloc[pick]
+    label = {}
+    for f in feats:
+        if f.source == "calendar":
+            label[f.name] = "calendar (time of day, weekday)"
+        elif f.source == target:
+            label[f.name] = f"{target} (recent history)"
+        else:
+            label[f.name] = f.source
+    groups: Dict[str, List[str]] = {}
+    for c in X.columns:
+        groups.setdefault(label.get(c, c), []).append(c)
+    metric = PRIMARY_METRIC[task]
+    base = evaluate(y, scores(estimator, X, task), task)[metric]
+    rng = np.random.default_rng(random_state)
+    drops = {}
+    for g, cols in groups.items():
+        losses = []
+        for _ in range(n_repeats):
+            Xp = X.copy()
+            perm = rng.permutation(len(X))
+            Xp[cols] = X[cols].to_numpy()[perm]
+            losses.append(evaluate(y, scores(estimator, Xp, task), task)[metric] - base)
+        drops[g] = max(0.0, float(np.mean(losses)))
+    total = sum(drops.values())
+    if total <= 0:
+        return []
+    shares = sorted(((g, d / total) for g, d in drops.items()), key=lambda t: -t[1])
+    return [{"input": g, "share": float(v)} for g, v in shares if v >= 0.005]

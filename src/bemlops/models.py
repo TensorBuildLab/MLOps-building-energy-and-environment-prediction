@@ -53,6 +53,24 @@ class TrainMean(BaseEstimator, RegressorMixin):
         return np.full(len(X), self.mean_)
 
 
+class ProfileBaseline(BaseEstimator, RegressorMixin):
+    """Mean of the target by time of day, separately for weekdays and weekends (training data only).
+    The fair no-ML reference for scheduled loads, where "same as an hour ago" is weak."""
+
+    @staticmethod
+    def _keys(idx: pd.DatetimeIndex) -> pd.MultiIndex:
+        return pd.MultiIndex.from_arrays([(idx.day_of_week >= 5).astype(int), idx.hour, idx.minute])
+
+    def fit(self, X: pd.DataFrame, y):
+        yy = pd.Series(np.asarray(y, dtype=float), index=self._keys(X.index))
+        self.table_ = yy.groupby(level=[0, 1, 2]).mean()
+        self.mean_ = float(np.nanmean(yy))
+        return self
+
+    def predict(self, X: pd.DataFrame):
+        return self.table_.reindex(self._keys(X.index)).fillna(self.mean_).to_numpy(dtype=float)
+
+
 class PersistenceClassifier(BaseEstimator, ClassifierMixin):
     """Probability of 'yes' = the latest known state (e.g. occupied an hour ago)."""
 
@@ -88,6 +106,30 @@ class ShareOfOnes(BaseEstimator, ClassifierMixin):
         return (self.predict_proba(X)[:, 1] >= 0.5).astype(int)
 
 
+class ChangeRegressor(BaseEstimator, RegressorMixin):
+    """Predict the change from an anchor input (the latest known target value), then add it back.
+
+    Strong for slow-moving targets (CO2, temperatures) where "same as before" is hard to beat:
+    the model only has to learn the departure from persistence.
+    """
+
+    def __init__(self, base=None, anchor: str = ""):
+        self.base = base
+        self.anchor = anchor
+
+    def fit(self, X: pd.DataFrame, y):
+        a = X[self.anchor].to_numpy(dtype=float)
+        yy = np.asarray(y, dtype=float)
+        self.mean_ = float(np.nanmean(yy))
+        ok = np.isfinite(a) & np.isfinite(yy)
+        self.base_ = clone(self.base).fit(X[ok], yy[ok] - a[ok])
+        return self
+
+    def predict(self, X: pd.DataFrame):
+        a = X[self.anchor].to_numpy(dtype=float)
+        return np.where(np.isfinite(a), a, self.mean_) + self.base_.predict(X)
+
+
 def scores(estimator, X: pd.DataFrame, task: str) -> np.ndarray:
     """Predicted values (regression) or predicted probability of 'yes' (classification)."""
     if task == "classification":
@@ -98,8 +140,13 @@ def scores(estimator, X: pd.DataFrame, task: str) -> np.ndarray:
 
 
 # ----- candidates -------------------------------------------------------------
-def candidates(random_state: int = 0, task: str = "regression") -> Dict[str, Tuple[Any, Dict[str, Any]]]:
-    """Model name -> (estimator, hyperparameter search space)."""
+def candidates(random_state: int = 0, task: str = "regression",
+               anchor: Optional[str] = None) -> Dict[str, Tuple[Any, Dict[str, Any]]]:
+    """Model name -> (estimator, hyperparameter search space).
+
+    anchor: for forecasts, the column holding the latest known target value; adds "gbm_change",
+    a gradient-boosting model of the change from that value.
+    """
     if task == "classification":
         return {
             "logistic": (
@@ -121,7 +168,7 @@ def candidates(random_state: int = 0, task: str = "regression") -> Dict[str, Tup
                  "max_iter": [100, 200]},
             ),
         }
-    return {
+    pool = {
         "ridge": (
             Pipeline([("impute", SimpleImputer(strategy="median")), ("scale", StandardScaler()), ("model", Ridge())]),
             {"model__alpha": loguniform(1e-3, 1e3)},
@@ -139,9 +186,17 @@ def candidates(random_state: int = 0, task: str = "regression") -> Dict[str, Tup
              "max_iter": [100, 200]},
         ),
     }
+    if anchor:
+        pool["gbm_change"] = (
+            ChangeRegressor(HistGradientBoostingRegressor(random_state=random_state), anchor),
+            {"base__learning_rate": [0.05, 0.1, 0.2], "base__max_leaf_nodes": [7, 15, 31],
+             "base__min_samples_leaf": [20, 50, 100], "base__l2_regularization": [0.0, 0.1, 1.0],
+             "base__max_iter": [100, 200]},
+        )
+    return pool
 
 
-DEFAULT_MODELS = {"regression": ("ridge", "random_forest", "gbm"),
+DEFAULT_MODELS = {"regression": ("ridge", "random_forest", "gbm", "gbm_change"),
                   "classification": ("logistic", "random_forest", "gbm")}
 
 
@@ -153,6 +208,13 @@ def tune(estimator, space: Dict[str, Any], X: pd.DataFrame, y: pd.Series, gap_st
         est = clone(estimator).fit(X, y)
         return est, {}, None
     cv = TimeSeriesSplit(n_splits=n_splits, gap=gap_steps)
+    if task == "classification":
+        # A fold whose training part holds one class only (e.g. a building closed for weeks) cannot be fitted.
+        yv = np.asarray(y)
+        cv = [(tr, te) for tr, te in cv.split(X) if len(np.unique(yv[tr])) == 2]
+        if not cv:
+            est = clone(estimator).fit(X, y)
+            return est, {}, None
     scoring = "neg_brier_score" if task == "classification" else "neg_root_mean_squared_error"
     # Sequential search; forests parallelise internally with threads (process pools are slow to start on Windows).
     search = RandomizedSearchCV(clone(estimator), space, n_iter=n_iter, cv=cv, scoring=scoring,

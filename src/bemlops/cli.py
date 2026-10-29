@@ -67,8 +67,16 @@ def main(argv=None) -> int:
             e = out.registry_entry
             print(f"Registered as version {e['version']} (gates passed: {e['gates_passed']})")
             if a.promote and e["gates_passed"]:
-                reg.promote(out.project.name, e["version"], reason="Promoted from the command line.")
-                print("Promoted to production.")
+                if reg.production(out.project.name) is None:
+                    reg.promote(out.project.name, e["version"], reason="First production model (command line).")
+                    print("Promoted to production.")
+                else:
+                    cmp_ = reg.compare(out.project.name, e["version"], _read(a.data))
+                    if cmp_["challenger_better"]:
+                        reg.promote(out.project.name, e["version"], reason="Beat the production model on unseen rows.")
+                        print("Promoted to production (beat the current model).")
+                    else:
+                        print("Not promoted: the current production model is as good or better.")
         return 0
     if a.cmd == "reproduce":
         res = reproduce(a.run, _read(a.data))

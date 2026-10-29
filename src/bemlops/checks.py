@@ -167,6 +167,33 @@ def check_index(df: pd.DataFrame) -> Tuple[List[Issue], Dict[str, Any]]:
     return issues, summary
 
 
+def _unit_switch(v: pd.Series, q, declared: str):
+    """If a column fits its declared unit early on and another unit later, return (time, unit, share)."""
+    vals = v.dropna()
+    if len(vals) < 50:
+        return None
+    bounds = q.typical or q.plausible
+    fits = {}
+    for unit, conv in q.units.items():
+        with np.errstate(all="ignore"):
+            c = conv(vals.to_numpy(dtype=float))
+        fits[unit] = pd.Series((c >= bounds[0]) & (c <= bounds[1]), index=vals.index)
+    ok_declared = fits[declared]
+    # first time after which the declared unit stops fitting for good (rolling share of fit < 20%)
+    roll = ok_declared.astype(float).rolling(25, min_periods=10).mean()
+    bad = roll < 0.2
+    if not bad.any():
+        return None
+    start_pos = max(int(np.argmax(bad.to_numpy())) - 24, 0)
+    if start_pos == 0 or ok_declared.iloc[:start_pos].mean() < 0.8:
+        return None  # never fitted, so not a switch: the declaration itself is wrong
+    tail = slice(start_pos, None)
+    for unit, f in fits.items():
+        if unit != declared and f.iloc[tail].mean() >= 0.9:
+            return str(vals.index[start_pos]), unit, float(f.iloc[tail].mean())
+    return None
+
+
 def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: float = 6.0) -> List[Issue]:
     name, q = spec.name, spec.q
     issues: List[Issue] = []
@@ -178,6 +205,12 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
         issues.append(Issue(f"non_numeric:{name}", "warning", name,
                             f"{sum(co.unparseable.values())} entries are text, not numbers: {top}.",
                             "prepare() treats them as missing.", {"values": dict(co.unparseable)}))
+    if co.decimal_comma:
+        top = ", ".join(f"'{k}'" for k, _ in co.decimal_comma.most_common(3))
+        issues.append(Issue(f"decimal_comma:{name}", "error", name,
+                            f"{sum(co.decimal_comma.values())} entries use a decimal comma ({top}); they were not "
+                            f"read rather than guessed.",
+                            "Read the file with decimal=',' (and the right sep), then update the data."))
     if co.n_numbers_in_text:
         issues.append(Issue(f"text_numbers:{name}", "info", name,
                             f"{co.n_numbers_in_text} entries had units or separators in the text "
@@ -245,9 +278,15 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
             msg = (f"{int(oor.sum())} readings ({frac:.1%}) are outside the plausible range for {q.name} "
                    f"({lo:g} to {hi:g} {q.canonical_unit}), e.g. {_examples(v[oor])} {spec.unit}.")
             if frac > 0.05:
-                issues.append(Issue(f"out_of_range:{name}", "error", name, msg,
-                                    "That is too many to be sensor glitches: check the declaration.",
-                                    {"n": int(oor.sum())}))
+                fix = "That is too many to be sensor glitches: check the declaration."
+                switch = _unit_switch(v, q, spec.unit)
+                if switch:
+                    when, other, share = switch
+                    msg += (f" From {when} on, {share:.0%} of readings fit {other} instead: the unit seems to "
+                            f"have changed part-way through.")
+                    fix = (f"Convert the readings from {when} on from {other} to {spec.unit} in your own code "
+                           f"(and note why), then update the data.")
+                issues.append(Issue(f"out_of_range:{name}", "error", name, msg, fix, {"n": int(oor.sum())}))
             else:
                 issues.append(Issue(f"out_of_range:{name}", "warning", name, msg,
                                     "prepare() treats them as missing.", {"n": int(oor.sum())}))
@@ -289,7 +328,9 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
 
     if q.kind == "interval":
         d = v.dropna().diff().dropna()
-        if len(d) > 50 and float((d >= 0).mean()) > 0.95 and v.nunique() > 10:
+        moves = d[d != 0]  # a sparse sub-meter is mostly 0 -> 0, which says nothing about being cumulative
+        if (len(moves) > 50 and float((moves > 0).mean()) > 0.95 and v.nunique() > 10
+                and float((v.dropna() == 0).mean()) < 0.5):
             issues.append(Issue(
                 f"cumulative:{name}", "error", name,
                 "Values almost never decrease: this looks like a cumulative meter reading, "
@@ -315,6 +356,9 @@ def check_data(df: pd.DataFrame, specs: Mapping[str, ColumnSpec], target: str,
     summary["declared_columns"] = len(specs)
     if isinstance(df.index, pd.DatetimeIndex):
         ordered = df.sort_index(kind="stable")
+        # Column checks see one row per timestamp (as prepare() will); repeated rows would otherwise
+        # make every step look like a gap and hide stuck sensors and spikes.
+        ordered = ordered[~ordered.index.duplicated(keep="first")]
         for name, spec in specs.items():
             if name in ordered.columns:
                 issues.extend(check_column(ordered[name], spec, name == target, stuck_hours))

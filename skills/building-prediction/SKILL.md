@@ -75,6 +75,9 @@ p = bemlops.Project(df, target="AHU1_CLG_KW", columns=columns, horizon="1h",
   truly known in advance: weather *forecasts*, occupancy *schedules*,
   *planned* setpoints. A measured value is never known ahead.
 - Use quantity `other` for features you derived yourself.
+- Shorthand flags work too: `"co2 [ppm] flat_ok"`, `"outdoor_air_temperature [degC] known_ahead"`.
+- Timestamps with UTC offsets that change at daylight saving (`+0100`/`+0200`): pass
+  `tz="Europe/Copenhagen"` (the building's zone) so calendar inputs use local hours.
 
 ### 4. Check the data and read every issue
 
@@ -106,20 +109,34 @@ for step in p.prepare_log: print(step)
 
 Standard and logged: unit conversion, masking of placeholders, impossible
 values, stuck stretches and spikes, resampling, and forward-fill of short
-input gaps. The target is never filled.
+input gaps. The target is never filled, and interval totals (energy) with
+missing readings become missing rather than too small. Every step only uses
+the past, so live serving cleans data exactly as training did.
 
 ### 6. Fit
 
 ```python
-results = p.fit()            # ridge, random forest, gradient boosting vs baselines
+results = p.fit()            # ridge, random forest, gradient boosting, "change from last value" vs baselines
 print(results)
 ```
 
 Read the result before reporting it:
-- **Skill vs the baseline** (persistence for forecasts, training mean for
-  estimates) is the first number to look at. If the skill is near 0 or
-  negative, more model tuning will not help. Look for missing inputs, a data
-  problem, or a horizon that is too long.
+- **Skill** is measured against the strongest no-ML baseline on validation data:
+  persistence, same time yesterday, or the time-of-day profile (for estimates,
+  the training mean). If the skill is near 0 or negative, more model tuning will
+  not help. Look for missing inputs, a data problem, or a horizon that is too long.
+- **The backtest** refits the chosen model before each of three later blocks. If
+  the single test period and the backtest disagree, say so: one period can be
+  unusual (a holiday, a schedule change).
+- **The 90% interval** and its test coverage, and **the main drivers** (which
+  inputs the model relies on), belong in your explanation to the human.
+
+**Your own features and models.** Compute extra inputs (rolling statistics, time
+since the last change, a schedule flag) as ordinary columns from past and present
+values only, declare them as `other`, and pass them in: bemlops lags them by the
+horizon like any measured input, so they cannot leak. A model of your own goes in
+through `p.fit(custom_models={"my_model": (estimator, search_space)})`, and is
+judged by exactly the same split, baselines and gates.
 - **Validation much better than test** usually means the test period differs
   (season, occupancy, operation change). Say so; consider more history.
 - **Warnings** in the results must be passed on to the human.
@@ -148,7 +165,9 @@ entry = reg.register(folder)                   # candidate version, gates evalua
 reg.promote(p.name, entry["version"], reason="First model.")
 
 model = reg.load(p.name)                       # the production model
-forecast = model.predict(latest_raw_data)      # validates the live data first; last rows = live forecast
+forecast = model.predict(last_eight_days)      # validates the live data first; last rows = live forecast
+# columns: predicted, lower/upper (90%), forecast_available_at, inputs_missing (>0: imputed inputs)
+# known-ahead inputs (weather forecasts, schedules) for the future rows: predict(..., future_inputs=df)
 print(model.check_drift(last_two_weeks))       # accuracy, input shift, new sensor faults
 bemlops.retrain(all_data, reg, p.name)         # challenger vs champion on unseen data; promotes only if better
 ```
@@ -191,10 +210,15 @@ units row under the header (read it, use it for the declarations, drop it).
 **Timestamps**:
 - Always pass `timestamp_format` when you can; `03/04` is March 4 in the US
   and April 3 elsewhere.
-- UTC exports: convert to local time if occupancy patterns matter
-  (`tz_convert`), then drop the time zone.
+- UTC exports, or offsets that change at daylight saving: pass `tz=` with the
+  building's time zone; the index is converted to local time with the zone kept.
+- Unreadable timestamps above 1% stop the project: that is nearly always a
+  wrong format (day-first vs month-first), not bad rows.
 - Daylight saving: duplicate hour in autumn (averaged by `prepare()`),
   missing hour in spring (a gap). Arizona and Hawaii do not change clocks.
+
+**Decimal commas** (`21,5`): European exports read without `decimal=","` are
+reported as an error, never guessed. Re-read the file with `decimal=","`.
 
 **Units**:
 - A `unit_mismatch` error lists which unit the values fit. Check the BAS point
@@ -214,6 +238,14 @@ units row under the header (read it, use it for the declarations, drop it).
   them; never silently drop data.
 - A zone that is always in alarm, or a setpoint that never changes, is still
   information. A constant column is dropped automatically.
+- **Cross-check related points.** No single-column check sees a meter that
+  reads exactly 0 for weeks while its valve is open and the fan runs, or a
+  people count stuck at 1 overnight while the lights are off. Look for these
+  contradictions yourself, set the faulty stretch to missing in your loader,
+  and note why.
+- A unit that changes part-way through (`out_of_range` error naming the
+  switch time and unit): convert the later readings in your own code, then
+  `p.update(data=...)`.
 
 **Derived features** that often help: degree-hours, supply-minus-zone
 temperature difference, occupied-mode flags from setpoint changes, holiday

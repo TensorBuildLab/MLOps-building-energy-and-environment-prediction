@@ -74,6 +74,10 @@ def run_task(df: pd.DataFrame, target: str, columns: Dict[str, Any], horizon, na
         "gates_passed": all(g["passed"] for g in record["gates"].values()),
         "failed_gates": ";".join(k for k, g in record["gates"].items() if not g["passed"]),
         "g14_pass": (r.guideline14 or {}).get("passes"),
+        "backtest_skill": (r.backtest or {}).get("pooled_skill"),
+        "interval_coverage": (r.interval or {}).get("test_coverage"),
+        "top_driver": r.drivers[0]["input"] if r.drivers else None,
+        "top_driver_share": r.drivers[0]["share"] if r.drivers else None,
     })
     for k, v in r.test.items():
         row[f"test_{k}"] = v

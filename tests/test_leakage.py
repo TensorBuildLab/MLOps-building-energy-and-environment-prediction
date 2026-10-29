@@ -84,3 +84,31 @@ def test_fit_refuses_until_errors_are_dealt_with(messy, points):
         p.fit()
     with pytest.raises(ValueError, match="reason"):
         p.accept("unit_mismatch:RM204_ZN_T", reason="ok")
+
+
+def test_cleaning_is_causal():
+    """Found by the pilot agents and the code review: masking decisions must not depend on later data."""
+    rng = np.random.default_rng(3)
+    idx = pd.date_range("2025-01-01", periods=3000, freq="5min")
+    x = pd.Series(20 + np.cumsum(rng.normal(0, 0.05, 3000)), index=idx)
+    x.iloc[1500] += 8.0  # a spike
+    x.iloc[2000:2200] = x.iloc[2000]  # stuck for ~16 h
+    specs = parse_columns({"x": "zone_air_temperature [degC]", "y": "other"})
+    base = pd.DataFrame({"x": x, "y": np.arange(3000.0)}, index=idx)
+    out1, _ = prepare(base, specs, "y", PrepareOptions(freq="5min", fill_limit=None))
+    cut = idx[2100]
+    changed = base.copy()
+    changed.loc[changed.index > cut, "x"] = 1000.0 * rng.random(int((changed.index > cut).sum()))
+    out2, _ = prepare(changed, specs, "y", PrepareOptions(freq="5min", fill_limit=None))
+    past = out1.index <= cut
+    pd.testing.assert_series_equal(out1.loc[past, "x"], out2.loc[past, "x"])
+    assert np.isnan(out1["x"].iloc[1500])  # the spike is still caught
+
+
+def test_negative_horizon_and_live_constant_inputs():
+    with pytest.raises(LeakageError):
+        build_features(_frame(), "y", SPECS, -1, STEP)
+    data = _frame()
+    data["x"] = 1.0  # constant in this window
+    X, _, _ = build_features(data, "y", SPECS, 4, STEP, target_lags=[4, 5], drop_constant=False)
+    assert "x__t-4" in X.columns and X["x__t-4"].notna().any()

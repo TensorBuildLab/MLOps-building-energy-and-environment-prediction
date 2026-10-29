@@ -66,11 +66,24 @@ class ForecastModel:
     config: Dict[str, Any] = field(default_factory=dict)
     train_start: Optional[pd.Timestamp] = None
     target_range: Optional[Tuple[float, float]] = None
+    holidays: List[str] = field(default_factory=list)
+    interval_half_width: Optional[float] = None  # nominal 90% interval, calibrated on validation errors
+    tz: Optional[str] = None  # time zone given at training (tz=...)
+    index_tz: Optional[str] = None  # time zone of the training index (None = naive)
     last_check_: Optional[DataReport] = None
 
     # ----- input handling ----------------------------------------------------
     def _index(self, data: pd.DataFrame) -> pd.DataFrame:
-        df, _ = to_time_index(data, self.timestamp, self.timestamp_format)
+        has_ts = self.timestamp is not None and self.timestamp in data.columns
+        df, _ = to_time_index(data, self.timestamp if has_ts else None, self.timestamp_format, tz=self.tz)
+        live_tz = None if df.index.tz is None else str(df.index.tz)
+        if self.index_tz and live_tz is None:
+            raise InvalidInputData(f"Live data has no time zone, but the model was trained in {self.index_tz}.")
+        if not self.index_tz and live_tz is not None:
+            raise InvalidInputData(f"Live data is in {live_tz}, but the model was trained on local times without "
+                                   f"a zone. Convert to the same local time and drop the zone.")
+        if self.index_tz and live_tz != self.index_tz:
+            df.index = df.index.tz_convert(self.index_tz)
         if self.target not in df.columns:
             if self.horizon > 0:
                 raise InvalidInputData(f"Forecasting needs recent values of the target '{self.target}'.")
@@ -130,8 +143,10 @@ class ForecastModel:
 
     def _predict_prepared(self, prepared: pd.DataFrame) -> pd.DataFrame:
         X, y, _ = build_features(prepared, self.target, self.specs, self.horizon, self.step,
-                                 target_lags=self.target_lags, include_doy=self.include_doy)
+                                 target_lags=self.target_lags, include_doy=self.include_doy,
+                                 holidays=self.holidays, drop_constant=False)
         X = X.reindex(columns=self.feature_names)
+        missing_inputs = X.isna().sum(axis=1).astype(int)
         s = scores(self.estimator, X, self.task)
         if self.task == "classification":
             actual = y.where(y.isna(), (y >= 0.5).astype(float))
@@ -139,18 +154,28 @@ class ForecastModel:
                                index=X.index)
         else:
             out = pd.DataFrame({"predicted": s, "actual": y}, index=X.index)
-        out["forecast_made_at"] = out.index - self.horizon * self.step
+            if self.interval_half_width is not None:
+                lo_b, hi_b = self.specs[self.target].q.plausible
+                out["lower"] = np.minimum(np.maximum(s - self.interval_half_width, lo_b), s)
+                out["upper"] = np.maximum(np.minimum(s + self.interval_half_width, hi_b), s)
+        # Bins are labelled by their start, so the last input bin (T - h) is complete at T - (h - 1) steps.
+        out["forecast_available_at"] = out.index - (self.horizon - 1) * self.step
+        out["inputs_missing"] = missing_inputs  # > 0: warm-up rows or gaps; those inputs were imputed
         return out
 
     # ----- public API ----------------------------------------------------------
     def predict(self, data: pd.DataFrame, future: bool = True, validate: bool = True,
-                on_error: str = "raise") -> pd.DataFrame:
+                on_error: str = "raise", future_inputs: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """Predictions for every time step in `data` (raw data is fine).
 
         validate:  check the live data first, as in training (results in `last_check_`).
         on_error:  "raise" (default) stops on failed checks; "warn" goes ahead.
         future:    in forecast mode, also cover the next `horizon` steps after the data
                    ends; those rows are the live forecast.
+        future_inputs: values of known-ahead inputs (weather forecasts, schedules) for those future
+                   rows, in the same format as `data`. Without them, known-ahead inputs are imputed
+                   there, and `inputs_missing` says so.
+        Pass at least a week of history so that every lag input exists for the live rows.
         """
         if validate:
             _, prepared = self._validate(data, on_error)
@@ -159,6 +184,12 @@ class ForecastModel:
         if future and self.horizon > 0:
             ahead = pd.date_range(prepared.index[-1] + self.step, periods=self.horizon, freq=self.step)
             prepared = prepared.reindex(prepared.index.append(ahead))
+        if future_inputs is not None:
+            known = [c for c, s in self.specs.items() if s.known_ahead]
+            fi = self._prepare(self._index(future_inputs))
+            for c in known:
+                if c in fi.columns:
+                    prepared[c] = prepared[c].combine_first(fi[c].reindex(prepared.index))
         return self._predict_prepared(prepared)
 
     def check_drift(self, recent: pd.DataFrame, tolerance: float = 1.5,

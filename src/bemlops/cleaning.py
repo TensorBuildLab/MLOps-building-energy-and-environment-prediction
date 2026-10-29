@@ -23,6 +23,9 @@ _BOOL_WORDS = {
     "open": 1.0, "closed": 0.0, "run": 1.0, "stop": 0.0, "enabled": 1.0, "disabled": 0.0,
 }
 
+# "21,5" or "1.234,5": a decimal comma (European exports read without decimal=","). Never guessed.
+_DECIMAL_COMMA = re.compile(r"^\s*[-+]?(?:\d{1,3}(?:\.\d{3})+|\d+),\d+(?:\D.*)?$")
+_THOUSANDS = re.compile(r"^\s*[-+]?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:\D.*)?$")
 # A number at the start of a string: "72.5 °F", "1,234.5 kWh", "-3e2".
 _NUMBER_PREFIX = re.compile(r"^\s*([-+]?(?:\d{1,3}(?:,\d{3})+|\d+)?(?:\.\d+)?(?:[eE][-+]?\d+)?)")
 
@@ -33,12 +36,15 @@ class Coerced:
     n_numbers_in_text: int = 0  # e.g. "72.5 F" -> 72.5
     n_words: int = 0  # e.g. "On" -> 1 for status columns
     unparseable: Counter = field(default_factory=Counter)  # e.g. {"OFFLINE": 12}
+    decimal_comma: Counter = field(default_factory=Counter)  # e.g. {"21,5": 3}: not parsed, never guessed
 
 
 def _parse_text(text: str, binary: bool) -> Tuple[Optional[float], str]:
     t = text.strip()
     if binary and t.lower() in _BOOL_WORDS:
         return _BOOL_WORDS[t.lower()], "word"
+    if _DECIMAL_COMMA.match(t) and not _THOUSANDS.match(t):
+        return None, "decimal_comma"  # "21,5" is 21.5 in much of Europe; truncating to 21 would be silent damage
     m = _NUMBER_PREFIX.match(t)
     if m and any(ch.isdigit() for ch in m.group(1)):
         try:
@@ -72,6 +78,8 @@ def coerce_numeric(s: pd.Series, binary: bool = False) -> Coerced:
         elif how == "word":
             result.n_words += 1
             out[p] = value
+        elif how == "decimal_comma":
+            result.decimal_comma[t] += 1
         else:
             result.unparseable[t] += 1
     result.values = pd.Series(out, index=s.index)
@@ -114,11 +122,16 @@ class Run:
 
 
 def stuck_runs(s: pd.Series, min_duration: pd.Timedelta, ignore_zero: bool) -> List[Run]:
-    """Stretches where a sensor repeats exactly the same value for too long."""
+    """Stretches where a sensor repeats exactly the same value for too long.
+
+    ignore_zero: for quantities that idle (solar at night, equipment off), flat stretches at the
+    series' floor (zero, or a small sensor offset such as 2-4 W/m2 at night) are normal and ignored.
+    """
     v = s.dropna()
     if len(v) < 3:
         return []
     vals = v.to_numpy(dtype=float)
+    floor = max(0.0, float(np.nanpercentile(vals, 2))) if ignore_zero else None
     times = v.index
     # A run never spans a gap in the data: equal values on Friday night and Monday
     # morning, with no rows in between, are not a stuck sensor.
@@ -130,12 +143,15 @@ def stuck_runs(s: pd.Series, min_duration: pd.Timedelta, ignore_zero: bool) -> L
     long_enough = (times[ends] - times[starts]) >= min_duration
     sel = (counts >= 3) & np.asarray(long_enough)
     if ignore_zero:
-        sel &= vals[starts] != 0
+        tol = 0.01 * (np.nanpercentile(vals, 98) - np.nanpercentile(vals, 2)) + 1e-12
+        sel &= (vals[starts] != 0) & (vals[starts] > floor + tol)
     return [Run(times[a], times[b], float(vals[a]), int(c))
             for a, b, c in zip(starts[sel], ends[sel], counts[sel])]
 
 
-def stuck_mask(s: pd.Series, runs: List[Run]) -> pd.Series:
+def stuck_mask(s: pd.Series, runs: List[Run], after: pd.Timedelta = pd.Timedelta(0)) -> pd.Series:
+    """Mask stuck stretches. With `after` = the detection threshold, only the part of each stretch from the
+    moment it became detectable is masked: what a live system can know at that time (no look-ahead)."""
     mask = np.zeros(len(s), dtype=bool)
     if not runs:
         return pd.Series(mask, index=s.index)
@@ -143,16 +159,18 @@ def stuck_mask(s: pd.Series, runs: List[Run]) -> pd.Series:
     idx = s.index
     ordered = idx.is_monotonic_increasing
     for r in runs:
+        start = r.start + after
         if ordered:
-            a, b = idx.searchsorted(r.start, "left"), idx.searchsorted(r.end, "right")
+            a, b = idx.searchsorted(start, "left"), idx.searchsorted(r.end, "right")
             mask[a:b] |= values[a:b] == r.value
         else:
-            mask |= np.asarray((idx >= r.start) & (idx <= r.end)) & (values == r.value)
+            mask |= np.asarray((idx >= start) & (idx <= r.end)) & (values == r.value)
     return pd.Series(mask, index=s.index)
 
 
 def spike_mask(s: pd.Series, k: float = 8.0) -> pd.Series:
-    """Single-sample jumps far away from their neighbours (rolling-median test)."""
+    """Readings far away from the readings just before them (causal: only the past is used, so live
+    serving can apply exactly the same rule as training)."""
     arr = s.to_numpy(dtype=float)
     out = np.zeros(len(arr), dtype=bool)
     pos = np.where(np.isfinite(arr))[0]
@@ -161,7 +179,7 @@ def spike_mask(s: pd.Series, k: float = 8.0) -> pd.Series:
     v = pd.Series(arr[pos])
     # Compare each reading only with neighbours from the same unbroken stretch of data.
     segment = np.r_[0, np.cumsum(_gap_breaks(s.index[pos]))]
-    med = v.groupby(segment).transform(lambda x: x.rolling(5, center=True, min_periods=3).median())
+    med = v.groupby(segment).transform(lambda x: x.shift(1).rolling(4, min_periods=3).median())
     resid = (v - med).to_numpy()
     finite = np.isfinite(resid)
     if not finite.any():

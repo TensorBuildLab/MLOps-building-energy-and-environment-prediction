@@ -45,12 +45,22 @@ def fingerprint(df: pd.DataFrame) -> str:
     return hashlib.sha256(h.tobytes() + cols).hexdigest()[:16]
 
 
+def package_fingerprint() -> str:
+    """Hash of the package's own source files: identifies the exact code a run used, with or without git."""
+    here = Path(__file__).resolve().parent
+    h = hashlib.sha256()
+    for f in sorted(here.glob("*.py")):
+        h.update(f.name.encode() + f.read_bytes().replace(b"\r\n", b"\n"))
+    return h.hexdigest()[:16]
+
+
 def _git_commit() -> str:
+    """Repository commit; '-dirty' only when the package source itself has uncommitted changes."""
     try:
         here = Path(__file__).resolve().parent
         out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=here, capture_output=True,
                              text=True, timeout=5)
-        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=here,
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no", "--", "."], cwd=here,
                                capture_output=True, text=True, timeout=5)
         if out.returncode == 0:
             return out.stdout.strip() + ("-dirty" if dirty.stdout.strip() else "")
@@ -62,7 +72,8 @@ def _git_commit() -> str:
 def environment() -> Dict[str, str]:
     import sklearn
 
-    return {"bemlops": __version__, "code_commit": _git_commit(), "python": sys.version.split()[0],
+    return {"bemlops": __version__, "code_commit": _git_commit(), "package_fingerprint": package_fingerprint(),
+            "python": sys.version.split()[0],
             "numpy": np.__version__, "pandas": pd.__version__, "scikit-learn": sklearn.__version__,
             "platform": platform.platform()}
 
@@ -108,6 +119,9 @@ def build_record(project: "Project", stamp: str) -> Dict[str, Any]:
                  "guideline14": r.guideline14},
         "warnings": r.warnings,
         "leakage_warnings": r.leakage_warnings,
+        "interval": r.interval,
+        "drivers": r.drivers,
+        "backtest": r.backtest,
         "event_log": project.log,
     })
 
@@ -232,6 +246,22 @@ def _markdown(project: "Project", plots: Dict[str, str]) -> str:
         out.append(f"\nASHRAE Guideline 14 ({g['resolution']}): CV(RMSE) {g['cvrmse_pct']:.1f}% "
                    f"(limit {g['cvrmse_limit']:.0f}%), NMBE {g['nmbe_pct']:.1f}% (limit ±{g['nmbe_limit']:.0f}%): "
                    f"**{'passes' if g['passes'] else 'does not pass'}**.")
+    if r.interval:
+        out.append(f"\n90% prediction interval: ±{r.interval['half_width']:.3g} {unit} (width from validation "
+                   f"errors); it contained {r.interval['test_coverage']:.0%} of test values.")
+    if r.backtest:
+        b = r.backtest
+        out += ["", "## Backtest (rolling origin)", "",
+                "The chosen model refitted before each block on all earlier data:", "",
+                "| Block | Rows | Skill |", "|---|---|---|"]
+        out += [f"| {x['from'][:10]} to {x['to'][:10]} | {x['rows']} | {x['skill']:.2f} |" for x in b["blocks"]]
+        out.append(f"\nPooled skill: **{b['pooled_skill']:.2f}**. The first blocks overlap the validation period "
+                   f"used to choose the model; the single test period above is the untouched result.")
+    if r.drivers:
+        out += ["", "## What the model relies on", "",
+                "Share of the model's accuracy lost when each input is scrambled (test period):", "",
+                "| Input | Share |", "|---|---|"]
+        out += [f"| {d['input']} | {d['share']:.0%} |" for d in r.drivers[:10]]
     for w in r.leakage_warnings + r.warnings:
         out.append(f"\n> Warning: {w}")
     if plots:
@@ -247,7 +277,10 @@ def model_card(project: "Project", record: Dict[str, Any]) -> str:
     cls = r.task["task_type"] == "classification"
     keys = CLASSIFICATION_KEYS if cls else REGRESSION_KEYS
     tr0, tr1 = r.split["bounds"]["train"][0], r.split["bounds"]["val"][1]
-    months_seen = sorted(set(pd.date_range(tr0, tr1, freq="D").month))
+    t0, t1 = pd.Timestamp(tr0), pd.Timestamp(tr1)
+    if t0.tzinfo is not None:  # offsets may differ across daylight saving
+        t0, t1 = t0.tz_convert("UTC").tz_localize(None), t1.tz_convert("UTC").tz_localize(None)
+    months_seen = sorted(set(pd.date_range(t0.normalize(), t1, freq="D").month))
     missing_months = [m for m in range(1, 13) if m not in months_seen]
     month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     inputs = [f"`{k}` ({v.quantity}{', ' + v.unit if v.unit else ''}{', known ahead' if v.known_ahead else ''})"
@@ -271,7 +304,8 @@ def model_card(project: "Project", record: Dict[str, Any]) -> str:
         f"- **Period:** {tr0} to {tr1} (train + validation)",
         f"- **Inputs:** {', '.join(inputs) if inputs else 'calendar only'}",
         f"- **Target range seen:** {lo:.3g} to {hi:.3g} {unit}" if not cls else
-        f"- **Share of 'yes' in training:** {float(np.mean(project.data[project.target].dropna() >= 0.5)):.2f}",
+        f"- **Share of 'yes' in training:** "
+        f"{float(np.mean(project.data.loc[: r.model.train_end, project.target].dropna() >= 0.5)):.2f}",
         "",
         "## Performance (held-out test period, time-ordered)", "",
         f"Test period {r.split['bounds']['test'][0]} to {r.split['bounds']['test'][1]}.", "",
@@ -279,6 +313,11 @@ def model_card(project: "Project", record: Dict[str, Any]) -> str:
     ]
     lines += _metric_rows(r.test, r.test_baseline, keys, unit)
     lines += ["", f"Skill vs {r.baseline_name}: {r.skill:.2f}.", ""]
+    if r.interval:
+        lines += [f"90% prediction interval: ±{r.interval['half_width']:.3g} {unit}; it contained "
+                  f"{r.interval['test_coverage']:.0%} of test values.", ""]
+    if r.drivers:
+        lines += ["Main inputs: " + ", ".join(f"{d['input']} ({d['share']:.0%})" for d in r.drivers[:5]) + ".", ""]
     if r.guideline14:
         lines.append(f"ASHRAE Guideline 14 (hourly): {'passes' if r.guideline14['passes'] else 'does not pass'}.")
         lines.append("")

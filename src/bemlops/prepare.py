@@ -98,7 +98,7 @@ def prepare(df: pd.DataFrame, specs: Mapping[str, ColumnSpec], target: str,
         if opts.mask_stuck and not (q.may_be_constant or spec.flat_ok):
             runs = stuck_runs(s, pd.Timedelta(hours=opts.stuck_hours), ignore_zero=q.zero_runs_ok)
             if runs:
-                m = stuck_mask(s, runs)
+                m = stuck_mask(s, runs, after=pd.Timedelta(hours=opts.stuck_hours))
                 s = s.mask(m)
                 _log(log, "mask_stuck", f"{len(runs)} stuck stretch(es) set to missing.", c, int(m.sum()))
         if opts.mask_spikes and q.spike_check:
@@ -114,11 +114,22 @@ def prepare(df: pd.DataFrame, specs: Mapping[str, ColumnSpec], target: str,
     if step is not None and freq < step:
         _log(log, "warning", f"Requested step {freq} is finer than the data ({step}); many values will be missing.")
     parts = {}
+    # A total over an interval is only right if every reading in it is present. Bins with missing
+    # readings become missing (never a too-small total), so a missing target is never filled with zeros.
+    expected = int(round(freq / step)) if (step is not None and freq >= step) else 1
     for c in cols:
         q = specs[c].q
         r = d[c].resample(freq, label="left", closed="left")
         if q.aggregate == "sum":
-            parts[c] = r.sum(min_count=1)
+            total, count = r.sum(min_count=1), r.count()
+            incomplete = count < expected
+            if incomplete.any():
+                n_bad = int((incomplete & total.notna()).sum())
+                total = total.mask(incomplete)
+                if n_bad:
+                    _log(log, "incomplete_totals", f"Interval totals with missing readings set to missing "
+                                                   f"(each needs {expected} readings).", c, n_bad)
+            parts[c] = total
         elif q.aggregate == "last":
             parts[c] = r.last()
         else:

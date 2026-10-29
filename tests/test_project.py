@@ -30,8 +30,10 @@ def test_forecast_beats_persistence(fitted):
     _, r, _ = fitted
     assert r.task["mode"] == "forecast" and r.task["horizon_steps"] == 4
     assert r.task["task_type"] == "regression"
-    assert r.skill > 0.2
+    assert r.skill > 0.1  # against the strongest no-ML baseline (persistence, yesterday or daily profile)
+    assert r.baseline_name in ("persistence", "same_time_yesterday", "time_of_day_profile")
     assert r.guideline14 is not None and "cvrmse_pct" in r.test
+    assert r.backtest and len(r.backtest["blocks"]) == 3
 
 
 def test_run_folder_is_complete_and_auditable(fitted):
@@ -84,7 +86,9 @@ def test_virtual_sensor_mode(messy):
     p.check_data()
     p.prepare(freq="15min")
     r = p.fit(**FAST)
-    assert r.baseline_name == "training_mean" and r.skill > 0.3
+    # The daily profile is a strong reference for CO2 in a scheduled office; with this tiny search the
+    # framework may rightly keep the baseline (skill 0). What must hold: a valid estimate, target not an input.
+    assert r.baseline_name in ("training_mean", "time_of_day_profile") and r.skill >= 0
     assert not any(f["source"] == "RM204_CO2" for f in r.features)
 
 
@@ -97,9 +101,36 @@ def test_yes_no_target_is_classification(messy, tmp_path):
     p.check_data()
     p.prepare(freq="15min")
     r = p.fit(models=("logistic", "gbm"), n_iter=2)
-    assert r.baseline_name == "persistence"
+    assert r.baseline_name in ("persistence", "same_time_yesterday")
     assert {"brier", "accuracy", "roc_auc"} <= set(r.test)
     assert r.skill > 0.2  # Brier skill score vs "same as an hour ago"
     folder = p.save_run(tmp_path)
     out = bemlops.load_model(folder / "model.joblib").predict(p.raw.iloc[-3000:], on_error="warn")
     assert out["probability"].between(0, 1).all() and set(out["predicted"].unique()) <= {0, 1}
+
+
+def test_intervals_drivers_and_provenance(fitted):
+    p, r, folder = fitted
+    iv = r.interval
+    assert iv and iv["half_width"] > 0 and 0.7 <= iv["test_coverage"] <= 1.0
+    assert {"lower", "upper"} <= set(r.predictions.columns)
+    shares = [d["share"] for d in r.drivers]
+    assert shares and 0.9 <= sum(shares) <= 1.0 + 1e-9  # tiny contributions (< 0.5%) are not listed
+    assert any("AHU1_CLG_KW" in d["input"] for d in r.drivers[:3])  # its own recent history matters most
+    record = json.loads((folder / "run.json").read_text(encoding="utf-8"))
+    assert len(record["run"]["environment"]["package_fingerprint"]) == 16
+    out = bemlops.load_model(folder / "model.joblib").predict(p.raw.iloc[-3000:], on_error="warn")
+    ok = out.dropna(subset=["predicted"])
+    assert (ok["lower"] <= ok["predicted"]).all() and (ok["predicted"] <= ok["upper"]).all()
+
+
+def test_holidays_become_a_known_ahead_input(messy):
+    from bemlops.datasets import OFFICE_POINTS
+
+    export, _ = messy
+    p = bemlops.Project(export, "AHU1_CLG_KW", dict(OFFICE_POINTS), horizon="1h",
+                        holidays=["2025-10-13", "2025-11-11"], **TS)
+    p.check_data()
+    p.prepare(freq="15min")
+    r = p.fit(models=("ridge",), n_iter=1)
+    assert "is_holiday" in r.model.feature_names and p.config()["holidays"] == ["2025-10-13", "2025-11-11"]

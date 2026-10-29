@@ -74,6 +74,12 @@ class Registry:
         record = json.loads((run_folder / "run.json").read_text(encoding="utf-8"))
         name = name or record["config"]["name"]
         index = self._load(name)
+        if index["versions"]:
+            first, new = index["versions"][0]["task"], record["task"]
+            for k in ("target", "horizon_steps", "step", "task_type"):
+                if first.get(k) != new.get(k):
+                    raise ValueError(f"Version for '{name}' has {k}={new.get(k)!r}, but earlier versions have "
+                                     f"{first.get(k)!r}. Register it under a different name.")
         version = max([e["version"] for e in index["versions"]], default=0) + 1
         dest = self.root / name / f"v{version}"
         dest.mkdir(parents=True)
@@ -111,6 +117,11 @@ class Registry:
         """Make `version` the production model. Refused if a gate fails, unless forced with a reason."""
         index = self._load(name)
         entry = self._entry(index, version)
+        # Re-check the gates under the registry's current policy (it may be stricter than at registration).
+        run_json = self.root / name / f"v{version}" / "run.json"
+        if run_json.exists():
+            entry["gates"] = check_gates(json.loads(run_json.read_text(encoding="utf-8")), self.policy)
+            entry["gates_passed"] = gates_passed(entry["gates"])
         if not entry["gates_passed"]:
             failed = {k: v["detail"] for k, v in entry["gates"].items() if not v["passed"]}
             if not force:
@@ -126,11 +137,11 @@ class Registry:
         self._save(name, index)
         return entry
 
-    def rollback(self, name: str, version: int, reason: str) -> Dict[str, Any]:
+    def rollback(self, name: str, version: int, reason: str, force: bool = False) -> Dict[str, Any]:
         """Put an earlier version back into production (e.g. after a bad release)."""
         if len(reason.strip()) < 10:
             raise ValueError("A rollback needs a written reason.")
-        return self.promote(name, version, reason=reason, action="rollback")
+        return self.promote(name, version, reason=reason, force=force, action="rollback")
 
     def load(self, name: str, version: Optional[int] = None) -> ForecastModel:
         """The production model, or a specific version."""
@@ -165,7 +176,8 @@ class Registry:
             raise KeyError(f"'{name}' has no production model to compare against.")
         champ = self.load(name, champ_entry["version"])
         chall = self.load(name, challenger)
-        start = max(pd.Timestamp(champ.train_end), pd.Timestamp(chall.train_end))
+        # Only rows whose forecasts were made after both training periods ended (plus the horizon gap).
+        start = max(pd.Timestamp(champ.train_end), pd.Timestamp(chall.train_end)) + chall.horizon * chall.step
         task = chall.task
         metric = PRIMARY_METRIC[task]
         col = "probability" if task == "classification" else "predicted"

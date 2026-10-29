@@ -65,7 +65,7 @@ def main(n: int = 60, seed: int = 0) -> None:
         df = pd.concat([elec[bid].rename("electricity"), w], axis=1)
         t0 = time.time()
         p, r, row = common.run_task(df, "electricity", COLUMNS, "24h", f"bdg2-{bid}", RUNS, notes=NOTES,
-                                    freq="1h", n_iter=4, models=("ridge", "gbm"),
+                                    freq="1h", n_iter=4, models=("ridge", "gbm", "gbm_change"),
                                     intended_use="Day-ahead hourly electricity forecast for operations planning.")
         row.update({"dataset": "BDG2", "building": bid, "site": site, "primary_use": b["primaryspaceusage"],
                     "sqm": b["sqm"], "coverage": float(coverage[bid]), "seconds": round(time.time() - t0, 1)})

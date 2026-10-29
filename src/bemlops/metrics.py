@@ -41,8 +41,9 @@ def regression_metrics(y_true, y_pred, n_params: int = 1) -> Dict[str, float]:
     }
     if abs(mean_y) > 1e-9:
         dof = max(n - n_params, 1)
-        out["cvrmse_pct"] = float(100 * np.sqrt(np.sum(err ** 2) / dof) / mean_y)
-        out["nmbe_pct"] = float(100 * np.sum(err) / (dof * mean_y))
+        # |mean| so that CV(RMSE) stays a positive error measure even for net (negative-mean) meters.
+        out["cvrmse_pct"] = float(100 * np.sqrt(np.sum(err ** 2) / dof) / abs(mean_y))
+        out["nmbe_pct"] = float(100 * np.sum(err) / (dof * abs(mean_y)))
     return out
 
 
@@ -63,13 +64,18 @@ def classification_metrics(y_true, prob) -> Dict[str, float]:
     recall_1 = tp / (tp + fn) if tp + fn else float("nan")
     recall_0 = tn / (tn + fp) if tn + fp else float("nan")
     precision = tp / (tp + fp) if tp + fp else float("nan")
+    if tp == 0 and (fp + fn) > 0:
+        f1 = 0.0
+    elif precision + recall_1 and np.isfinite(precision + recall_1):
+        f1 = float(2 * precision * recall_1 / (precision + recall_1))
+    else:
+        f1 = float("nan")
     out = {
         "n": n,
         "brier": float(np.mean((p - y) ** 2)),
         "accuracy": float(np.mean(pred == y)),
         "balanced_accuracy": float(np.nanmean([recall_1, recall_0])),
-        "f1": float(2 * precision * recall_1 / (precision + recall_1))
-        if precision + recall_1 and np.isfinite(precision + recall_1) else float("nan"),
+        "f1": f1,
         "share_of_ones": float(np.mean(y)),
     }
     if 0 < y.sum() < n:  # ROC AUC via the rank-sum formula, ties counted half
@@ -108,9 +114,14 @@ def guideline14(actual: pd.Series, predicted: pd.Series, aggregate: str = "mean"
     hourly = grouped.sum(min_count=1) if aggregate == "sum" else grouped.mean()
     hourly = hourly.dropna()
     m = regression_metrics(hourly["a"], hourly["p"])
-    if "cvrmse_pct" not in m:
-        return None
     limits = GUIDELINE14[resolution]
+    if "cvrmse_pct" not in m or m["mean_actual"] <= 0:
+        # The criteria assume consumption (a positive mean). They cannot be met by a net meter or a
+        # near-zero series, and "not applicable" must not count as a pass.
+        return {"resolution": resolution, "cvrmse_pct": m.get("cvrmse_pct", float("nan")),
+                "nmbe_pct": m.get("nmbe_pct", float("nan")), "cvrmse_limit": limits["cvrmse"],
+                "nmbe_limit": limits["nmbe"], "passes": False,
+                "note": "not defined for a non-positive mean"}
     return {
         "resolution": resolution,
         "cvrmse_pct": m["cvrmse_pct"],

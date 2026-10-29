@@ -66,7 +66,7 @@ def reproduce(run_json: Union[str, Path], data: pd.DataFrame, tolerance: float =
     cleaning the agent did before handing it over).
     """
     record = json.loads(Path(run_json).read_text(encoding="utf-8"))
-    p = Project.from_config(data, record["config"])
+    p = Project.from_config(data, record["config"], trust_accepted=True)  # same data: same decisions
     data_match = fingerprint(p.raw) == record["data"]["raw_fingerprint"]
     p.check_data()
     p.prepare()

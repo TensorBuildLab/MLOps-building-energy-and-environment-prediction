@@ -89,3 +89,12 @@ def test_cli_monitor_and_predict(lifecycle, tmp_path):
                  "--out", str(out), "--warn"]) == 0
     assert len(pd.read_csv(out)) > 100
     assert main(["monitor", "--registry", str(reg.root), "--name", "ahu1-kw", "--data", str(csv)]) in (0, 2)
+
+
+def test_accepted_errors_are_not_carried_into_new_data(config):
+    cfg = dict(config)
+    cfg["accepted"] = {"columns:missing": "RH sensor removed in 2024; documented by facilities."}
+    export, _ = messy_office(days=45, seed=5)
+    p = bemlops.Project.from_config(export.drop(columns=["OAT"]), cfg)
+    assert "columns:missing" in [i.id for i in p.unresolved()]  # must be decided again
+    assert p.previous_acceptances
