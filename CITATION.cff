@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it, and the paper below."
+title: "bemlops: MLOps for building energy and environment prediction"
+type: software
+authors:
+  - name: "TensorBuildLab"
+repository-code: "https://github.com/TensorBuildLab/MLOps-building-energy-and-environment-prediction"
+license: BSD-3-Clause
+version: 0.1.0.dev0
+preferred-citation:
+  type: article
+  title: "Scaling Data-Driven Building Energy Modelling using Large Language Models"
+  authors:
+    - family-names: Khadka
+      given-names: Sunil
+    - family-names: Zhang
+      given-names: Liang
+  year: 2024
+  journal: "arXiv preprint"
+  identifiers:
+    - type: other
+      value: "arXiv:2407.03469"
+  url: "https://arxiv.org/abs/2407.03469"

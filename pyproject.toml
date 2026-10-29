@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bemlops"
+dynamic = ["version"]
+description = "MLOps for building energy and indoor-environment prediction: an AI agent handles messy real-world data, the package guarantees the parts that must never go wrong."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "BSD-3-Clause" }
+authors = [{ name = "TensorBuildLab" }]
+keywords = ["building energy", "indoor environment", "MLOps", "forecasting", "BAS", "BMS", "LLM agents", "ASHRAE Guideline 14"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+    "scipy>=1.10",
+    "joblib>=1.3",
+]
+
+[project.optional-dependencies]
+plots = ["matplotlib>=3.7"]
+dev = ["pytest>=7", "matplotlib>=3.7"]
+
+[project.urls]
+Repository = "https://github.com/TensorBuildLab/MLOps-building-energy-and-environment-prediction"
+"Preliminary paper" = "https://arxiv.org/abs/2407.03469"
+
+[tool.setuptools.dynamic]
+version = { attr = "bemlops._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
