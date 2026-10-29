@@ -37,6 +37,8 @@ class DriftReport:
     data_issues: List[str]
     retrain_recommended: bool
     message: str
+    baseline_error: Optional[float] = None  # persistence on the same recent rows (forecasts)
+    worse_than_baseline: bool = False
 
     def __str__(self) -> str:
         return self.message
@@ -216,6 +218,17 @@ class ForecastModel:
                     if share > 0:
                         oor[c] = share
         degraded = bool(np.isfinite(ratio) and ratio > tolerance)
+        # Compare with "same as before" on the same rows: a model can stay close to its own test-time
+        # error and still lose to persistence (found on district heating in summer, heating off).
+        base_err, worse = None, False
+        if self.horizon > 0:
+            persist = out["actual"].shift(self.horizon)
+            if self.task == "classification":
+                persist = persist.clip(0, 1)
+            both = pd.concat({"a": out["actual"], "p": persist}, axis=1).dropna()
+            if len(both) >= 10:
+                base_err = evaluate(both["a"], both["p"], self.task).get(metric)
+                worse = bool(base_err is not None and np.isfinite(base_err) and err > base_err)
         shifted = {c: s_ for c, s_ in oor.items() if s_ > max_out_of_range}
         new_faults = [i.id for i in report.issues if i.severity in ("error", "warning")
                       and i.id.split(":")[0] in ("stuck", "unit_mismatch", "implausible", "out_of_range",
@@ -228,19 +241,29 @@ class ForecastModel:
                          ", ".join(f"{c} ({s_:.0%})" for c, s_ in shifted.items()) + ".")
         if new_faults:
             parts.append("Data-quality issues in the live feed: " + ", ".join(new_faults) + ".")
-        retrain = degraded or bool(shifted)
+        if worse:
+            parts.append(f"The model is worse than persistence on these rows ({err:.3g} vs {base_err:.3g}): "
+                         f"fall back to persistence until a retrained model beats it.")
+        retrain = degraded or bool(shifted) or worse
         if retrain:
             parts.append("Retraining on recent data is recommended.")
         elif new_faults:
             parts.append("Fix the sensor or feed issues; retraining will not help with those.")
         else:
             parts.append("No action needed.")
-        return DriftReport(metric, err, self.test_error, ratio, oor, new_faults, retrain, " ".join(parts))
+        return DriftReport(metric, err, self.test_error, ratio, oor, new_faults, retrain, " ".join(parts),
+                           base_err, worse)
 
     def save(self, path: Union[str, Path]) -> Path:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.last_check_ = None
+        # Parallel tree prediction sums in a varying order (differences ~1e-15); one thread repeats exactly.
+        try:
+            params = self.estimator.get_params(deep=True)
+            self.estimator.set_params(**{k: 1 for k in params if k == "n_jobs" or k.endswith("__n_jobs")})
+        except (AttributeError, ValueError):
+            pass
         joblib.dump(self, path)
         return path
 

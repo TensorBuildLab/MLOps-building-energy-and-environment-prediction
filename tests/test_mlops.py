@@ -98,3 +98,21 @@ def test_accepted_errors_are_not_carried_into_new_data(config):
     p = bemlops.Project.from_config(export.drop(columns=["OAT"]), cfg)
     assert "columns:missing" in [i.id for i in p.unresolved()]  # must be decided again
     assert p.previous_acceptances
+
+
+def test_drift_check_compares_with_persistence_and_refit_all(tmp_path):
+    from bemlops.datasets import OFFICE_POINTS, messy_office
+
+    export, _ = messy_office(days=45, seed=4)
+    p = bemlops.Project(export, "AHU1_CLG_KW", dict(OFFICE_POINTS), horizon="1h", **TS)
+    p.check_data()
+    p.prepare(freq="15min")
+    r = p.fit(models=("ridge",), n_iter=1, refit_all=True)
+    assert r.model.train_end == r.model.train_end.__class__(p.data.dropna(subset=["AHU1_CLG_KW"]).index[-1])
+    assert any("refitted on all data" in w for w in r.warnings)
+    folder = p.save_run(tmp_path)
+    model = bemlops.load_model(folder / "model.joblib")
+    recent = p.raw.loc[p.raw.index >= p.raw.index.max() - pd.Timedelta(days=12)]
+    rep = model.check_drift(recent)
+    assert rep.baseline_error is not None
+    assert rep.worse_than_baseline == (rep.error_now > rep.baseline_error)
