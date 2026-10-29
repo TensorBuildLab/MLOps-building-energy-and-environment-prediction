@@ -1,0 +1,2 @@
+run,task,expected_rmse,delivered,hidden_rows,rmse,mae,persistence_rmse,skill,coverage,actual_over_expected,leak_tests,leak_failures,leakage
+T1_C-sonnet,T1,35.0,True,2880,21.721290407984757,12.793791349507087,20.94678184717372,-0.03697506215808222,1.0,0.6206082973709931,15,0,False

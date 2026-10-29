@@ -21,7 +21,7 @@ STEPS = [
     ("aalborg", "Aalborg: 6 rooms x 4 targets + building systems", HERE / "aalborg" / "run.py", []),
     ("faults", "Aalborg: fault injection (10 seeds)", HERE / "aalborg" / "faults.py", []),
     ("lifecycle", "Aalborg: deploy, monitor and retrain over 8 months", HERE / "aalborg" / "lifecycle.py", []),
-    ("bdg2", "BDG2: one configuration on 40 buildings", HERE / "bdg2" / "run.py", ["40"]),
+    ("bdg2", "BDG2: one configuration on 20 buildings", HERE / "bdg2" / "run.py", ["20"]),
 ]
 
 if __name__ == "__main__":

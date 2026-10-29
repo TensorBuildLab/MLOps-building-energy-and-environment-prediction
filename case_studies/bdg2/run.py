@@ -34,7 +34,7 @@ NOTES = [
     "dataset authors judged invalid are already removed, which shows up as missing).",
     "Weather is the site's station data; it is used only up to the forecast time (no weather forecasts are "
     "available, so none is assumed).",
-    "Buildings sampled at random among those with at least 90% of hours present, at most 6 per site.",
+    "Buildings sampled at random among those with at least 90% of hours present, one per site in turn.",
 ]
 COLUMNS = {
     "electricity": "energy [kWh]",
@@ -52,8 +52,9 @@ def main(n: int = 60, seed: int = 0) -> None:
     eligible = md[md["building_id"].isin(coverage[coverage >= 0.9].index)]
     eligible = eligible[eligible["site_id"].isin(weather["site_id"].unique())]
     shuffled = eligible.sample(frac=1.0, random_state=seed)
-    picks = shuffled.groupby("site_id").head(6)  # at most 6 per site, so no single campus dominates
-    picks = picks.sample(min(n, len(picks)), random_state=seed).sort_values("building_id")
+    # Round-robin over sites (one building per site, then a second, ...) so no campus dominates.
+    shuffled["rank"] = shuffled.groupby("site_id").cumcount()
+    picks = shuffled.sort_values(["rank", "site_id"]).head(n).sort_values("building_id")
     print(f"{len(eligible)} eligible buildings; sampled {len(picks)} from {picks['site_id'].nunique()} sites", flush=True)
 
     rows = []
@@ -65,7 +66,7 @@ def main(n: int = 60, seed: int = 0) -> None:
         df = pd.concat([elec[bid].rename("electricity"), w], axis=1)
         t0 = time.time()
         p, r, row = common.run_task(df, "electricity", COLUMNS, "24h", f"bdg2-{bid}", RUNS, notes=NOTES,
-                                    freq="1h", n_iter=4, models=("ridge", "gbm", "gbm_change"),
+                                    freq="1h", n_iter=3, models=("ridge", "gbm", "gbm_change"),
                                     intended_use="Day-ahead hourly electricity forecast for operations planning.")
         row.update({"dataset": "BDG2", "building": bid, "site": site, "primary_use": b["primaryspaceusage"],
                     "sqm": b["sqm"], "coverage": float(coverage[bid]), "seconds": round(time.time() - t0, 1)})
@@ -78,4 +79,4 @@ def main(n: int = 60, seed: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 60)
+    main(int(sys.argv[1]) if len(sys.argv) > 1 else 20)

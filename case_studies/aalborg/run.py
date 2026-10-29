@@ -116,8 +116,11 @@ def main() -> None:
         short = target.replace(":", "-").replace("__", "-").replace("_", "").lower()
         name = f"aalborg-{short}-{horizon}"
         accept = {f"missing:{target}": PEOPLE_REASON} if "People" in target else {}
+        # Random forests are left out here to keep 27 tasks on 29k rows tractable on a laptop; ridge,
+        # gradient boosting and the change model remain (logistic and boosting for yes/no targets).
+        models = ("logistic", "gbm") if "Room__active" in target else ("ridge", "gbm", "gbm_change")
         p, r, row = common.run_task(df, target, cols, horizon, name, RUNS, notes=NOTES, n_iter=3,
-                                    intended_use=use, accept=accept)
+                                    intended_use=use, accept=accept, models=models)
         row.update({"dataset": "Aalborg", "building": room or "building systems"})
         rows.append(row)
         print(f"{name}: {row['status']} skill={row.get('skill')}", flush=True)

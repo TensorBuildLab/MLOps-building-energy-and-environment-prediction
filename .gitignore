@@ -19,3 +19,6 @@ runs/
 Thumbs.db
 .vscode/
 .idea/
+
+# Development worktree
+.wt/
