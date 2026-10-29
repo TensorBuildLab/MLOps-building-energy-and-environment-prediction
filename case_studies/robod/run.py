@@ -26,6 +26,7 @@ OUT = HERE / "results"
 RUNS = REPO / "runs" / "robod"
 
 ROOMS = {1: "lecture room", 2: "lecture room", 3: "office", 4: "research office", 5: "library"}
+PROTOCOL_ROOMS = {4, 5}  # the evaluation-protocol comparison (costly) runs on the two rooms with the most data
 
 
 # ----- Part 1: the agent's work (loading and declaring) -------------------------------
@@ -103,7 +104,7 @@ def main() -> None:
             row.update({"dataset": "ROBOD", "building": f"Room {room} ({kind})"})
             rows.append(row)
             print(f"{name}: {row['status']} skill={row.get('skill')}", flush=True)
-            if r is not None and p.task == "regression":
+            if r is not None and p.task == "regression" and room in PROTOCOL_ROOMS:
                 comp = common.protocol_comparison(p)
                 protocol.append(common.protocol_row("ROBOD", name, target, horizon, comp))
     OUT.mkdir(parents=True, exist_ok=True)

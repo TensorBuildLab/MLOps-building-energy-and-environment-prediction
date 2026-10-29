@@ -116,7 +116,7 @@ def main() -> None:
         short = target.replace(":", "-").replace("__", "-").replace("_", "").lower()
         name = f"aalborg-{short}-{horizon}"
         accept = {f"missing:{target}": PEOPLE_REASON} if "People" in target else {}
-        p, r, row = common.run_task(df, target, cols, horizon, name, RUNS, notes=NOTES, n_iter=4,
+        p, r, row = common.run_task(df, target, cols, horizon, name, RUNS, notes=NOTES, n_iter=3,
                                     intended_use=use, accept=accept)
         row.update({"dataset": "Aalborg", "building": room or "building systems"})
         rows.append(row)

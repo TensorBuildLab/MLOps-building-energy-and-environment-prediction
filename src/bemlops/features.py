@@ -153,7 +153,7 @@ def suspicious_inputs(X: pd.DataFrame, y: pd.Series, feats: List[Feature], targe
 
 
 def input_drivers(estimator, X: pd.DataFrame, y: pd.Series, feats: List[Feature], target: str, task: str,
-                  random_state: int = 0, max_rows: int = 3000, n_repeats: int = 3) -> List[Dict[str, object]]:
+                  random_state: int = 0, max_rows: int = 2000, n_repeats: int = 3) -> List[Dict[str, object]]:
     """How much of the model's accuracy each input carries, on the test period.
 
     Grouped permutation importance: all columns built from one input (its lags) are scrambled
