@@ -65,23 +65,33 @@ def run_task(df: pd.DataFrame, target: str, columns: Dict[str, Any], horizon, na
         row["status"] = "blocked: " + ";".join(i.id for i in blocked)
         return p, None, row
     p.prepare(freq=freq)
-    r = p.fit(n_iter=n_iter, models=models)
-    folder = p.save_run(runs_dir)
-    record = json.loads((folder / "run.json").read_text(encoding="utf-8"))
+    # Resume: a finished run of this task (same code) is read back from its record instead of re-fitted.
+    existing = sorted(Path(runs_dir).glob(f"{name}-2*/run.json"))
+    if existing:
+        record = json.loads(existing[-1].read_text(encoding="utf-8"))
+        r = "resumed"
+    else:
+        r = p.fit(n_iter=n_iter, models=models)
+        folder = p.save_run(runs_dir)
+        record = json.loads((folder / "run.json").read_text(encoding="utf-8"))
+    test, base = record["test"]["model"], dict(record["test"]["baseline"])
+    drivers = record.get("drivers") or []
     row.update({
-        "status": "fitted", "run": folder.name, "unit": r.task.get("unit"), "n_test": r.split["sizes"]["test"],
-        "chosen": r.chosen, "baseline": r.baseline_name, "skill": r.skill,
+        "status": "fitted", "run": record["run"]["name"] + "-" + record["run"]["created"],
+        "code_commit": record["run"]["environment"].get("code_commit"),
+        "unit": record["task"].get("unit"), "n_test": record["split"]["sizes"]["test"],
+        "chosen": record["chosen_model"]["name"], "baseline": base.pop("name"), "skill": record["test"]["skill"],
         "gates_passed": all(g["passed"] for g in record["gates"].values()),
         "failed_gates": ";".join(k for k, g in record["gates"].items() if not g["passed"]),
-        "g14_pass": (r.guideline14 or {}).get("passes"),
-        "backtest_skill": (r.backtest or {}).get("pooled_skill"),
-        "interval_coverage": (r.interval or {}).get("test_coverage"),
-        "top_driver": r.drivers[0]["input"] if r.drivers else None,
-        "top_driver_share": r.drivers[0]["share"] if r.drivers else None,
+        "g14_pass": (record["test"].get("guideline14") or {}).get("passes"),
+        "backtest_skill": (record.get("backtest") or {}).get("pooled_skill"),
+        "interval_coverage": (record.get("interval") or {}).get("test_coverage"),
+        "top_driver": drivers[0]["input"] if drivers else None,
+        "top_driver_share": drivers[0]["share"] if drivers else None,
     })
-    for k, v in r.test.items():
+    for k, v in test.items():
         row[f"test_{k}"] = v
-    for k, v in r.test_baseline.items():
+    for k, v in base.items():
         row[f"base_{k}"] = v
     return p, r, row
 
