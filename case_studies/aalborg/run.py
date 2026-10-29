@@ -106,10 +106,13 @@ PROTOCOL_ROOMS = {"RoomA", None}  # the evaluation-protocol comparison is run on
 
 
 # ----- Part 2: bemlops does the rest ------------------------------------------------------
-def main() -> None:
+def main(part: int = 0, parts: int = 1) -> None:
+    """parts > 1 runs every parts-th task (several workers in parallel); `merge()` then joins the parts."""
     df = load()
     rows, protocol = [], []
-    for room, target, horizon, use in TASKS:
+    for k, (room, target, horizon, use) in enumerate(TASKS):
+        if k % parts != part:
+            continue
         cols = dict(SYSTEM)
         if room:
             cols.update(room_columns(room))
@@ -127,10 +130,32 @@ def main() -> None:
         if r is not None and p.task == "regression" and room in PROTOCOL_ROOMS:
             protocol.append(common.protocol_row("Aalborg", name, target, horizon, common.protocol_comparison(p)))
     OUT.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(rows).to_csv(OUT / "summary.csv", index=False)
-    pd.DataFrame(protocol).to_csv(OUT / "protocol_comparison.csv", index=False)
+    suffix = "" if parts == 1 else f"_part{part}"
+    pd.DataFrame(rows).to_csv(OUT / f"summary{suffix}.csv", index=False)
+    pd.DataFrame(protocol).to_csv(OUT / f"protocol_comparison{suffix}.csv", index=False)
     print(f"Wrote {OUT}")
 
 
+def merge() -> None:
+    """Join the parts written by parallel workers, in the original task order."""
+    order = {f"aalborg-{t.replace(':', '-').replace('__', '-').replace('_', '').lower()}-{h}": i
+             for i, (_, t, h, _) in enumerate(TASKS)}
+    for stem in ("summary", "protocol_comparison"):
+        parts = sorted(OUT.glob(f"{stem}_part*.csv"))
+        if parts:
+            df = pd.concat([pd.read_csv(f) for f in parts if f.stat().st_size > 2], ignore_index=True)
+            df = df.sort_values("task", key=lambda s: s.map(order)).reset_index(drop=True)
+            df.to_csv(OUT / f"{stem}.csv", index=False)
+            for f in parts:
+                f.unlink()
+    print(f"Merged parts in {OUT}")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "merge":
+        merge()
+    elif len(sys.argv) > 1:
+        i, n = map(int, sys.argv[1].split("/"))
+        main(i, n)
+    else:
+        main()
