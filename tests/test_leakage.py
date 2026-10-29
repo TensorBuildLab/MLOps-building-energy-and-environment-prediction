@@ -112,3 +112,26 @@ def test_negative_horizon_and_live_constant_inputs():
     data["x"] = 1.0  # constant in this window
     X, _, _ = build_features(data, "y", SPECS, 4, STEP, target_lags=[4, 5], drop_constant=False)
     assert "x__t-4" in X.columns and X["x__t-4"].notna().any()
+
+
+def test_gradient_boosting_ignores_an_input_with_no_values_in_a_fold():
+    """A long gap can leave an input entirely missing in an early tuning fold (ROBOD Room 3 after the
+    dead-meter days were masked); gradient boosting must skip that input instead of crashing, and must
+    behave exactly like the plain estimator when every input has values."""
+    import numpy as np
+    import pandas as pd
+    from sklearn.ensemble import HistGradientBoostingRegressor
+
+    from bemlops.models import GradientBoostingRegressor, tune
+
+    rng = np.random.default_rng(0)
+    X = pd.DataFrame({"a": rng.normal(size=400), "b": rng.normal(size=400)})
+    y = pd.Series(2 * X["a"] + rng.normal(scale=0.1, size=400))
+    X.loc[:199, "b"] = np.nan  # empty in the first half, so in the first folds
+    best, params, _ = tune(GradientBoostingRegressor(random_state=0), {"max_iter": [50]}, X, y, gap_steps=1,
+                           n_iter=1, random_state=0, task="regression")
+    assert np.isfinite(best.predict(X)).all()
+    full = X.fillna(0.0)
+    ours = GradientBoostingRegressor(random_state=0, max_iter=50).fit(full, y).predict(full)
+    plain = HistGradientBoostingRegressor(random_state=0, max_iter=50).fit(full, y).predict(full)
+    assert np.array_equal(ours, plain)

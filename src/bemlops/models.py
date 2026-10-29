@@ -130,6 +130,39 @@ class ChangeRegressor(BaseEstimator, RegressorMixin):
         return np.where(np.isfinite(a), a, self.mean_) + self.base_.predict(X)
 
 
+class _IgnoreEmptyInputs:
+    """For gradient boosting: inputs with no values at all in the training rows are left out.
+
+    scikit-learn's histogram binning fails on a column that is entirely missing, which happens when a
+    long gap in the data falls inside an early tuning fold. When every input has values, the data are
+    passed through unchanged, so results are identical to the plain estimator.
+    """
+
+    def fit(self, X, y, **kwargs):
+        values = X.to_numpy(dtype=float) if hasattr(X, "to_numpy") else np.asarray(X, dtype=float)
+        used = ~np.all(np.isnan(values), axis=0)
+        self.used_inputs_ = None if used.all() else used
+        return super().fit(self._keep(X), y, **kwargs)
+
+    def _keep(self, X):
+        used = getattr(self, "used_inputs_", None)
+        if used is None:
+            return X
+        return X.loc[:, used] if hasattr(X, "loc") else np.asarray(X)[:, used]
+
+    def predict(self, X):
+        return super().predict(self._keep(X))
+
+
+class GradientBoostingRegressor(_IgnoreEmptyInputs, HistGradientBoostingRegressor):
+    pass
+
+
+class GradientBoostingClassifier(_IgnoreEmptyInputs, HistGradientBoostingClassifier):
+    def predict_proba(self, X):
+        return super().predict_proba(self._keep(X))
+
+
 def scores(estimator, X: pd.DataFrame, task: str) -> np.ndarray:
     """Predicted values (regression) or predicted probability of 'yes' (classification)."""
     if task == "classification":
@@ -162,7 +195,7 @@ def candidates(random_state: int = 0, task: str = "regression",
                  "model__max_features": [1.0, 0.6, 0.3]},
             ),
             "gbm": (
-                HistGradientBoostingClassifier(random_state=random_state),
+                GradientBoostingClassifier(random_state=random_state),
                 {"learning_rate": [0.05, 0.1, 0.2], "max_leaf_nodes": [7, 15, 31],
                  "min_samples_leaf": [20, 50, 100], "l2_regularization": [0.0, 0.1, 1.0],
                  "max_iter": [100, 200]},
@@ -180,7 +213,7 @@ def candidates(random_state: int = 0, task: str = "regression",
              "model__max_features": [1.0, 0.6, 0.3]},
         ),
         "gbm": (
-            HistGradientBoostingRegressor(random_state=random_state),
+            GradientBoostingRegressor(random_state=random_state),
             {"learning_rate": [0.05, 0.1, 0.2], "max_leaf_nodes": [7, 15, 31],
              "min_samples_leaf": [20, 50, 100], "l2_regularization": [0.0, 0.1, 1.0],
              "max_iter": [100, 200]},
@@ -188,7 +221,7 @@ def candidates(random_state: int = 0, task: str = "regression",
     }
     if anchor:
         pool["gbm_change"] = (
-            ChangeRegressor(HistGradientBoostingRegressor(random_state=random_state), anchor),
+            ChangeRegressor(GradientBoostingRegressor(random_state=random_state), anchor),
             {"base__learning_rate": [0.05, 0.1, 0.2], "base__max_leaf_nodes": [7, 15, 31],
              "base__min_samples_leaf": [20, 50, 100], "base__l2_regularization": [0.0, 0.1, 1.0],
              "base__max_iter": [100, 200]},
