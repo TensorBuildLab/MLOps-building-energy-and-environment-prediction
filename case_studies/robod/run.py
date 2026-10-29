@@ -36,6 +36,29 @@ def load(room: int) -> pd.DataFrame:
     ts = pd.to_datetime(df.pop("timestamp"), format="%Y-%m-%d %H:%M %z")
     df.index = pd.DatetimeIndex(ts).tz_convert("Asia/Singapore")  # keep local time; Singapore has no DST
     df.columns = [c.split(" [")[0] for c in df.columns]
+    return mask_dead_chilled_water_meter(df)
+
+
+def mask_dead_chilled_water_meter(df: pd.DataFrame) -> pd.DataFrame:
+    """Blank whole days on which the chilled-water meter read zero while the cooling coil was in use.
+
+    A day counts as an outage when the AHU fan ran (> 5 Hz) with the cooling-coil valve open (> 15%) for
+    at least one hour, yet the meter recorded no chilled-water energy at all during those rows. Zero
+    energy with an open valve and a running fan is physically implausible, so those days are set to
+    missing rather than kept as true zeros. The independent agents of the pilot study (paper Section 6.6)
+    found this outage in Room 5; the first version of this case study missed it.
+    """
+    if not {"chilled_water_energy", "cooling_coil_valve_command", "ahu_fan_speed"} <= set(df.columns):
+        return df
+    running = (df["cooling_coil_valve_command"] > 15) & (df["ahu_fan_speed"] > 5)
+    day = df.index.normalize()
+    cw_running = df["chilled_water_energy"].where(running)
+    by_day = pd.DataFrame({"run_rows": running, "cw": cw_running}).groupby(day).agg(
+        run_rows=("run_rows", "sum"), cw=("cw", "sum"))
+    dead = by_day.index[(by_day["run_rows"] >= 12) & (by_day["cw"] == 0)]
+    df = df.copy()
+    df.loc[day.isin(dead), "chilled_water_energy"] = float("nan")
+    df.attrs["dead_chilled_water_days"] = [d.strftime("%Y-%m-%d") for d in dead]
     return df
 
 
@@ -73,6 +96,8 @@ NOTES = [
     "Data cover weekdays in separate blocks between September and December 2021; gaps between blocks stay missing.",
     "outdoor_relative_humidity sits at 99.9-100% for many hours on tropical nights: saturation, not a stuck "
     "sensor. Declared flat_ok.",
+    "chilled_water_energy: whole days on which the meter read zero while the AHU fan ran with the cooling-coil "
+    "valve open are set to missing (dead meter; see mask_dead_chilled_water_meter).",
 ]
 
 TASKS = [

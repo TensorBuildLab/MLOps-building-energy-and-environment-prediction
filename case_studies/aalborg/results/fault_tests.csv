@@ -1,0 +1,5 @@
+comparison,metric,median_difference,p_value,n_pairs
+"faulty data, unguarded script vs bemlops",rmse_ppm,-0.0270209928150571,0.921875,10
+"faulty data, unguarded script vs bemlops",mae_ppm,1.8538986061419411,0.009765625,10
+"faulty data, unguarded script + same unit fix vs bemlops",rmse_ppm,0.012373874447263233,1.0,10
+"faulty data, unguarded script + same unit fix vs bemlops",mae_ppm,1.6417517753894302,0.009765625,10

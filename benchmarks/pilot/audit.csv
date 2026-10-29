@@ -1,8 +1,9 @@
-run,faults_found,final_model,tokens,tool_calls,minutes,notes
-T1_A-opus,7/8,own (gradient boosting on change from last value),173882,57,70,missed the 3-day stuck ventilation meter (input not used); found ventilation schedule change in May
-T1_A-sonnet,7/8,own (ExtraTrees + boosting on change from last value),227793,136,57,missed the stuck ventilation meter; excluded the unit-switched room temperature as a failed sensor
-T1_C-sonnet,7/8,own (ExtraTrees on change from last value); bemlops used for checks,278881,179,60,missed the stuck ventilation meter; bemlops showed no model beating persistence on its single test window
-T2_A-opus,8/8,own (boosting + meter-fault rules),211451,67,68,also found a five-week dead meter (zeros with valve open) and catch-up readings not planted by us
-T2_A-sonnet,8/8,own (time-of-day profile + ridge + rules),266722,71,82,also found the dead meter and catch-up readings
-T2_C-sonnet,7/8,own (time-of-day profile + ridge); bemlops used for checks,281109,134,68,missed the planted stuck airflow; found the dead meter; turned bemlops masking off as look-ahead
-T2_C-opus,8/8,bemlops random forest + own known-ahead schedule and holiday inputs,239422,94,96,found the dead meter; reported bemlops look-ahead masking and empty known-ahead inputs in live rows
+run,faults_found,final_model,own_causality_test,tokens,tool_calls,minutes,notes
+T1_A-opus,7/8,own (gradient boosting on change from last value),yes (dev/leak_test.py),173882,57,70,missed the 3-day stuck ventilation meter (input not used); found ventilation schedule change in May
+T1_A-sonnet,7/8,own (ExtraTrees + boosting on change from last value),yes (work/verify.py),227793,136,57,missed the stuck ventilation meter; excluded the unit-switched room temperature as a failed sensor
+T1_C-opus,7/8,bemlops gradient boosting on the change from the last value + own lagged inputs,yes (check_causal.py),265044,97,152,missed the stuck ventilation meter; changed the split to 0.8/0.1/0.1 to train on the new ventilation schedule; reported DST crashes; look-ahead masking and the missing change model
+T1_C-sonnet,7/8,own (ExtraTrees on change from last value); bemlops used for checks,yes (work/verify.py),278881,179,60,missed the stuck ventilation meter; bemlops showed no model beating persistence on its single test window
+T2_A-opus,8/8,own (boosting + meter-fault rules),yes (dev_leak.py),211451,67,68,also found a five-week dead meter (zeros with valve open) and catch-up readings not planted by us
+T2_A-sonnet,8/8,own (time-of-day profile + ridge + rules),no (causality stated in docstring only),266722,71,82,also found the dead meter and catch-up readings
+T2_C-sonnet,7/8,own (time-of-day profile + ridge); bemlops used for checks,yes (work/test_causal.py),281109,134,68,missed the planted stuck airflow; found the dead meter; turned bemlops masking off as look-ahead
+T2_C-opus,8/8,bemlops random forest + own known-ahead schedule and holiday inputs,yes (test_predict.py; test_stress.py),239422,94,96,found the dead meter; reported bemlops look-ahead masking and empty known-ahead inputs in live rows

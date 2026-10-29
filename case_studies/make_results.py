@@ -75,9 +75,36 @@ def iqr(s: pd.Series) -> str:
     return f"{s.median():.2f} [{s.quantile(.25):.2f}, {s.quantile(.75):.2f}]"
 
 
+def wilson(k: int, n: int, z: float = 1.96) -> tuple:
+    """Wilson score interval for a proportion [Wilson 1927]."""
+    if n == 0:
+        return float("nan"), float("nan")
+    p = k / n
+    den = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / den
+    half = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
+    return centre - half, centre + half
+
+
+def share(mask) -> str:
+    """'k/n (p%, 95% CI lo-hi%)' for a boolean series."""
+    m = pd.Series(mask).dropna().astype(bool)
+    k, n = int(m.sum()), len(m)
+    if n == 0:
+        return "n/a"
+    lo, hi = wilson(k, n)
+    return f"{k}/{n} ({k / n:.0%}; {lo:.0%}–{hi:.0%})"
+
+
+def dm_results() -> pd.DataFrame:
+    f = HERE / "dm_tests.csv"
+    return pd.read_csv(f) if f.exists() else pd.DataFrame(columns=["task", "model_better_p05"])
+
+
 # ----- Table: results by target type ----------------------------------------------------
 def table_targets(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
+    dm = dm_results().set_index("task")["model_better_p05"] if not dm_results().empty else pd.Series(dtype=bool)
     for cat in CATEGORY_ORDER:
         d = df[df["category"] == cat]
         if d.empty:
@@ -96,14 +123,41 @@ def table_targets(df: pd.DataFrame) -> pd.DataFrame:
             "Datasets": ", ".join(sorted(d["dataset"].unique())),
             "Tasks": len(d),
             "Fitted": len(fit),
-            "Skill vs baseline, median [IQR]": iqr(fit["skill"]),
-            "Beat baseline (skill > 0)": f"{(fit['skill'] > 0).mean():.0%}",
+            "Skill, median [IQR]": iqr(fit["skill"]),
+            "Model chosen over baseline": f"{(fit['chosen'] != fit['baseline']).sum()}/{len(fit)}",
+            "Skill > 0": share(fit["skill"] > 0),
+            "Better than baseline, DM p < 0.05": share(fit["task"].map(dm).fillna(False))
+            if len(dm) else "n/a",
             "Backtest skill, median": f"{fit['backtest_skill'].median():.2f}"
             if "backtest_skill" in fit and fit["backtest_skill"].notna().any() else "n/a",
-            "90% interval coverage, median": f"{fit['interval_coverage'].median():.0%}"
+            "90% interval coverage, median [range]":
+                f"{fit['interval_coverage'].median():.0%} [{fit['interval_coverage'].min():.0%}–"
+                f"{fit['interval_coverage'].max():.0%}]"
             if "interval_coverage" in fit and fit["interval_coverage"].notna().any() else "n/a",
-            "Passed all gates": f"{fit['gates_passed'].mean():.0%}",
+            "Passed all gates": share(fit["gates_passed"]),
             "Typical test error (median)": err,
+        })
+    return pd.DataFrame(rows)
+
+
+def table_datasets(df: pd.DataFrame) -> pd.DataFrame:
+    """Headline proportions per dataset, with Wilson intervals."""
+    dm = dm_results().set_index("task")["model_better_p05"] if not dm_results().empty else pd.Series(dtype=bool)
+    rows = []
+    for ds, d in list(df.groupby("dataset", sort=False)) + [("All", df)]:
+        fit = d[d["status"] == "fitted"]
+        g14 = fit["g14_pass"].dropna() if "g14_pass" in fit else pd.Series(dtype=bool)
+        rows.append({
+            "Dataset": ds, "Tasks": len(d), "Fitted": len(fit),
+            "Skill, median [IQR]": iqr(fit["skill"]),
+            "Baseline kept (chosen on validation)": f"{(fit['chosen'] == fit['baseline']).sum()}/{len(fit)}",
+            "Skill > 0": share(fit["skill"] > 0),
+            "Better than baseline, DM p < 0.05": share(fit["task"].map(dm).fillna(False)) if len(dm) else "n/a",
+            "Guideline 14 met (energy tasks)": share(g14) if len(g14) else "n/a",
+            "Passed all gates": share(fit["gates_passed"]),
+            "Test and backtest skill disagree in sign": share(
+                (np.sign(fit["skill"]) != np.sign(fit["backtest_skill"]))[fit["backtest_skill"].notna()])
+            if fit["backtest_skill"].notna().any() else "n/a",
         })
     return pd.DataFrame(rows)
 
@@ -149,10 +203,24 @@ def table_protocol(p: pd.DataFrame) -> pd.DataFrame:
             "Error understated by shuffling, median": f"{under.median():.0%}",
             "Tasks understated by > 10%": f"{(d['optimism_ratio'] > 1.1).mean():.0%}",
             "R² shuffled vs blocked (median)": f"{d['r2_shuffled_cv'].median():.2f} vs {d['r2_blocked_cv'].median():.2f}",
-            "Adding feature selection on all rows (median ratio to shuffled)":
+            "Shuffled + selection on all rows / shuffled, median":
                 f"{(d['rmse_shuffled_cv_selection'] / d['rmse_shuffled_cv']).median():.2f}",
+            "Time-ordered holdout / blocked CV, median [range]":
+                (lambda r: f"{r.median():.2f} [{r.min():.2f}–{r.max():.2f}]")(
+                    d["rmse_time_ordered_holdout"] / d["rmse_blocked_cv"]),
         })
     return pd.DataFrame(rows)
+
+
+def table_protocol_tasks(p: pd.DataFrame) -> pd.DataFrame:
+    """Per-task protocol results (appendix)."""
+    t = p[["dataset", "task", "rmse_shuffled_cv", "rmse_shuffled_cv_selection", "rmse_blocked_cv",
+           "rmse_time_ordered_holdout", "optimism_ratio"]].copy()
+    for c in t.columns[2:]:
+        t[c] = t[c].map(lambda v: f"{v:.3g}")
+    return t.rename(columns={"rmse_shuffled_cv": "Shuffled CV", "rmse_shuffled_cv_selection": "Shuffled + selection",
+                             "rmse_blocked_cv": "Blocked CV", "rmse_time_ordered_holdout": "Time-ordered holdout",
+                             "optimism_ratio": "Blocked / shuffled"})
 
 
 def fig_protocol(p: pd.DataFrame) -> None:
@@ -197,44 +265,102 @@ def tables_faults():
         "R²": [f"{d['r2'].mean():.2f}" for _, d in g],
         "Runs": [len(d) for _, d in g],
     })
-    return t1, t2
+    tests_file = HERE / "aalborg" / "results" / "fault_tests.csv"
+    t3 = None
+    if tests_file.exists():
+        t3 = pd.read_csv(tests_file)
+        t3["comparison"] = t3["comparison"].str.replace("faulty data, ", "").str.replace(" vs bemlops",
+                                                                                          " minus bemlops")
+        t3["median_difference"] = t3["median_difference"].map(lambda v: f"{v:+.2f}")
+        t3["p_value"] = t3["p_value"].map(lambda v: f"{v:.3f}")
+        t3 = t3.rename(columns={"comparison": "Paired difference (same seed)", "metric": "Metric",
+                                "median_difference": "Median (ppm)", "p_value": "Wilcoxon p",
+                                "n_pairs": "Pairs"})
+    return t1, t2, t3
 
 
 # ----- Lifecycle -------------------------------------------------------------------------------
-def lifecycle():
+LIFECYCLE_ARMS = {  # column -> (label, colour, line style)
+    "static_rmse": ("static (never retrained)", COLORS["Aalborg"], "-"),
+    "naive_rmse": ("retrained every month", COLORS["BDG2"], "-"),
+    "production_rmse": ("monitored, gated retraining", COLORS["ROBOD"], "-"),
+    "persistence_rmse": ("persistence", INK2, "--"),
+}
+
+
+def lifecycle_frame() -> pd.DataFrame:
+    """Monthly RMSE of every arm on the same month, plus the causal fallback-rule counterfactual.
+
+    Fallback rule (added to the drift check after this experiment): in month m, serve persistence
+    instead of the production model if the production model was worse than persistence in month m-1.
+    The decision uses only month m-1, so it could have been taken in operation.
+    """
     lc = pd.read_csv(HERE / "aalborg" / "results" / "lifecycle.csv")
+    lc["persistence_rmse"] = lc["production_persistence_rmse"]
+    naive = HERE / "aalborg" / "results" / "lifecycle_naive.csv"
+    if naive.exists():
+        lc = lc.merge(pd.read_csv(naive)[["task", "month", "naive_rmse", "naive_persistence_rmse"]],
+                      on=["task", "month"], how="left")
+    else:
+        lc["naive_rmse"] = np.nan
+    parts = []
+    for _, d in lc.groupby("task", sort=False):
+        d = d.sort_values("month").copy()
+        worse_last_month = (d["production_skill"] < 0).shift(1, fill_value=False).astype(bool)
+        d["fallback_uses_persistence"] = worse_last_month
+        d["fallback_rmse"] = np.where(worse_last_month, d["persistence_rmse"], d["production_rmse"])
+        parts.append(d)
+    return pd.concat(parts, ignore_index=True)
+
+
+def lifecycle():
+    lc = lifecycle_frame()
     tasks = list(dict.fromkeys(lc["task"]))
     fig, axes = plt.subplots(1, len(tasks), figsize=(3.6 * len(tasks), 3.0))
     axes = np.atleast_1d(axes)
     for ax, task in zip(axes, tasks):
         d = lc[lc["task"] == task]
         x = np.arange(len(d))
-        ax.plot(x, d["static_skill"], color=COLORS["Aalborg"], lw=2, marker="o", ms=4,
-                label="static (never retrained)")
-        ax.plot(x, d["production_skill"], color=COLORS["ROBOD"], lw=2, marker="o", ms=4,
-                label="monitored + retrained")
+        for col, (label, color, ls) in LIFECYCLE_ARMS.items():
+            if d[col].notna().any():
+                ax.plot(x, d[col], color=color, lw=2 if ls == "-" else 1.2, ls=ls, marker="o" if ls == "-" else None,
+                        ms=4, label=label, zorder=3 if col == "production_rmse" else 2)
         for xi, (_, r) in zip(x, d.iterrows()):
             if bool(r["promoted"]):
-                ax.annotate("new version\npromoted", (xi, r["production_skill"]), xytext=(0, -26),
-                            textcoords="offset points", ha="center", fontsize=7, color=INK2,
-                            arrowprops={"arrowstyle": "-", "color": INK2, "lw": 0.6})
-        ax.axhline(0, color=INK2, lw=0.8)
+                ax.annotate("promoted", (xi + 0.5, ax.get_ylim()[1]), xytext=(0, -2), textcoords="offset points",
+                            ha="center", va="top", fontsize=7, color=INK2)
+                ax.axvline(xi + 0.5, color=GRID, lw=1.2, zorder=1)
         ax.set_xticks(x, [m[5:] for m in d["month"]])
         ax.set_xlabel("month of 2023")
+        unit = "kW" if "heating" in task.lower() else "ppm"
+        ax.set_ylabel(f"monthly RMSE ({unit})")
         ax.set_title(task, fontsize=9, color=INK, loc="left")
-    axes[0].set_ylabel("monthly skill vs persistence")
-    axes[0].legend(loc="lower left", frameon=False, fontsize=8)
+    axes[0].legend(loc="upper left", frameon=False, fontsize=7)
     fig.tight_layout()
-    fig.savefig(FIGS / "lifecycle_skill.png", dpi=200)
+    fig.savefig(FIGS / "lifecycle_rmse.png", dpi=200)
     plt.close(fig)
-    t = lc[["task", "month", "production_version", "static_rmse", "production_rmse", "static_skill",
-            "production_skill", "drift_ratio", "retrain_recommended", "promoted", "data_issues"]].copy()
-    for c in ("static_rmse", "production_rmse"):
-        t[c] = t[c].map(lambda v: f"{v:.3g}")
-    for c in ("static_skill", "production_skill", "drift_ratio"):
-        t[c] = t[c].map(lambda v: f"{v:.2f}")
-    t["data_issues"] = t["data_issues"].fillna("").str.replace(";", ", ")
-    return t
+    t = lc[["task", "month", "production_version", "static_rmse", "naive_rmse", "production_rmse",
+            "persistence_rmse", "fallback_rmse", "drift_ratio", "retrain_recommended", "promoted"]].copy()
+    for c in ("static_rmse", "naive_rmse", "production_rmse", "persistence_rmse", "fallback_rmse"):
+        t[c] = t[c].map(lambda v: f"{v:.3g}" if pd.notna(v) else "")
+    t["fallback_rmse"] = [f"{v} (P)" if p else v for v, p in zip(t["fallback_rmse"], lc["fallback_uses_persistence"])]
+    t["drift_ratio"] = t["drift_ratio"].map(lambda v: f"{v:.2f}")
+    t = t.rename(columns={"production_version": "Version", "static_rmse": "Static", "naive_rmse": "Monthly retrain",
+                          "production_rmse": "Monitored + gated", "persistence_rmse": "Persistence",
+                          "fallback_rmse": "Gated + fallback rule", "drift_ratio": "Drift ratio",
+                          "retrain_recommended": "Retrain advised", "promoted": "Promoted"})
+    summary = []
+    for task, d in lc.groupby("task", sort=False):
+        row = {"Task": task}
+        for col, label in (("static_rmse", "Static"), ("naive_rmse", "Monthly retrain"),
+                           ("production_rmse", "Monitored + gated"), ("persistence_rmse", "Persistence"),
+                           ("fallback_rmse", "Gated + fallback rule")):
+            row[label] = f"{d[col].mean():.3g}" if d[col].notna().any() else ""
+        row["Months monitored model beat persistence"] = f"{(d['production_rmse'] < d['persistence_rmse']).sum()}/{len(d)}"
+        row["Retrains (promoted)"] = f"{int(d['retrain_recommended'].sum())} ({int(d['promoted'].sum())})"
+        row["Monthly fits, naive arm"] = int(d["naive_rmse"].notna().sum())
+        summary.append(row)
+    return t, pd.DataFrame(summary)
 
 
 # ----- BDG2 --------------------------------------------------------------------------------------
@@ -257,10 +383,11 @@ def bdg2(df: pd.DataFrame):
     t = pd.DataFrame([{
         "Buildings": len(d), "Sites": d["site"].nunique(), "Fitted": len(fit),
         "Primary uses": d["primary_use"].nunique(),
-        "Skill vs persistence, median [IQR]": iqr(fit["skill"]),
+        "Skill vs strongest baseline, median [IQR]": iqr(fit["skill"]),
+        "Skill > 0": share(fit["skill"] > 0),
         "CV(RMSE) %, median [IQR]": iqr(fit["test_cvrmse_pct"]),
-        "Passed Guideline 14": f"{fit['g14_pass'].mean():.0%}",
-        "Passed all gates": f"{fit['gates_passed'].mean():.0%}",
+        "Met Guideline 14": share(fit["g14_pass"]),
+        "Passed all gates": share(fit["gates_passed"]),
         "Seconds per building, median": f"{fit['seconds'].median():.0f}",
     }])
     return t
@@ -293,18 +420,67 @@ def pilot() -> pd.DataFrame:
     audit_file = folder.parent / "audit.csv"
     if audit_file.exists():
         s = s.merge(pd.read_csv(audit_file), on="run", how="left")
+    stats_file = folder / "pilot_stats.csv"
+    if stats_file.exists():
+        s = s.merge(pd.read_csv(stats_file)[["run", "profile_rmse", "skill_vs_profile"]], on="run", how="left")
     s["actual / expected RMSE"] = s["rmse"] / s["expected_rmse"]
-    cols = ["task", "condition", "model", "delivered", "rmse", "persistence_rmse", "skill", "expected_rmse",
-            "actual / expected RMSE", "leak_failures", "leak_tests"] + \
-           [c for c in ("faults_found", "final_model") if c in s.columns]
-    out = s[cols].sort_values(["task", "condition", "model"]).copy()
-    for c in ("rmse", "persistence_rmse", "expected_rmse"):
-        out[c] = out[c].map(lambda v: f"{v:.3g}" if pd.notna(v) else "")
-    for c in ("skill", "actual / expected RMSE"):
-        out[c] = out[c].map(lambda v: f"{v:.2f}" if pd.notna(v) else "")
+    cols = ["task", "condition", "model", "delivered", "rmse", "persistence_rmse", "skill", "profile_rmse",
+            "skill_vs_profile", "expected_rmse", "actual / expected RMSE", "leak_failures", "leak_tests"]
+    out = s[[c for c in cols if c in s.columns]].sort_values(["task", "condition", "model"]).copy()
+    for c in ("rmse", "persistence_rmse", "profile_rmse", "expected_rmse"):
+        if c in out:
+            out[c] = out[c].map(lambda v: f"{v:.3g}" if pd.notna(v) else "")
+    for c in ("skill", "skill_vs_profile", "actual / expected RMSE"):
+        if c in out:
+            out[c] = out[c].map(lambda v: f"{v:.3f}" if pd.notna(v) else "")
     out["leakage test"] = out.apply(lambda r: f"{int(r['leak_failures'])}/{int(r['leak_tests'])} changed"
                                     if pd.notna(r.get("leak_tests")) else "", axis=1)
-    return out.drop(columns=["leak_failures", "leak_tests"])
+    out = out.drop(columns=["leak_failures", "leak_tests"]).rename(columns={
+        "rmse": "RMSE", "persistence_rmse": "Persistence RMSE", "skill": "Skill vs persistence",
+        "profile_rmse": "Profile RMSE", "skill_vs_profile": "Skill vs profile", "expected_rmse": "Self-reported RMSE"})
+    return out
+
+
+def pilot_audit() -> pd.DataFrame:
+    """What each agent found and built, and what it cost (manual audit + agent usage counters)."""
+    pdir = HERE.parent / "benchmarks" / "pilot"
+    a = pd.read_csv(pdir / "audit.csv")
+    a["Task"] = a["run"].str[:2]
+    a["Condition"] = a["run"].str[3].map({"A": "alone", "C": "+ bemlops"})
+    a["Model"] = a["run"].str.split("-").str[-1].str.capitalize()
+    a = a.sort_values(["Task", "Condition", "Model"])
+    a["Tokens (thousands)"] = (a["tokens"] / 1000).round().astype(int)
+    return a[["Task", "Condition", "Model", "faults_found", "own_causality_test", "final_model",
+              "Tokens (thousands)", "tool_calls", "minutes"]].rename(columns={
+        "faults_found": "Planted faults found", "own_causality_test": "Own causality test",
+        "final_model": "Final model", "tool_calls": "Tool calls", "minutes": "Minutes"})
+
+
+def pilot_pairs() -> pd.DataFrame:
+    f = HERE.parent / "benchmarks" / "pilot" / "results" / "pilot_pairs.csv"
+    if not f.exists():
+        return pd.DataFrame()
+    p = pd.read_csv(f)
+    unit = p["task"].map({"T1": "ppm", "T2": "kWh"})
+    return pd.DataFrame({
+        "Task": p["task"], "Model": p["model"].str.capitalize(),
+        "RMSE, + bemlops minus alone": [f"{v:+.2f} {u}" for v, u in zip(p["rmse_bemlops_minus_alone"], unit)],
+        "95% day-block bootstrap interval": [f"[{lo:+.2f}, {hi:+.2f}]" for lo, hi in zip(p["ci95_low"], p["ci95_high"])],
+        "Days": p["days"],
+    })
+
+
+def dm_table() -> pd.DataFrame:
+    dm = dm_results()
+    if dm.empty:
+        return dm
+    rows = []
+    for ds, d in list(dm.groupby("dataset", sort=False)) + [("All", dm)]:
+        rows.append({"Dataset": ds, "Fitted tasks tested": len(d),
+                     "Model better than baseline (p < 0.05)": share(d["model_better_p05"]),
+                     "Baseline better (p < 0.05)": share((d["dm_stat"] > 0) & (d["p_value"] < 0.05)),
+                     "No significant difference": share(~(d["p_value"] < 0.05))})
+    return pd.DataFrame(rows)
 
 
 def main() -> None:
@@ -312,25 +488,39 @@ def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
     df = load_summaries()
     df.to_csv(TABLES / "all_tasks.csv", index=False)
-    (TABLES / "targets.md").write_text(md_table(table_targets(df)), encoding="utf-8")
-    (TABLES / "data_issues.md").write_text(md_table(data_issue_table(df)), encoding="utf-8")
+    write = lambda name, frame: (TABLES / f"{name}.md").write_text(md_table(frame), encoding="utf-8")  # noqa: E731
+    write("targets", table_targets(df))
+    write("datasets", table_datasets(df))
+    write("data_issues", data_issue_table(df))
     fig_skill(df)
+    dm = dm_table()
+    if not dm.empty:
+        write("dm_tests", dm)
     p = protocol()
     if not p.empty:
-        (TABLES / "protocol.md").write_text(md_table(table_protocol(p)), encoding="utf-8")
+        write("protocol", table_protocol(p))
+        write("protocol_tasks", table_protocol_tasks(p))
         fig_protocol(p)
     if (HERE / "aalborg" / "results" / "fault_detection_rate.csv").exists():
-        t1, t2 = tables_faults()
-        (TABLES / "fault_detection.md").write_text(md_table(t1), encoding="utf-8")
-        (TABLES / "fault_cost.md").write_text(md_table(t2), encoding="utf-8")
+        t1, t2, t3 = tables_faults()
+        write("fault_detection", t1)
+        write("fault_cost", t2)
+        if t3 is not None:
+            write("fault_tests", t3)
     if (HERE / "aalborg" / "results" / "lifecycle.csv").exists():
-        (TABLES / "lifecycle.md").write_text(md_table(lifecycle()), encoding="utf-8")
+        monthly, summary = lifecycle()
+        write("lifecycle", monthly)
+        write("lifecycle_summary", summary)
     t = bdg2(df)
     if t is not None:
-        (TABLES / "bdg2.md").write_text(md_table(t), encoding="utf-8")
+        write("bdg2", t)
     pt = pilot()
     if not pt.empty:
-        (TABLES / "pilot.md").write_text(md_table(pt), encoding="utf-8")
+        write("pilot", pt)
+        write("pilot_audit", pilot_audit())
+        pp = pilot_pairs()
+        if not pp.empty:
+            write("pilot_pairs", pp)
     counts = df.groupby("dataset").agg(tasks=("task", "count"), fitted=("status", lambda s: (s == "fitted").sum()))
     print(counts.to_string())
     print(f"Wrote {TABLES} and {FIGS}")

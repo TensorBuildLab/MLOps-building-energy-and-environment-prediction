@@ -1,0 +1,2 @@
+run,task,expected_rmse,delivered,hidden_rows,rmse,mae,persistence_rmse,skill,coverage,actual_over_expected,leak_tests,leak_failures,leakage
+T1_C-opus,T1,27,True,2880,19.736692205124456,11.240987161633345,20.94678184717372,0.05776971617301385,1.0,0.7309886001897946,15,0,False
