@@ -102,6 +102,17 @@ _register(Quantity("co2", "ppm", {"ppm": _identity}, plausible=(250, 10000), typ
 _register(Quantity("pm25", "ug/m3", {"ug/m3": _identity, "mg/m3": _scale(1e3)}, plausible=(0, 2000),
                    typical=(0, 500), zero_runs_ok=True, spike_check=False, brick="PM2.5_Sensor",
                    description="Short spikes are often real (cooking, cleaning, a passing truck)"))
+_register(Quantity("voc", "ppb", {"ppb": _identity, "ppm": _scale(1e3)},
+                   plausible=(0, 100000), typical=(0, 10000), zero_runs_ok=True, spike_check=False,
+                   brick="TVOC_Sensor", description="Total volatile organic compounds"))
+_register(Quantity("sound_level", "dBA", {"dBA": _identity, "dB": _identity}, plausible=(0, 140),
+                   typical=(20, 120), spike_check=False, description="Sound pressure level"))
+_register(Quantity("barometric_pressure", "hPa", {"hPa": _identity, "kPa": _scale(10.0), "Pa": _scale(0.01),
+                                                   "mbar": _identity, "inHg": _scale(33.8639)},
+                   plausible=(850, 1090), typical=(870, 1080), description="Atmospheric pressure"))
+_register(Quantity("water_flow", "L/s", {"L/s": _identity, "gpm": _scale(0.0630902), "m3/h": _scale(1 / 3.6),
+                                         "L/min": _scale(1 / 60)},
+                   plausible=(0, float("inf")), zero_runs_ok=True, spike_check=False, brick="Water_Flow_Sensor"))
 _register(Quantity("illuminance", "lux", {"lux": _identity, "fc": _scale(10.7639)}, plausible=(0, 150000),
                    zero_runs_ok=True, spike_check=False, brick="Illuminance_Sensor",
                    description="Jumps are real (lights switching, sun patches)"))
@@ -157,7 +168,8 @@ _UNIT_ALIASES = {
     "m/s": "m/s", "mph": "mph", "km/h": "km/h",
     "count": "count", "people": "count", "persons": "count", "#": "count",
     "binary": "binary", "bool": "binary", "on/off": "binary", "0/1": "binary",
-    "m3/s": "m3/s", "cfm": "cfm", "l/s": "L/s", "m3/h": "m3/h",
+    "m3/s": "m3/s", "cfm": "cfm", "l/s": "L/s", "m3/h": "m3/h", "gpm": "gpm", "l/min": "L/min",
+    "ppb": "ppb", "dba": "dBA", "db(a)": "dBA", "db": "dB", "hpa": "hPa", "mbar": "mbar", "inhg": "inHg",
     "pa": "Pa", "kpa": "kPa", "inh2o": "inH2O", "in wc": "inH2O", "in. w.c.": "inH2O", "psi": "psi",
 }
 

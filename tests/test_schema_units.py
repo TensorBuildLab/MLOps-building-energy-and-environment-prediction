@@ -74,3 +74,24 @@ def test_shorthand_flags():
     s = parse_spec("c", "co2 [ppm] flat_ok")
     assert s.flat_ok and s.unit == "ppm"
     assert parse_spec("o", "outdoor temperature [degC], known_ahead").known_ahead
+
+
+def test_more_quantities_and_single_threaded_saves(tmp_path):
+    from bemlops.checks import check_data
+    from bemlops.models import candidates
+
+    idx = pd.date_range("2025-01-01", periods=500, freq="15min")
+    rng = np.random.default_rng(0)
+    df = pd.DataFrame({"p": 1013 + rng.normal(0, 3, 500), "v": 200 + rng.normal(0, 20, 500),
+                       "s": 45 + rng.normal(0, 3, 500), "w": 2 + rng.random(500)}, index=idx)
+    specs = parse_columns({"p": "barometric_pressure [hPa]", "v": "voc [ppb]", "s": "sound_level [dBA]",
+                           "w": "water_flow [L/s]"})
+    assert check_data(df, specs, "w").ok
+    est, _ = candidates(0)["random_forest"]
+    from bemlops.deploy import ForecastModel
+    import dataclasses
+    fields = {f.name: None for f in dataclasses.fields(ForecastModel)}
+    fields.update(estimator=est, specs={}, feature_names=[], target_lags=[], input_ranges={}, test_error=1.0)
+    m = ForecastModel(**fields)
+    m.save(tmp_path / "m.joblib")
+    assert est.get_params()["model__n_jobs"] == 1

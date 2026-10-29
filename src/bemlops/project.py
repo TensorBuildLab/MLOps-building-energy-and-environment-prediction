@@ -313,25 +313,30 @@ class Project:
 
     def fit(self, models: Optional[Sequence[str]] = None, n_iter: Optional[int] = None,
             fractions=None, random_state: Optional[int] = None,
-            custom_models: Optional[Mapping[str, Any]] = None, backtest_blocks: Optional[int] = None) -> Results:
+            custom_models: Optional[Mapping[str, Any]] = None, backtest_blocks: Optional[int] = None,
+            refit_all: Optional[bool] = None) -> Results:
         """Choose and evaluate a model.
 
         custom_models: {name: (estimator, search_space)} added to the candidates, e.g. a model the
             agent built. It is evaluated under exactly the same rules as the built-in ones.
         backtest_blocks: also refit the chosen model before each of this many later blocks and score
             each block (rolling origin), so one unusual test period cannot decide the verdict alone.
+        refit_all: after evaluation, refit the chosen configuration on all data (including the test
+            period) for deployment. The reported metrics remain those of the evaluated model; the record
+            says which data the deployed model saw.
         """
         # Saved fit options (e.g. from a configuration) fill in anything not given here.
         saved = self.fit_options
         explicit = models or saved.get("models")
         models = tuple(explicit or DEFAULT_MODELS[self.task])
         backtest_blocks = backtest_blocks if backtest_blocks is not None else saved.get("backtest_blocks", 3)
+        refit_all = bool(refit_all if refit_all is not None else saved.get("refit_all", False))
         n_iter = n_iter if n_iter is not None else saved.get("n_iter", 10)
         fractions = tuple(fractions or saved.get("fractions") or (0.7, 0.15, 0.15))
         random_state = random_state if random_state is not None else saved.get("random_state", 0)
         self.fit_options = {"models": list(models) if explicit else None, "n_iter": n_iter,
                             "fractions": list(fractions), "random_state": random_state,
-                            "backtest_blocks": backtest_blocks}
+                            "backtest_blocks": backtest_blocks, "refit_all": refit_all}
 
         blocking = self.unresolved()
         if blocking:
@@ -464,11 +469,18 @@ class Project:
         task_info = {"target": target, "quantity": q.name, "unit": unit, "mode": self.mode, "task_type": task,
                      "horizon_steps": h, "step": str(step),
                      "description": f"{self.mode} {kind}{target} ({q.name}, {unit}) {horizon_text}"}
+        deployed, deployed_end = final, sp.bounds["val"][1]
+        if refit_all:
+            deployed = clone(base_est).set_params(**params) if params else clone(base_est)
+            deployed.fit(Xu, yu)
+            deployed_end = Xu.index[-1]
+            warnings_.append("Deployed model refitted on all data, including the test period; the reported "
+                             "test metrics are those of the model trained before it.")
         model = ForecastModel(
             target=target, specs=dict(self.specs), horizon=h, step=step,
-            prepare_options=self.prepare_options, estimator=final, model_name=chosen,
+            prepare_options=self.prepare_options, estimator=deployed, model_name=chosen,
             feature_names=list(X.columns), target_lags=lags, include_doy="doy_sin" in X.columns,
-            input_ranges=ranges, test_error=test_m[primary], train_end=sp.bounds["val"][1],
+            input_ranges=ranges, test_error=test_m[primary], train_end=deployed_end,
             version=__version__, trained_at=_dt.datetime.now().isoformat(timespec="seconds"), unit=unit,
             task=task, timestamp=self.timestamp, timestamp_format=self.timestamp_format,
             config=self.config(), train_start=sp.bounds["train"][0], target_range=target_range,

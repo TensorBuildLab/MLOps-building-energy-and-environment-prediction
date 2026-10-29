@@ -204,7 +204,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
         top = ", ".join(f"'{k}' ({n})" for k, n in co.unparseable.most_common(4))
         issues.append(Issue(f"non_numeric:{name}", "warning", name,
                             f"{sum(co.unparseable.values())} entries are text, not numbers: {top}.",
-                            "prepare() treats them as missing.", {"values": dict(co.unparseable)}))
+                            "prepare() treats them as missing (by default).", {"values": dict(co.unparseable)}))
     if co.decimal_comma:
         top = ", ".join(f"'{k}'" for k, _ in co.decimal_comma.most_common(3))
         issues.append(Issue(f"decimal_comma:{name}", "error", name,
@@ -236,7 +236,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
         issues.append(Issue(f"sentinel:{name}", "warning", name,
                             f"{int(sent.sum())} readings are placeholder values ({_examples(v[sent])}) that "
                             f"controllers write when a reading is missing.",
-                            "prepare() treats them as missing.", {"n": int(sent.sum())}))
+                            "prepare() treats them as missing (by default).", {"n": int(sent.sum())}))
     v = v.mask(sent)
 
     unit_ok = q.canonical_unit is None
@@ -289,7 +289,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
                 issues.append(Issue(f"out_of_range:{name}", "error", name, msg, fix, {"n": int(oor.sum())}))
             else:
                 issues.append(Issue(f"out_of_range:{name}", "warning", name, msg,
-                                    "prepare() treats them as missing.", {"n": int(oor.sum())}))
+                                    "prepare() treats them as missing (by default).", {"n": int(oor.sum())}))
             v = v.mask(oor)
 
     if not (q.may_be_constant or spec.flat_ok):
@@ -299,7 +299,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
             total = sum((r.duration for r in runs), pd.Timedelta(0))
             msg = (f"Sensor repeats exactly {longest.value:g} for {fmt_td(longest.duration)} "
                    f"({longest.start} to {longest.end}); {len(runs)} such stretch(es), {fmt_td(total)} in total.")
-            fix = "prepare() treats these stretches as missing."
+            fix = "prepare() treats these stretches as missing once they are detectable (by default)."
             # Change-of-value logging (a new value only when it moves past a deadband) produces long flat
             # stretches that are not faults. Found on real data (Aalborg CO2: 95% of steps unchanged).
             d = v.dropna().diff().dropna()
@@ -324,7 +324,7 @@ def check_column(s: pd.Series, spec: ColumnSpec, is_target: bool, stuck_hours: f
             t0 = v.index[spikes.to_numpy()][0]
             issues.append(Issue(f"spikes:{name}", "warning", name,
                                 f"{int(spikes.sum())} single-sample spike(s), e.g. {_examples(v[spikes])} at {t0}.",
-                                "prepare() treats them as missing.", {"n": int(spikes.sum())}))
+                                "prepare() treats them as missing (by default).", {"n": int(spikes.sum())}))
 
     if q.kind == "interval":
         d = v.dropna().diff().dropna()
