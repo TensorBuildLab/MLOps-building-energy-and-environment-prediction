@@ -6,7 +6,7 @@ authors:
   - name: "TensorBuildLab"
 repository-code: "https://github.com/TensorBuildLab/MLOps-building-energy-and-environment-prediction"
 license: BSD-3-Clause
-version: 0.1.0.dev0
+version: 0.2.0
 preferred-citation:
   type: article
   title: "Scaling Data-Driven Building Energy Modelling using Large Language Models"
