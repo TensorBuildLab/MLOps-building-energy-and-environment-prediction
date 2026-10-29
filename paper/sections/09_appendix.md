@@ -54,3 +54,9 @@ every earlier fit of these models would have failed at the same point.
 
 This is principle P9 of Kreuzberger et al. [2023], feedback loops, applied to
 the framework itself.
+
+## Appendix B. Evaluation protocol per task
+
+**Table B1.** RMSE of the same random forest on the same rows under each protocol, in the target's own unit. The time-ordered holdout scores a different, later window and is shown for reference.
+
+<!-- table: protocol_tasks -->

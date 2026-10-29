@@ -1,51 +1,103 @@
 ## 8. Conclusion
 
-Large language model agents can now write the code for a building prediction
-model. Whether the result can be trusted in operation depends on what
-surrounds that code. We divided the work: the agent provides the
-generalization that messy, building-specific data demand, and domain
-guardrails provide the guarantees that operation demands. The guarantees are:
+LLM agents can now write the code for a building prediction model. Whether
+the result can be relied on in operation depends on what surrounds that code.
+We divided the work. The agent supplies the judgment that messy,
+building-specific data demand. A domain package applies the same checks every
+time:
 - declarations checked against physics;
-- causal cleaning and leakage-safe inputs;
-- time-ordered evaluation against the strongest simple baseline;
-- gated promotion, monitoring, champion/challenger retraining;
-- a complete record.
+- causal cleaning, and inputs that cannot reach past the forecast time;
+- time-ordered evaluation against the strongest no-ML baseline;
+- gated promotion, monitoring and retraining;
+- one record per run.
 
-On real buildings in three countries, the same workflow handled every kind of
-target we tried: energy, thermal load, temperature, CO2, humidity, PM2.5,
-people counts and occupancy. It kept the simple rule wherever a model could
-not clearly beat it. Five measurements show what the guardrails change:
-1. **Evaluation:** a random split, the protocol of our 2024 study, made errors
-   look substantially smaller than they were.
-2. **Faulty data:** with the guardrails, accuracy on faulty data matched clean
-   data, while a quick unguarded script varied and was worse on average.
-3. **Lifecycle:** over eight months, monitoring with gated retraining reduced
-   monthly error by 10–33% against a model left alone.
-4. **Pilot:** capable agents, told to be rigorous, built equally accurate and
-   leak-free models with or without the framework. This places the
-   framework's value in making rigour the default and the work auditable and
-   maintainable, not in out-modeling a careful agent.
-5. **Agents as testers:** the agents that used the framework found more of its
-   defects than our own tests did.
+We evaluated this framework on three public real-building datasets and with
+eight independent agent runs. The answers to the five research questions are:
 
-Next steps are the full multi-agent benchmark with unprimed prompts,
-cross-sensor consistency checks, conditional prediction intervals, metadata
-from Brick models, and field deployment in an operating building.
+- **RQ1 (many targets).** One workflow produced an evaluated, gated result
+  for all 92 tasks: energy, thermal load, temperature, CO2, humidity, PM2.5,
+  people counts and occupancy. Ordinary models beat the strongest no-ML
+  baseline significantly in 52% of tasks, and 45% failed the promotion gates.
+  For a deployable building model, the strongest simple rule is the bar to
+  clear.
+- **RQ2 (evaluation protocol).** On the same rows, the random split of our
+  2024 study understated RMSE by a median of 27% (range 2–59%) against blocked
+  cross-validation, on every one of 22 tasks. Feature selection on all rows
+  added no measurable optimism.
+- **RQ3 (faults).** The checks detected six of eight planted fault types in
+  every seed, spikes in nine seeds of ten and a stuck meter at its idle floor
+  in five. With them, accuracy on faulty data matched clean data. A quick
+  script was 1.6–1.9 ppm worse in MAE, with or without the agent's unit fix,
+  and three to five times less stable between seeds. RMSE did not differ.
+- **RQ4 (lifecycle).** Monitoring with gated retraining beat a static model
+  by 10–33% in mean monthly RMSE. It did not beat persistence for district
+  heating, and simple monthly retraining did better on both tasks. Retraining
+  should be scheduled, and persistence monitored alongside the model.
+- **RQ5 (independent agents).** Capable agents, told to be rigorous, built
+  equally accurate, leak-free models with or without the framework, and found
+  as many planted faults. The framework arm cost more. All four agents that
+  saw the dead chilled-water meter found it; our own case-study agent, relying
+  on the checks, had missed it.
+
+The framework's measured value therefore does not lie in out-modeling a
+careful agent. It lies in three places:
+- making the time-ordered protocol and the strongest baseline the default;
+- producing comparable, re-executable records;
+- supporting the lifecycle after the first model.
+
+Agents that used the framework also turned out to be effective testers of
+it.
+
+The next steps follow from the limits of this study:
+- a multi-run benchmark with unprimed prompts and weaker agents;
+- checks across related sensors;
+- prediction intervals that depend on the time of day and are recalibrated
+  in operation;
+- declarations taken from Brick models;
+- field deployment in an operating building.
 
 ## Data and code availability
 
-All code, configurations, run records, case-study summaries and the pilot
-benchmark are at
+All code, configurations, case-study results, the run record behind every
+reported number, the pilot prompts and the pilot deliverables are at
 https://github.com/TensorBuildLab/MLOps-building-energy-and-environment-prediction
-(BSD 3-Clause). The datasets are public: ROBOD (CC BY 4.0), the Aalborg offices
-(CC BY 4.0) and BDG2 (CC BY-SA 4.0). They are downloaded and checksum-verified
-by `case_studies/download.py`. Every result was produced by package version
-0.2.0.dev0, and every run record carries the package's source fingerprint
-(`f394d2e9ee9047c8` for all results reported here).
+(BSD 3-Clause). The datasets are public: ROBOD (CC BY 4.0), the Aalborg
+offices (CC BY 4.0) and BDG2 (CC BY-SA 4.0). `case_studies/download.py`
+downloads them and verifies their checksums. Test predictions and saved
+models are not published, because they contain the measured data; they are
+regenerated by the case-study scripts.
+
+Every result in Section 6 was produced by package version 0.2.0.dev0, with
+package source fingerprint `f394d2e9ee9047c8`, with two exceptions. The three
+re-run ROBOD chilled-water tasks used fingerprint `042ae8d1a30afc30`, which adds only
+the fix for inputs that are empty in a tuning fold (Appendix A). The pilot's
+framework arm used git commit `5c575a6`.
+
+Run records made at different commits of the case-study scripts carry the
+same package fingerprint. Reproducing a result means re-executing the
+recorded decisions with the same package version, not re-running an agent.
+
+## Declaration of generative AI and AI-assisted technologies
+
+The authors used an LLM agent (Claude Opus 5.5, Anthropic, in Claude Code)
+for several parts of this work:
+- writing the software;
+- running the case studies;
+- drafting and revising the manuscript;
+- checking the references against bibliographic databases.
+
+The pilot study used separate instances of Claude Opus 5.5 and Claude Sonnet
+5.5 as its subjects. The authors directed the work, and reviewed and edited
+the code, results and text. They take full responsibility for the content of
+the publication. [Authors: confirm this statement before submission.]
+
+## Prior publication
+
+A preliminary version of this work was posted as arXiv:2407.03469 and
+presented at the ASHRAE 2024 Annual Conference (paper IN-24-C-009). That
+version used prompt templates with a simulated building. The framework,
+software, datasets, experiments and results reported here are new.
 
 ## Acknowledgements
 
-The case studies, the pilot and parts of the software were carried out with
-an LLM agent (Claude Opus 5.5, Anthropic) working under the authors'
-direction. The pilot used independent instances of Claude Opus 5.5 and
-Claude Sonnet 5.5. [Authors: confirm your review of the results here before submission.]
+[To be completed by the authors: funding and acknowledgements.]

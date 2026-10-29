@@ -98,6 +98,15 @@ def _read_pred(path: Path, task: str) -> pd.Series:
     return s[~s.index.duplicated(keep="first")]
 
 
+def _dead_meter_days() -> list:
+    """Days on which ROBOD Room 5's chilled-water meter was dead (T2's source), from the case-study loader."""
+    import sys
+    sys.path.insert(0, str(HERE / "robod"))
+    sys.path.insert(0, str(HERE))
+    import run as robod
+    return robod.load(5).attrs.get("dead_chilled_water_days", [])
+
+
 def pilot_stats(n_boot: int = 2000, seed: int = 0):
     meta = json.loads((HIDDEN / "meta.json").read_text(encoding="utf-8"))
     rows, preds = [], {}
@@ -112,6 +121,8 @@ def pilot_stats(n_boot: int = 2000, seed: int = 0):
         local = target.index.tz_convert(TASK_TZ[task])
         key = pd.MultiIndex.from_arrays([(local.day_of_week >= 5).astype(int), local.hour, local.minute])
         train = target.index < cut
+        if task == "T2":  # the profile must not average in the dead-meter days (false zeros)
+            train = train & ~local.normalize().strftime("%Y-%m-%d").isin(_dead_meter_days())
         prof = pd.Series(target.to_numpy()[train], index=key[train]).groupby(level=[0, 1, 2]).mean()
         profile = pd.Series(prof.reindex(key).to_numpy(), index=target.index)
         pred = _read_pred(f, task)

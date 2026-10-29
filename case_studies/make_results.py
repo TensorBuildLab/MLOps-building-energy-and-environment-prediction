@@ -83,7 +83,7 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple:
     den = 1 + z * z / n
     centre = (p + z * z / (2 * n)) / den
     half = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
-    return centre - half, centre + half
+    return max(0.0, centre - half), min(1.0, centre + half)
 
 
 def share(mask) -> str:
@@ -178,7 +178,7 @@ def fig_skill(df: pd.DataFrame) -> None:
     ax.set_yticks(range(len(cats)), cats)
     ax.invert_yaxis()
     ax.set_xlim(-0.55, 1.0)
-    ax.set_xlabel("Skill vs no-ML baseline on the held-out test period (0 = no better; values below -0.5 shown at -0.5)")
+    ax.set_xlabel("Test skill vs strongest no-ML baseline (below −0.5 shown at −0.5)")
     ax.grid(axis="y", visible=False)
     ax.legend(loc="lower right", frameon=False)
     fig.tight_layout()
@@ -316,7 +316,7 @@ def lifecycle_frame() -> pd.DataFrame:
 def lifecycle():
     lc = lifecycle_frame()
     tasks = list(dict.fromkeys(lc["task"]))
-    fig, axes = plt.subplots(1, len(tasks), figsize=(3.6 * len(tasks), 3.0))
+    fig, axes = plt.subplots(1, len(tasks), figsize=(3.6 * len(tasks), 3.3))
     axes = np.atleast_1d(axes)
     for ax, task in zip(axes, tasks):
         d = lc[lc["task"] == task]
@@ -326,26 +326,27 @@ def lifecycle():
                 ax.plot(x, d[col], color=color, lw=2 if ls == "-" else 1.2, ls=ls, marker="o" if ls == "-" else None,
                         ms=4, label=label, zorder=3 if col == "production_rmse" else 2)
         for xi, (_, r) in zip(x, d.iterrows()):
-            if bool(r["promoted"]):
-                ax.annotate("promoted", (xi + 0.5, ax.get_ylim()[1]), xytext=(0, -2), textcoords="offset points",
-                            ha="center", va="top", fontsize=7, color=INK2)
-                ax.axvline(xi + 0.5, color=GRID, lw=1.2, zorder=1)
+            if bool(r["promoted"]) and xi < len(d) - 1:  # a promotion at the end of month xi serves from xi + 1
+                ax.axvline(xi + 0.5, color=INK2, lw=0.8, ls=":", zorder=1)
         ax.set_xticks(x, [m[5:] for m in d["month"]])
         ax.set_xlabel("month of 2023")
         unit = "kW" if "heating" in task.lower() else "ppm"
         ax.set_ylabel(f"monthly RMSE ({unit})")
         ax.set_title(task, fontsize=9, color=INK, loc="left")
-    axes[0].legend(loc="upper left", frameon=False, fontsize=7)
-    fig.tight_layout()
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=4, frameon=False, fontsize=8)
+    fig.tight_layout(rect=(0, 0.09, 1, 1))
     fig.savefig(FIGS / "lifecycle_rmse.png", dpi=200)
     plt.close(fig)
     t = lc[["task", "month", "production_version", "static_rmse", "naive_rmse", "production_rmse",
             "persistence_rmse", "fallback_rmse", "drift_ratio", "retrain_recommended", "promoted"]].copy()
     for c in ("static_rmse", "naive_rmse", "production_rmse", "persistence_rmse", "fallback_rmse"):
-        t[c] = t[c].map(lambda v: f"{v:.3g}" if pd.notna(v) else "")
+        t[c] = t[c].map(lambda v: f"{v:#.3g}" if pd.notna(v) else "")
+    for c in ("retrain_recommended", "promoted"):
+        t[c] = t[c].map({True: "yes", False: "no"}).fillna(t[c])
     t["fallback_rmse"] = [f"{v} (P)" if p else v for v, p in zip(t["fallback_rmse"], lc["fallback_uses_persistence"])]
     t["drift_ratio"] = t["drift_ratio"].map(lambda v: f"{v:.2f}")
-    t = t.rename(columns={"production_version": "Version", "static_rmse": "Static", "naive_rmse": "Monthly retrain",
+    t = t.rename(columns={"task": "Task", "month": "Month", "production_version": "Version", "static_rmse": "Static", "naive_rmse": "Monthly retrain",
                           "production_rmse": "Monitored + gated", "persistence_rmse": "Persistence",
                           "fallback_rmse": "Gated + fallback rule", "drift_ratio": "Drift ratio",
                           "retrain_recommended": "Retrain advised", "promoted": "Promoted"})
@@ -355,7 +356,7 @@ def lifecycle():
         for col, label in (("static_rmse", "Static"), ("naive_rmse", "Monthly retrain"),
                            ("production_rmse", "Monitored + gated"), ("persistence_rmse", "Persistence"),
                            ("fallback_rmse", "Gated + fallback rule")):
-            row[label] = f"{d[col].mean():.3g}" if d[col].notna().any() else ""
+            row[label] = f"{d[col].mean():#.3g}" if d[col].notna().any() else ""
         row["Months monitored model beat persistence"] = f"{(d['production_rmse'] < d['persistence_rmse']).sum()}/{len(d)}"
         row["Retrains (promoted)"] = f"{int(d['retrain_recommended'].sum())} ({int(d['promoted'].sum())})"
         row["Monthly fits, naive arm"] = int(d["naive_rmse"].notna().sum())
@@ -374,7 +375,7 @@ def bdg2(df: pd.DataFrame):
             edgecolor="white", linewidth=1.5, zorder=3)
     ax.axvline(30, color=INK, lw=1, zorder=4)
     ax.text(31, ax.get_ylim()[1] * 0.92, "Guideline 14 hourly limit (30%)", fontsize=8, color=INK)
-    ax.set_xlabel("CV(RMSE) on the held-out test period, % (day-ahead, hourly; >100% shown at 100%)")
+    ax.set_xlabel("Test-period CV(RMSE), %  (values above 100 shown at 100)")
     ax.set_ylabel("buildings")
     ax.grid(axis="x", visible=False)
     fig.tight_layout()
@@ -437,7 +438,10 @@ def pilot() -> pd.DataFrame:
                                     if pd.notna(r.get("leak_tests")) else "", axis=1)
     out = out.drop(columns=["leak_failures", "leak_tests"]).rename(columns={
         "rmse": "RMSE", "persistence_rmse": "Persistence RMSE", "skill": "Skill vs persistence",
-        "profile_rmse": "Profile RMSE", "skill_vs_profile": "Skill vs profile", "expected_rmse": "Self-reported RMSE"})
+        "profile_rmse": "Profile RMSE", "skill_vs_profile": "Skill vs profile", "expected_rmse": "Self-reported RMSE",
+        "task": "Task", "condition": "Condition", "model": "Model", "delivered": "Ran",
+        "actual / expected RMSE": "Achieved / self-reported", "leakage test": "Leakage test"})
+    out["Ran"] = out["Ran"].map({True: "yes", False: "no"}).fillna(out["Ran"])
     return out
 
 
@@ -475,8 +479,9 @@ def dm_table() -> pd.DataFrame:
     if dm.empty:
         return dm
     rows = []
+    names = {"robod": "ROBOD", "aalborg": "Aalborg", "bdg2": "BDG2"}
     for ds, d in list(dm.groupby("dataset", sort=False)) + [("All", dm)]:
-        rows.append({"Dataset": ds, "Fitted tasks tested": len(d),
+        rows.append({"Dataset": names.get(ds, ds), "Fitted tasks tested": len(d),
                      "Model better than baseline (p < 0.05)": share(d["model_better_p05"]),
                      "Baseline better (p < 0.05)": share((d["dm_stat"] > 0) & (d["p_value"] < 0.05)),
                      "No significant difference": share(~(d["p_value"] < 0.05))})

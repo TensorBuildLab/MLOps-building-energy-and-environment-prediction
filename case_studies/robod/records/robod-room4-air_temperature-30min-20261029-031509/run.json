@@ -1,0 +1,1068 @@
+{
+  "run": {
+    "name": "robod-room4-air_temperature-30min",
+    "created": "20261029-031509",
+    "environment": {
+      "bemlops": "0.2.0.dev0",
+      "code_commit": "8d12bd9",
+      "package_fingerprint": "f394d2e9ee9047c8",
+      "python": "3.12.10",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "config": {
+    "config_version": 1,
+    "name": "robod-room4-air_temperature-30min",
+    "target": "air_temperature",
+    "task": "regression",
+    "horizon": "30min",
+    "columns": {
+      "indoor_co2": {
+        "name": "indoor_co2",
+        "quantity": "co2",
+        "unit": "ppm",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "air_temperature": {
+        "name": "air_temperature",
+        "quantity": "zone_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "indoor_relative_humidity": {
+        "name": "indoor_relative_humidity",
+        "quantity": "relative_humidity",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "pm2.5": {
+        "name": "pm2.5",
+        "quantity": "pm25",
+        "unit": "ug/m3",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "illuminance": {
+        "name": "illuminance",
+        "quantity": "illuminance",
+        "unit": "lux",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "voc": {
+        "name": "voc",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "sound_pressure_level": {
+        "name": "sound_pressure_level",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "wifi_connected_devices": {
+        "name": "wifi_connected_devices",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "occupant_count": {
+        "name": "occupant_count",
+        "quantity": "occupancy_count",
+        "unit": "count",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "occupant_presence": {
+        "name": "occupant_presence",
+        "quantity": "occupancy_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "plug_load_energy": {
+        "name": "plug_load_energy",
+        "quantity": "energy",
+        "unit": "kWh",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "lighting_energy": {
+        "name": "lighting_energy",
+        "quantity": "energy",
+        "unit": "kWh",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "chilled_water_energy": {
+        "name": "chilled_water_energy",
+        "quantity": "energy",
+        "unit": "kWh",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "temp_setpoint": {
+        "name": "temp_setpoint",
+        "quantity": "temperature_setpoint",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "supply_air_temperature": {
+        "name": "supply_air_temperature",
+        "quantity": "supply_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "damper_position": {
+        "name": "damper_position",
+        "quantity": "position",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "supply_air_flow": {
+        "name": "supply_air_flow",
+        "quantity": "airflow",
+        "unit": "m3/h",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "dry_bulb_temp": {
+        "name": "dry_bulb_temp",
+        "quantity": "outdoor_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "global_horizontal_solar_radiation": {
+        "name": "global_horizontal_solar_radiation",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "outdoor_relative_humidity": {
+        "name": "outdoor_relative_humidity",
+        "quantity": "relative_humidity",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      }
+    },
+    "timestamp": null,
+    "timestamp_format": null,
+    "tz": null,
+    "intended_use": "Forecast room temperature 30 min ahead.",
+    "holidays": [],
+    "prepare": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "fit": {
+      "models": null,
+      "n_iter": 6,
+      "fractions": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "random_state": 0,
+      "backtest_blocks": 3
+    },
+    "accepted": {},
+    "notes": [
+      "Timestamps carry +08:00; converted to Asia/Singapore local time (no daylight saving).",
+      "indoor_co2 never reads below exactly 400 ppm: a sensor floor, so long flat stretches at 400 in an empty room are real. Declared flat_ok so they are not masked as a stuck sensor.",
+      "wifi_connected_devices declared 'other': a proxy for occupancy, not a count of people.",
+      "Energy columns are kWh per 5-minute interval (not cumulative), so declared as interval energy.",
+      "ahu_fan_energy not used: identical statistics in Rooms 4 and 5 suggest a shared AHU, not room-level data.",
+      "Data cover weekdays in separate blocks between September and December 2021; gaps between blocks stay missing.",
+      "outdoor_relative_humidity sits at 99.9-100% for many hours on tropical nights: saturation, not a stuck sensor. Declared flat_ok."
+    ]
+  },
+  "task": {
+    "target": "air_temperature",
+    "quantity": "zone_air_temperature",
+    "unit": "degC",
+    "mode": "forecast",
+    "task_type": "regression",
+    "horizon_steps": 2,
+    "step": "0 days 00:15:00",
+    "description": "forecast air_temperature (zone_air_temperature, degC) 30 min ahead (2 step(s) of 15 min)"
+  },
+  "data": {
+    "raw_fingerprint": "eb6e671f4a45f8f2",
+    "prepared_fingerprint": "e34811be9ddfab1c",
+    "raw_rows": 13536,
+    "prepared_rows": 10368,
+    "summary": {
+      "rows": 13536,
+      "start": "2021-09-07 00:00:00+08:00",
+      "end": "2021-12-23 23:55:00+08:00",
+      "step": "5 min",
+      "timezone": "Asia/Singapore",
+      "target": "air_temperature",
+      "declared_columns": 20
+    }
+  },
+  "data_check": {
+    "summary": {
+      "rows": "13536",
+      "start": "2021-09-07 00:00:00+08:00",
+      "end": "2021-12-23 23:55:00+08:00",
+      "step": "5 min",
+      "timezone": "Asia/Singapore",
+      "target": "air_temperature",
+      "declared_columns": "20"
+    },
+    "issues": [
+      {
+        "id": "index:gaps",
+        "severity": "warning",
+        "column": null,
+        "message": "11 gap(s) longer than 3 time steps, 61 d 55 min in total; longest 23 d 5 min from 2021-10-01 23:55:00+08:00 to 2021-10-25 00:00:00+08:00.",
+        "fix": "Gaps stay missing. Short gaps in inputs are forward-filled; the target is never filled.",
+        "evidence": {
+          "n": "11"
+        }
+      },
+      {
+        "id": "columns:undeclared",
+        "severity": "info",
+        "column": null,
+        "message": "14 column(s) are not declared and will be ignored: ceiling_fan_energy, ahu_fan_energy, cooling_coil_valve_position, cooling_coil_valve_command, ahu_fan_speed, offcoil_air_temp, offcoil_temp_setpoint, pressure_across_filter ....",
+        "fix": "Declare any you want the model to use.",
+        "evidence": {}
+      },
+      {
+        "id": "spikes:indoor_co2",
+        "severity": "warning",
+        "column": "indoor_co2",
+        "message": "6 single-sample spike(s), e.g. 633.433, 580.433, 543.867 at 2021-09-07 06:55:00+08:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "6"
+        }
+      },
+      {
+        "id": "spikes:air_temperature",
+        "severity": "warning",
+        "column": "air_temperature",
+        "message": "169 single-sample spike(s), e.g. 25.9052, 25.7607, 25.876 at 2021-09-07 00:15:00+08:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "169"
+        }
+      },
+      {
+        "id": "spikes:indoor_relative_humidity",
+        "severity": "warning",
+        "column": "indoor_relative_humidity",
+        "message": "52 single-sample spike(s), e.g. 76.6427, 74.8973, 79.3857 at 2021-09-14 00:10:00+08:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "52"
+        }
+      },
+      {
+        "id": "stuck:occupant_count",
+        "severity": "warning",
+        "column": "occupant_count",
+        "message": "Sensor repeats exactly 1 for 7 h 5 min (2021-09-29 01:25:00+08:00 to 2021-09-29 08:30:00+08:00); 1 such stretch(es), 7 h 5 min in total. The value is unchanged in 78% of steps and changes by at least ~1 when it does: this looks like change-of-value logging with a deadband.",
+        "fix": "If so, flat stretches are normal: declare the column with flat_ok=True and note why. Otherwise prepare() treats them as missing.",
+        "evidence": {
+          "n_runs": "1",
+          "n": "425",
+          "unchanged_share": "0.77584041374215"
+        }
+      },
+      {
+        "id": "stuck:chilled_water_energy",
+        "severity": "warning",
+        "column": "chilled_water_energy",
+        "message": "Sensor repeats exactly 0.0440593 for 11 h 45 min (2021-11-03 18:40:00+08:00 to 2021-11-04 06:25:00+08:00); 1 such stretch(es), 11 h 45 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "1",
+          "n": "705",
+          "unchanged_share": "0.5775397118581456"
+        }
+      },
+      {
+        "id": "stuck:supply_air_temperature",
+        "severity": "warning",
+        "column": "supply_air_temperature",
+        "message": "Sensor repeats exactly 27.4455 for 6 h 20 min (2021-11-01 00:00:00+08:00 to 2021-11-01 06:20:00+08:00); 1 such stretch(es), 6 h 20 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "1",
+          "n": "380",
+          "unchanged_share": "0.5451052826006649"
+        }
+      },
+      {
+        "id": "stuck:supply_air_flow",
+        "severity": "warning",
+        "column": "supply_air_flow",
+        "message": "Sensor repeats exactly 739.639 for 1 d 3 h 15 min (2021-11-16 15:25:00+08:00 to 2021-11-17 18:40:00+08:00); 2 such stretch(es), 2 d 3 h 40 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "2",
+          "n": "3100",
+          "unchanged_share": "0.16195049870705577"
+        }
+      },
+      {
+        "id": "spikes:dry_bulb_temp",
+        "severity": "warning",
+        "column": "dry_bulb_temp",
+        "message": "21 single-sample spike(s), e.g. 24.6033, 26.9033, 26.0046 at 2021-09-10 05:00:00+08:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "21"
+        }
+      },
+      {
+        "id": "spikes:outdoor_relative_humidity",
+        "severity": "warning",
+        "column": "outdoor_relative_humidity",
+        "message": "55 single-sample spike(s), e.g. 83.6001, 84.2, 78.985 at 2021-09-07 07:15:00+08:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "55"
+        }
+      }
+    ]
+  },
+  "unresolved_errors": [],
+  "accepted_issues": {},
+  "notes": [
+    "Timestamps carry +08:00; converted to Asia/Singapore local time (no daylight saving).",
+    "indoor_co2 never reads below exactly 400 ppm: a sensor floor, so long flat stretches at 400 in an empty room are real. Declared flat_ok so they are not masked as a stuck sensor.",
+    "wifi_connected_devices declared 'other': a proxy for occupancy, not a count of people.",
+    "Energy columns are kWh per 5-minute interval (not cumulative), so declared as interval energy.",
+    "ahu_fan_energy not used: identical statistics in Rooms 4 and 5 suggest a shared AHU, not room-level data.",
+    "Data cover weekdays in separate blocks between September and December 2021; gaps between blocks stay missing.",
+    "outdoor_relative_humidity sits at 99.9-100% for many hours on tropical nights: saturation, not a stuck sensor. Declared flat_ok."
+  ],
+  "prepare": {
+    "options": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "log": [
+      {
+        "step": "mask_spikes",
+        "column": "indoor_co2",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 6
+      },
+      {
+        "step": "mask_spikes",
+        "column": "air_temperature",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 169
+      },
+      {
+        "step": "mask_spikes",
+        "column": "indoor_relative_humidity",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 52
+      },
+      {
+        "step": "mask_stuck",
+        "column": "occupant_count",
+        "detail": "1 stuck stretch(es) set to missing.",
+        "count": 14
+      },
+      {
+        "step": "mask_stuck",
+        "column": "chilled_water_energy",
+        "detail": "1 stuck stretch(es) set to missing.",
+        "count": 70
+      },
+      {
+        "step": "mask_stuck",
+        "column": "supply_air_temperature",
+        "detail": "1 stuck stretch(es) set to missing.",
+        "count": 5
+      },
+      {
+        "step": "convert_units",
+        "column": "supply_air_flow",
+        "detail": "Converted m3/h to m3/s.",
+        "count": null
+      },
+      {
+        "step": "mask_stuck",
+        "column": "supply_air_flow",
+        "detail": "2 stuck stretch(es) set to missing.",
+        "count": 478
+      },
+      {
+        "step": "mask_spikes",
+        "column": "dry_bulb_temp",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 21
+      },
+      {
+        "step": "mask_spikes",
+        "column": "outdoor_relative_humidity",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 55
+      },
+      {
+        "step": "incomplete_totals",
+        "column": "chilled_water_energy",
+        "detail": "Interval totals with missing readings set to missing (each needs 3 readings).",
+        "count": 1
+      },
+      {
+        "step": "resample",
+        "column": null,
+        "detail": "Resampled to a regular 15 min grid (10368 rows).",
+        "count": 10368
+      },
+      {
+        "step": "forward_fill",
+        "column": "indoor_co2",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 48
+      },
+      {
+        "step": "forward_fill",
+        "column": "indoor_relative_humidity",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 47
+      },
+      {
+        "step": "forward_fill",
+        "column": "pm2.5",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 47
+      },
+      {
+        "step": "forward_fill",
+        "column": "illuminance",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 47
+      },
+      {
+        "step": "forward_fill",
+        "column": "voc",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 47
+      },
+      {
+        "step": "forward_fill",
+        "column": "sound_pressure_level",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 47
+      },
+      {
+        "step": "forward_fill",
+        "column": "wifi_connected_devices",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "occupant_count",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 48
+      },
+      {
+        "step": "forward_fill",
+        "column": "occupant_presence",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "plug_load_energy",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "lighting_energy",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "chilled_water_energy",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 48
+      },
+      {
+        "step": "forward_fill",
+        "column": "temp_setpoint",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "supply_air_temperature",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 45
+      },
+      {
+        "step": "forward_fill",
+        "column": "damper_position",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "supply_air_flow",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 48
+      },
+      {
+        "step": "forward_fill",
+        "column": "dry_bulb_temp",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 46
+      },
+      {
+        "step": "forward_fill",
+        "column": "global_horizontal_solar_radiation",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 44
+      },
+      {
+        "step": "forward_fill",
+        "column": "outdoor_relative_humidity",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 46
+      }
+    ]
+  },
+  "features": [
+    {
+      "name": "air_temperature__t-2",
+      "source": "air_temperature",
+      "shift": 2,
+      "kind": "target_lag"
+    },
+    {
+      "name": "air_temperature__t-3",
+      "source": "air_temperature",
+      "shift": 3,
+      "kind": "target_lag"
+    },
+    {
+      "name": "air_temperature__t-4",
+      "source": "air_temperature",
+      "shift": 4,
+      "kind": "target_lag"
+    },
+    {
+      "name": "air_temperature__t-5",
+      "source": "air_temperature",
+      "shift": 5,
+      "kind": "target_lag"
+    },
+    {
+      "name": "air_temperature__t-96",
+      "source": "air_temperature",
+      "shift": 96,
+      "kind": "target_lag"
+    },
+    {
+      "name": "air_temperature__t-672",
+      "source": "air_temperature",
+      "shift": 672,
+      "kind": "target_lag"
+    },
+    {
+      "name": "air_temperature__mean_1d",
+      "source": "air_temperature",
+      "shift": 2,
+      "kind": "target_rolling"
+    },
+    {
+      "name": "indoor_co2__t-2",
+      "source": "indoor_co2",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "indoor_relative_humidity__t-2",
+      "source": "indoor_relative_humidity",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "pm2.5__t-2",
+      "source": "pm2.5",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "illuminance__t-2",
+      "source": "illuminance",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "voc__t-2",
+      "source": "voc",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "sound_pressure_level__t-2",
+      "source": "sound_pressure_level",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "wifi_connected_devices__t-2",
+      "source": "wifi_connected_devices",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "occupant_count__t-2",
+      "source": "occupant_count",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "occupant_presence__t-2",
+      "source": "occupant_presence",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "plug_load_energy__t-2",
+      "source": "plug_load_energy",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "lighting_energy__t-2",
+      "source": "lighting_energy",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "chilled_water_energy__t-2",
+      "source": "chilled_water_energy",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "temp_setpoint__t-2",
+      "source": "temp_setpoint",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "supply_air_temperature__t-2",
+      "source": "supply_air_temperature",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "damper_position__t-2",
+      "source": "damper_position",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "supply_air_flow__t-2",
+      "source": "supply_air_flow",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "dry_bulb_temp__t-2",
+      "source": "dry_bulb_temp",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "global_horizontal_solar_radiation__t-2",
+      "source": "global_horizontal_solar_radiation",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "outdoor_relative_humidity__t-2",
+      "source": "outdoor_relative_humidity",
+      "shift": 2,
+      "kind": "input_lag"
+    },
+    {
+      "name": "hour_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "hour_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "is_weekend",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    }
+  ],
+  "split": {
+    "sizes": {
+      "train": 3154,
+      "val": 673,
+      "test": 675
+    },
+    "gap": "30 min",
+    "bounds": {
+      "train": [
+        "2021-09-07 00:00:00+08:00",
+        "2021-11-12 21:30:00+08:00"
+      ],
+      "val": [
+        "2021-11-12 22:15:00+08:00",
+        "2021-12-14 22:15:00+08:00"
+      ],
+      "test": [
+        "2021-12-14 23:00:00+08:00",
+        "2021-12-23 23:45:00+08:00"
+      ]
+    }
+  },
+  "validation": [
+    {
+      "model": "gbm_change",
+      "type": "ml",
+      "n": 673,
+      "rmse": 0.1558618326876499,
+      "mae": 0.09539508427849273,
+      "r2": 0.8094176537477502,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 0.5676042017247039,
+      "nmbe_pct": -0.009732237029789639,
+      "params": {
+        "base__min_samples_leaf": 100,
+        "base__max_leaf_nodes": 7,
+        "base__max_iter": 100,
+        "base__learning_rate": 0.1,
+        "base__l2_regularization": 0.1
+      },
+      "cv_score": 0.198126828749541
+    },
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 673,
+      "rmse": 0.16177751997430093,
+      "mae": 0.10238503137349797,
+      "r2": 0.7946761216367004,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 0.5891474423121642,
+      "nmbe_pct": 0.026119884877079506,
+      "params": {
+        "min_samples_leaf": 50,
+        "max_leaf_nodes": 31,
+        "max_iter": 100,
+        "learning_rate": 0.05,
+        "l2_regularization": 0.0
+      },
+      "cv_score": 0.28732816821816914
+    },
+    {
+      "model": "random_forest",
+      "type": "ml",
+      "n": 673,
+      "rmse": 0.16239481157794206,
+      "mae": 0.10176131020459252,
+      "r2": 0.7931062309013179,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 0.5913954417221177,
+      "nmbe_pct": 0.048846416226749324,
+      "params": {
+        "model__min_samples_leaf": 10,
+        "model__max_features": 1.0,
+        "model__max_depth": 16
+      },
+      "cv_score": 0.252603158273166
+    },
+    {
+      "model": "ridge",
+      "type": "ml",
+      "n": 673,
+      "rmse": 0.1875232794446317,
+      "mae": 0.12428397402591165,
+      "r2": 0.7241242727726085,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 0.6829061323003596,
+      "nmbe_pct": 0.05451348118994207,
+      "params": {
+        "model__alpha": 4.135997393839888
+      },
+      "cv_score": 0.20060530769252435
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 673,
+      "rmse": 0.20193787994909088,
+      "mae": 0.10754345731260229,
+      "r2": 0.680081984512097,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 0.7353999832414718,
+      "nmbe_pct": -0.002048580361927862,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "time_of_day_profile",
+      "type": "baseline",
+      "n": 673,
+      "rmse": 0.31304030364169644,
+      "mae": 0.26733985463440435,
+      "r2": 0.2312172599292026,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 1.1400032233182076,
+      "nmbe_pct": 0.47654427892292894,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 673,
+      "rmse": 0.3491398952967232,
+      "mae": 0.2659249557641609,
+      "r2": 0.043682580047562425,
+      "mean_actual": 27.480021770133725,
+      "cvrmse_pct": 1.2714676078349876,
+      "nmbe_pct": 0.14321088861497436,
+      "params": {},
+      "cv_score": null
+    }
+  ],
+  "chosen_model": {
+    "name": "gbm_change",
+    "params": {
+      "base__min_samples_leaf": 100,
+      "base__max_leaf_nodes": 7,
+      "base__max_iter": 100,
+      "base__learning_rate": 0.1,
+      "base__l2_regularization": 0.1
+    }
+  },
+  "test": {
+    "model": {
+      "n": 675,
+      "rmse": 0.17000324052404558,
+      "mae": 0.0968237829118097,
+      "r2": 0.7878920608857202,
+      "mean_actual": 27.615485468375308,
+      "cvrmse_pct": 0.616064885545888,
+      "nmbe_pct": 0.008467503080362627
+    },
+    "baseline": {
+      "name": "persistence",
+      "n": 675,
+      "rmse": 0.22658110266756315,
+      "mae": 0.1162409722471724,
+      "r2": 0.623218217228162,
+      "mean_actual": 27.615485468375308,
+      "cvrmse_pct": 0.8210941194500919,
+      "nmbe_pct": -0.01019835669597063
+    },
+    "skill": 0.24970247508472876,
+    "guideline14": null
+  },
+  "warnings": [],
+  "leakage_warnings": [],
+  "interval": {
+    "nominal": 0.9,
+    "half_width": 0.2259400357709339,
+    "test_coverage": 0.9155555555555556
+  },
+  "drivers": [
+    {
+      "input": "air_temperature (recent history)",
+      "share": 0.8932889780416046
+    },
+    {
+      "input": "calendar (time of day, weekday)",
+      "share": 0.08161204324542352
+    },
+    {
+      "input": "illuminance",
+      "share": 0.013086333257211032
+    },
+    {
+      "input": "indoor_relative_humidity",
+      "share": 0.006715578987225382
+    }
+  ],
+  "backtest": {
+    "blocks": [
+      {
+        "from": "2021-11-12 21:45:00+08:00",
+        "to": "2021-12-10 14:15:00+08:00",
+        "rows": 451,
+        "rmse": 0.1717312549541914,
+        "baseline_rmse": 0.21437866811315184,
+        "skill": 0.19893496649792874
+      },
+      {
+        "from": "2021-12-10 14:30:00+08:00",
+        "to": "2021-12-17 07:00:00+08:00",
+        "rows": 451,
+        "rmse": 0.15865495456560744,
+        "baseline_rmse": 0.22881560667400416,
+        "skill": 0.30662529155345286
+      },
+      {
+        "from": "2021-12-17 07:15:00+08:00",
+        "to": "2021-12-23 23:45:00+08:00",
+        "rows": 450,
+        "rmse": 0.1523383656834293,
+        "baseline_rmse": 0.199037793450071,
+        "skill": 0.23462593187537695
+      }
+    ],
+    "pooled_rmse": 0.16111703569514782,
+    "pooled_baseline_rmse": 0.21443332518569985,
+    "pooled_skill": 0.2486380764015107
+  },
+  "event_log": [
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "Timestamps carry +08:00; converted to Asia/Singapore local time (no daylight saving)."
+    },
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "indoor_co2 never reads below exactly 400 ppm: a sensor floor, so long flat stretches at 400 in an empty room are real. Declared flat_ok so they are not masked as a stuck sensor."
+    },
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "wifi_connected_devices declared 'other': a proxy for occupancy, not a count of people."
+    },
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "Energy columns are kWh per 5-minute interval (not cumulative), so declared as interval energy."
+    },
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "ahu_fan_energy not used: identical statistics in Rooms 4 and 5 suggest a shared AHU, not room-level data."
+    },
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "Data cover weekdays in separate blocks between September and December 2021; gaps between blocks stay missing."
+    },
+    {
+      "time": "2026-10-29T03:11:48",
+      "kind": "note",
+      "detail": "outdoor_relative_humidity sits at 99.9-100% for many hours on tropical nights: saturation, not a stuck sensor. Declared flat_ok."
+    },
+    {
+      "time": "2026-10-29T03:11:49",
+      "kind": "check",
+      "detail": "0 errors, 10 warnings"
+    },
+    {
+      "time": "2026-10-29T03:11:50",
+      "kind": "prepare",
+      "detail": "10368 rows on a 15 min grid"
+    },
+    {
+      "time": "2026-10-29T03:15:09",
+      "kind": "fit",
+      "detail": "chosen gbm_change, test rmse 0.17"
+    }
+  ],
+  "gates": {
+    "data_check_resolved": {
+      "passed": true,
+      "detail": "all errors fixed or accepted with reasons"
+    },
+    "beats_baseline": {
+      "passed": true,
+      "detail": "skill 0.250 vs required 0.05"
+    },
+    "guideline14": {
+      "passed": true,
+      "detail": "not applicable"
+    },
+    "no_suspicious_inputs": {
+      "passed": true,
+      "detail": "none"
+    },
+    "enough_test_data": {
+      "passed": true,
+      "detail": "675 test rows (need 200)"
+    }
+  }
+}

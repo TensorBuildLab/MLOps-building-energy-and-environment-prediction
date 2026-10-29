@@ -1,0 +1,1060 @@
+{
+  "run": {
+    "name": "aalborg-roomd-people-amount-1h",
+    "created": "20261029-030412",
+    "environment": {
+      "bemlops": "0.2.0.dev0",
+      "code_commit": "8d12bd9",
+      "package_fingerprint": "f394d2e9ee9047c8",
+      "python": "3.12.10",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "config": {
+    "config_version": 1,
+    "name": "aalborg-roomd-people-amount-1h",
+    "target": "RoomD:People__amount",
+    "task": "regression",
+    "horizon": "1h",
+    "columns": {
+      "Outdoor:Temperature_air": {
+        "name": "Outdoor:Temperature_air",
+        "quantity": "outdoor_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Outdoor:Wind__velocity": {
+        "name": "Outdoor:Wind__velocity",
+        "quantity": "wind_speed",
+        "unit": "m/s",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Outdoor:Solar__direct_radiation__east_fa\u00e7ade": {
+        "name": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "Outdoor:Solar__direct_radiation__south_fa\u00e7ade": {
+        "name": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "Outdoor:Solar__direct_radiation__west_fa\u00e7ade": {
+        "name": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "Ventilation:EL_meter__power": {
+        "name": "Ventilation:EL_meter__power",
+        "quantity": "electric_power",
+        "unit": "W",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Ventilation:Fan__air_flow__supply": {
+        "name": "Ventilation:Fan__air_flow__supply",
+        "quantity": "airflow",
+        "unit": "m3/h",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Ventilation:Sensor__air_temperature__supply": {
+        "name": "Ventilation:Sensor__air_temperature__supply",
+        "quantity": "supply_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Heating:DH__power": {
+        "name": "Heating:DH__power",
+        "quantity": "thermal_power",
+        "unit": "W",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Ventilation:HC__power": {
+        "name": "Ventilation:HC__power",
+        "quantity": "thermal_power",
+        "unit": "W",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Sensor__CO2": {
+        "name": "RoomD:Sensor__CO2",
+        "quantity": "co2",
+        "unit": "ppm",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "RoomD:Sensor__room_temperature": {
+        "name": "RoomD:Sensor__room_temperature",
+        "quantity": "zone_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:People__amount": {
+        "name": "RoomD:People__amount",
+        "quantity": "occupancy_count",
+        "unit": "count",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Room__active": {
+        "name": "RoomD:Room__active",
+        "quantity": "occupancy_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Damper__position": {
+        "name": "RoomD:Damper__position",
+        "quantity": "position",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Radiator__control_signal__motor_valve": {
+        "name": "RoomD:Radiator__control_signal__motor_valve",
+        "quantity": "position",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Light__level__ceiling": {
+        "name": "RoomD:Light__level__ceiling",
+        "quantity": "illuminance",
+        "unit": "lux",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Light__on_off_signal": {
+        "name": "RoomD:Light__on_off_signal",
+        "quantity": "equipment_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Window__opened_closed": {
+        "name": "RoomD:Window__opened_closed",
+        "quantity": "equipment_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Control__setpoint_temperature_global": {
+        "name": "RoomD:Control__setpoint_temperature_global",
+        "quantity": "temperature_setpoint",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Control__heating_limit": {
+        "name": "RoomD:Control__heating_limit",
+        "quantity": "temperature_setpoint",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "RoomD:Control__cooling_limit": {
+        "name": "RoomD:Control__cooling_limit",
+        "quantity": "temperature_setpoint",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      }
+    },
+    "timestamp": null,
+    "timestamp_format": null,
+    "tz": null,
+    "intended_use": "Forecast the number of people in the room one hour ahead.",
+    "holidays": [],
+    "prepare": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "fit": {
+      "models": [
+        "ridge",
+        "gbm",
+        "gbm_change"
+      ],
+      "n_iter": 3,
+      "fractions": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "random_state": 0,
+      "backtest_blocks": 3
+    },
+    "accepted": {
+      "missing:RoomD:People__amount": "Camera people counts were only recorded for part of the year (documented by the dataset authors). Missing targets are skipped, never filled; results cover the recorded periods."
+    },
+    "notes": [
+      "Timestamps carry UTC offsets that switch at daylight saving; converted to Europe/Copenhagen local time with the zone kept, so the repeated autumn hour and the missing spring hour are handled exactly.",
+      "Units are not in the headers. Inferred from magnitudes and the dataset paper: district-heating, heating-coil and ventilation electric power in W, supply air flow in m3/h, temperatures in degC.",
+      "Facade solar sensors never read exactly zero (night offset of 2-4 W/m2), so long flat night stretches are real: declared flat_ok.",
+      "Heating:DH__energy_accumulated and Ventilation:EL_meter__energy_accumulated are cumulative meters; not used, since the matching power points carry the same information per interval.",
+      "Room CO2 is logged on change of value: in Room A the reading is unchanged in 95% of 5-minute steps and moves by at least ~34 ppm when it changes (vs 9% unchanged for room temperature). Long flat stretches are therefore expected, not stuck sensors: CO2 declared flat_ok in every room.",
+      "Outdoor temperature is NOT logged that way (34% unchanged, tiny steps), so its flat stretches (e.g. 4.99997 degC for 37 h in November) are real faults and stay masked. Wind speed looks change-of-value logged too, but 25-hour holds are implausible, so it is left to masking (it is only an input).",
+      "Room ventilation and heating are served by building systems that also serve other spaces; system points are inputs to room tasks, not room-level loads."
+    ]
+  },
+  "task": {
+    "target": "RoomD:People__amount",
+    "quantity": "occupancy_count",
+    "unit": "count",
+    "mode": "forecast",
+    "task_type": "regression",
+    "horizon_steps": 4,
+    "step": "0 days 00:15:00",
+    "description": "forecast RoomD:People__amount (occupancy_count, count) 1 h ahead (4 step(s) of 15 min)"
+  },
+  "data": {
+    "raw_fingerprint": "735e35c55fccbd76",
+    "prepared_fingerprint": "3bacffe076b8350c",
+    "raw_rows": 88705,
+    "prepared_rows": 29569,
+    "summary": {
+      "rows": 88705,
+      "start": "2023-02-27 00:00:00+01:00",
+      "end": "2024-01-01 00:00:00+01:00",
+      "step": "5 min",
+      "timezone": "Europe/Copenhagen",
+      "target": "RoomD:People__amount",
+      "declared_columns": 22
+    }
+  },
+  "data_check": {
+    "summary": {
+      "rows": "88705",
+      "start": "2023-02-27 00:00:00+01:00",
+      "end": "2024-01-01 00:00:00+01:00",
+      "step": "5 min",
+      "timezone": "Europe/Copenhagen",
+      "target": "RoomD:People__amount",
+      "declared_columns": "22"
+    },
+    "issues": [
+      {
+        "id": "columns:undeclared",
+        "severity": "info",
+        "column": null,
+        "message": "167 column(s) are not declared and will be ignored: Heating:Control__setpoint_water_temperature__supply, Heating:DH__energy_accumulated, Heating:DH__operation_hours_accumulated, Heating:DH__water_flow, Heating:DH__water_flow_accumulated, Heating:DH__water_temperature__return, Heating:DH__water_temperature__supply, Heating:Mixing_valve__control_signal ....",
+        "fix": "Declare any you want the model to use.",
+        "evidence": {}
+      },
+      {
+        "id": "stuck:Outdoor:Temperature_air",
+        "severity": "warning",
+        "column": "Outdoor:Temperature_air",
+        "message": "Sensor repeats exactly 4.99997 for 1 d 13 h 15 min (2023-11-19 06:15:00+01:00 to 2023-11-20 19:30:00+01:00); 60 such stretch(es), 26 d 10 h 30 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "60",
+          "n": "38070",
+          "unchanged_share": "0.3386641900080416"
+        }
+      },
+      {
+        "id": "stuck:Outdoor:Wind__velocity",
+        "severity": "warning",
+        "column": "Outdoor:Wind__velocity",
+        "message": "Sensor repeats exactly 0.64299 for 1 d 1 h 20 min (2023-02-28 11:15:00+01:00 to 2023-03-01 12:35:00+01:00); 116 such stretch(es), 46 d 3 h 20 min in total. The value is unchanged in 82% of steps and changes by at least ~0.20278 when it does: this looks like change-of-value logging with a deadband.",
+        "fix": "If so, flat stretches are normal: declare the column with flat_ok=True and note why. Otherwise prepare() treats them as missing.",
+        "evidence": {
+          "n_runs": "116",
+          "n": "66440",
+          "unchanged_share": "0.8200956182486525"
+        }
+      },
+      {
+        "id": "spikes:Outdoor:Wind__velocity",
+        "severity": "warning",
+        "column": "Outdoor:Wind__velocity",
+        "message": "289 single-sample spike(s), e.g. 4.20511, 4.61631, 4.64302 at 2023-03-23 11:10:00+01:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "289"
+        }
+      },
+      {
+        "id": "spikes:RoomD:Sensor__CO2",
+        "severity": "warning",
+        "column": "RoomD:Sensor__CO2",
+        "message": "122 single-sample spike(s), e.g. 400, 527, 772 at 2023-03-07 15:00:00+01:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "122"
+        }
+      },
+      {
+        "id": "spikes:RoomD:Sensor__room_temperature",
+        "severity": "warning",
+        "column": "RoomD:Sensor__room_temperature",
+        "message": "32 single-sample spike(s), e.g. 23.16, 23.04, 25.3 at 2023-03-31 01:35:00+02:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "32"
+        }
+      },
+      {
+        "id": "missing:RoomD:People__amount",
+        "severity": "warning",
+        "column": "RoomD:People__amount",
+        "message": "40% of entries are missing.",
+        "fix": "Missing target values are skipped, never invented.",
+        "evidence": {}
+      }
+    ]
+  },
+  "unresolved_errors": [],
+  "accepted_issues": {
+    "missing:RoomD:People__amount": "Camera people counts were only recorded for part of the year (documented by the dataset authors). Missing targets are skipped, never filled; results cover the recorded periods."
+  },
+  "notes": [
+    "Timestamps carry UTC offsets that switch at daylight saving; converted to Europe/Copenhagen local time with the zone kept, so the repeated autumn hour and the missing spring hour are handled exactly.",
+    "Units are not in the headers. Inferred from magnitudes and the dataset paper: district-heating, heating-coil and ventilation electric power in W, supply air flow in m3/h, temperatures in degC.",
+    "Facade solar sensors never read exactly zero (night offset of 2-4 W/m2), so long flat night stretches are real: declared flat_ok.",
+    "Heating:DH__energy_accumulated and Ventilation:EL_meter__energy_accumulated are cumulative meters; not used, since the matching power points carry the same information per interval.",
+    "Room CO2 is logged on change of value: in Room A the reading is unchanged in 95% of 5-minute steps and moves by at least ~34 ppm when it changes (vs 9% unchanged for room temperature). Long flat stretches are therefore expected, not stuck sensors: CO2 declared flat_ok in every room.",
+    "Outdoor temperature is NOT logged that way (34% unchanged, tiny steps), so its flat stretches (e.g. 4.99997 degC for 37 h in November) are real faults and stay masked. Wind speed looks change-of-value logged too, but 25-hour holds are implausible, so it is left to masking (it is only an input).",
+    "Room ventilation and heating are served by building systems that also serve other spaces; system points are inputs to room tasks, not room-level loads."
+  ],
+  "prepare": {
+    "options": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "log": [
+      {
+        "step": "mask_stuck",
+        "column": "Outdoor:Temperature_air",
+        "detail": "60 stuck stretch(es) set to missing.",
+        "count": 3354
+      },
+      {
+        "step": "mask_stuck",
+        "column": "Outdoor:Wind__velocity",
+        "detail": "116 stuck stretch(es) set to missing.",
+        "count": 5052
+      },
+      {
+        "step": "mask_spikes",
+        "column": "Outdoor:Wind__velocity",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 286
+      },
+      {
+        "step": "convert_units",
+        "column": "Ventilation:EL_meter__power",
+        "detail": "Converted W to kW.",
+        "count": null
+      },
+      {
+        "step": "convert_units",
+        "column": "Ventilation:Fan__air_flow__supply",
+        "detail": "Converted m3/h to m3/s.",
+        "count": null
+      },
+      {
+        "step": "convert_units",
+        "column": "Heating:DH__power",
+        "detail": "Converted W to kW.",
+        "count": null
+      },
+      {
+        "step": "convert_units",
+        "column": "Ventilation:HC__power",
+        "detail": "Converted W to kW.",
+        "count": null
+      },
+      {
+        "step": "mask_spikes",
+        "column": "RoomD:Sensor__CO2",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 122
+      },
+      {
+        "step": "mask_spikes",
+        "column": "RoomD:Sensor__room_temperature",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 32
+      },
+      {
+        "step": "resample",
+        "column": null,
+        "detail": "Resampled to a regular 15 min grid (29569 rows).",
+        "count": 29569
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Temperature_air",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 279
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Wind__velocity",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 379
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:EL_meter__power",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:Fan__air_flow__supply",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:Sensor__air_temperature__supply",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Heating:DH__power",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:HC__power",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Sensor__CO2",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 7
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Sensor__room_temperature",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Room__active",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Damper__position",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Radiator__control_signal__motor_valve",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Light__level__ceiling",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Light__on_off_signal",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Window__opened_closed",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Control__setpoint_temperature_global",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Control__heating_limit",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "RoomD:Control__cooling_limit",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      }
+    ]
+  },
+  "features": [
+    {
+      "name": "RoomD:People__amount__t-4",
+      "source": "RoomD:People__amount",
+      "shift": 4,
+      "kind": "target_lag"
+    },
+    {
+      "name": "RoomD:People__amount__t-5",
+      "source": "RoomD:People__amount",
+      "shift": 5,
+      "kind": "target_lag"
+    },
+    {
+      "name": "RoomD:People__amount__t-6",
+      "source": "RoomD:People__amount",
+      "shift": 6,
+      "kind": "target_lag"
+    },
+    {
+      "name": "RoomD:People__amount__t-7",
+      "source": "RoomD:People__amount",
+      "shift": 7,
+      "kind": "target_lag"
+    },
+    {
+      "name": "RoomD:People__amount__t-96",
+      "source": "RoomD:People__amount",
+      "shift": 96,
+      "kind": "target_lag"
+    },
+    {
+      "name": "RoomD:People__amount__t-672",
+      "source": "RoomD:People__amount",
+      "shift": 672,
+      "kind": "target_lag"
+    },
+    {
+      "name": "RoomD:People__amount__mean_1d",
+      "source": "RoomD:People__amount",
+      "shift": 4,
+      "kind": "target_rolling"
+    },
+    {
+      "name": "Outdoor:Temperature_air__t-4",
+      "source": "Outdoor:Temperature_air",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Wind__velocity__t-4",
+      "source": "Outdoor:Wind__velocity",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade__t-4",
+      "source": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade__t-4",
+      "source": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade__t-4",
+      "source": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__t-4",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:Fan__air_flow__supply__t-4",
+      "source": "Ventilation:Fan__air_flow__supply",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:Sensor__air_temperature__supply__t-4",
+      "source": "Ventilation:Sensor__air_temperature__supply",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Heating:DH__power__t-4",
+      "source": "Heating:DH__power",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:HC__power__t-4",
+      "source": "Ventilation:HC__power",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Sensor__CO2__t-4",
+      "source": "RoomD:Sensor__CO2",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Sensor__room_temperature__t-4",
+      "source": "RoomD:Sensor__room_temperature",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Room__active__t-4",
+      "source": "RoomD:Room__active",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Damper__position__t-4",
+      "source": "RoomD:Damper__position",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Radiator__control_signal__motor_valve__t-4",
+      "source": "RoomD:Radiator__control_signal__motor_valve",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Light__level__ceiling__t-4",
+      "source": "RoomD:Light__level__ceiling",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Light__on_off_signal__t-4",
+      "source": "RoomD:Light__on_off_signal",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Window__opened_closed__t-4",
+      "source": "RoomD:Window__opened_closed",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Control__setpoint_temperature_global__t-4",
+      "source": "RoomD:Control__setpoint_temperature_global",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Control__heating_limit__t-4",
+      "source": "RoomD:Control__heating_limit",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "RoomD:Control__cooling_limit__t-4",
+      "source": "RoomD:Control__cooling_limit",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "hour_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "hour_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "is_weekend",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    }
+  ],
+  "split": {
+    "sizes": {
+      "train": 12509,
+      "val": 2676,
+      "test": 2677
+    },
+    "gap": "1 h",
+    "bounds": {
+      "train": [
+        "2023-02-27 00:00:00+01:00",
+        "2023-10-16 22:00:00+02:00"
+      ],
+      "val": [
+        "2023-10-16 23:15:00+02:00",
+        "2023-11-13 19:00:00+01:00"
+      ],
+      "test": [
+        "2023-11-13 20:15:00+01:00",
+        "2023-12-11 17:15:00+01:00"
+      ]
+    }
+  },
+  "validation": [
+    {
+      "model": "gbm_change",
+      "type": "ml",
+      "n": 2676,
+      "rmse": 0.45893685665969475,
+      "mae": 0.23280931524766385,
+      "r2": 0.5109082485812662,
+      "mean_actual": 0.2918535127055306,
+      "cvrmse_pct": 157.2784329299114,
+      "nmbe_pct": -9.457493931042373,
+      "params": {
+        "base__min_samples_leaf": 50,
+        "base__max_leaf_nodes": 7,
+        "base__max_iter": 100,
+        "base__learning_rate": 0.2,
+        "base__l2_regularization": 1.0
+      },
+      "cv_score": 0.5048225678319661
+    },
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 2676,
+      "rmse": 0.4691904559291894,
+      "mae": 0.23863973045836662,
+      "r2": 0.48880946552612614,
+      "mean_actual": 0.2918535127055306,
+      "cvrmse_pct": 160.7923586510552,
+      "nmbe_pct": -11.546768448945361,
+      "params": {
+        "min_samples_leaf": 20,
+        "max_leaf_nodes": 15,
+        "max_iter": 200,
+        "learning_rate": 0.05,
+        "l2_regularization": 0.1
+      },
+      "cv_score": 0.49634499412860783
+    },
+    {
+      "model": "ridge",
+      "type": "ml",
+      "n": 2676,
+      "rmse": 0.47738541679509006,
+      "mae": 0.2842967789637301,
+      "r2": 0.470796435229191,
+      "mean_actual": 0.2918535127055306,
+      "cvrmse_pct": 163.60078552766697,
+      "nmbe_pct": -8.024779416910894,
+      "params": {
+        "model__alpha": 19.549524484259873
+      },
+      "cv_score": 0.49586767115204394
+    },
+    {
+      "model": "time_of_day_profile",
+      "type": "baseline",
+      "n": 2676,
+      "rmse": 0.5375600824773274,
+      "mae": 0.2836502081809746,
+      "r2": 0.3289753275356494,
+      "mean_actual": 0.2918535127055306,
+      "cvrmse_pct": 184.2227446997135,
+      "nmbe_pct": -25.114538507197636,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 2676,
+      "rmse": 0.595337026442987,
+      "mae": 0.24713502740408566,
+      "r2": 0.17698025808542295,
+      "mean_actual": 0.2918535127055306,
+      "cvrmse_pct": 204.02300060536712,
+      "nmbe_pct": -1.2087610141861652e-16,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 2676,
+      "rmse": 0.7453559924999298,
+      "mae": 0.3450423517688092,
+      "r2": -0.29006609030190256,
+      "mean_actual": 0.2918535127055306,
+      "cvrmse_pct": 255.4347526771717,
+      "nmbe_pct": 4.013450285399739,
+      "params": {},
+      "cv_score": null
+    }
+  ],
+  "chosen_model": {
+    "name": "gbm_change",
+    "params": {
+      "base__min_samples_leaf": 50,
+      "base__max_leaf_nodes": 7,
+      "base__max_iter": 100,
+      "base__learning_rate": 0.2,
+      "base__l2_regularization": 1.0
+    }
+  },
+  "test": {
+    "model": {
+      "n": 2677,
+      "rmse": 0.5067591700406107,
+      "mae": 0.2727065058833762,
+      "r2": 0.5218665199566985,
+      "mean_actual": 0.3782841489229237,
+      "cvrmse_pct": 133.9875986300629,
+      "nmbe_pct": 0.8376077628950199
+    },
+    "baseline": {
+      "name": "time_of_day_profile",
+      "n": 2677,
+      "rmse": 0.5012605008987954,
+      "mae": 0.2587710890919498,
+      "r2": 0.5321863493736658,
+      "mean_actual": 0.3782841489229237,
+      "cvrmse_pct": 132.5337453649823,
+      "nmbe_pct": 7.270219910404059
+    },
+    "skill": -0.010969683691325782,
+    "guideline14": null
+  },
+  "warnings": [
+    "The model is barely better than time_of_day_profile on test data (skill -0.01)."
+  ],
+  "leakage_warnings": [],
+  "interval": {
+    "nominal": 0.9,
+    "half_width": 0.7412504301709333,
+    "test_coverage": 0.8692566305565932
+  },
+  "drivers": [
+    {
+      "input": "calendar (time of day, weekday)",
+      "share": 0.4903016926116821
+    },
+    {
+      "input": "RoomD:People__amount (recent history)",
+      "share": 0.4302368971673609
+    },
+    {
+      "input": "RoomD:Light__on_off_signal",
+      "share": 0.04010700538133557
+    },
+    {
+      "input": "RoomD:Room__active",
+      "share": 0.00945825617026893
+    },
+    {
+      "input": "Ventilation:EL_meter__power",
+      "share": 0.007774137933999076
+    },
+    {
+      "input": "RoomD:Sensor__CO2",
+      "share": 0.0075391690582511
+    },
+    {
+      "input": "Ventilation:Fan__air_flow__supply",
+      "share": 0.0052720596631854995
+    }
+  ],
+  "backtest": {
+    "blocks": [
+      {
+        "from": "2023-10-16 22:15:00+02:00",
+        "to": "2023-11-04 11:45:00+01:00",
+        "rows": 1787,
+        "rmse": 0.46594675753344744,
+        "baseline_rmse": 0.5613896653505915,
+        "skill": 0.17001187180305388
+      },
+      {
+        "from": "2023-11-04 12:00:00+01:00",
+        "to": "2023-11-23 02:30:00+01:00",
+        "rows": 1787,
+        "rmse": 0.4651604575788708,
+        "baseline_rmse": 0.46858972464092613,
+        "skill": 0.007318272001553439
+      },
+      {
+        "from": "2023-11-23 02:45:00+01:00",
+        "to": "2023-12-11 17:15:00+01:00",
+        "rows": 1787,
+        "rmse": 0.51900043092518,
+        "baseline_rmse": 0.526721613487843,
+        "skill": 0.014658943861321494
+      }
+    ],
+    "pooled_rmse": 0.4840255087807668,
+    "pooled_baseline_rmse": 0.5203109149078542,
+    "pooled_skill": 0.06973792993274697
+  },
+  "event_log": [
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Timestamps carry UTC offsets that switch at daylight saving; converted to Europe/Copenhagen local time with the zone kept, so the repeated autumn hour and the missing spring hour are handled exactly."
+    },
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Units are not in the headers. Inferred from magnitudes and the dataset paper: district-heating, heating-coil and ventilation electric power in W, supply air flow in m3/h, temperatures in degC."
+    },
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Facade solar sensors never read exactly zero (night offset of 2-4 W/m2), so long flat night stretches are real: declared flat_ok."
+    },
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Heating:DH__energy_accumulated and Ventilation:EL_meter__energy_accumulated are cumulative meters; not used, since the matching power points carry the same information per interval."
+    },
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Room CO2 is logged on change of value: in Room A the reading is unchanged in 95% of 5-minute steps and moves by at least ~34 ppm when it changes (vs 9% unchanged for room temperature). Long flat stretches are therefore expected, not stuck sensors: CO2 declared flat_ok in every room."
+    },
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Outdoor temperature is NOT logged that way (34% unchanged, tiny steps), so its flat stretches (e.g. 4.99997 degC for 37 h in November) are real faults and stay masked. Wind speed looks change-of-value logged too, but 25-hour holds are implausible, so it is left to masking (it is only an input)."
+    },
+    {
+      "time": "2026-10-29T03:02:40",
+      "kind": "note",
+      "detail": "Room ventilation and heating are served by building systems that also serve other spaces; system points are inputs to room tasks, not room-level loads."
+    },
+    {
+      "time": "2026-10-29T03:02:42",
+      "kind": "check",
+      "detail": "0 errors, 6 warnings"
+    },
+    {
+      "time": "2026-10-29T03:02:42",
+      "kind": "accept",
+      "detail": "missing:RoomD:People__amount: Camera people counts were only recorded for part of the year (documented by the dataset authors). Missing targets are skipped, never filled; results cover the recorded periods."
+    },
+    {
+      "time": "2026-10-29T03:02:44",
+      "kind": "prepare",
+      "detail": "29569 rows on a 15 min grid"
+    },
+    {
+      "time": "2026-10-29T03:04:12",
+      "kind": "fit",
+      "detail": "chosen gbm_change, test rmse 0.5068"
+    }
+  ],
+  "gates": {
+    "data_check_resolved": {
+      "passed": true,
+      "detail": "all errors fixed or accepted with reasons"
+    },
+    "beats_baseline": {
+      "passed": false,
+      "detail": "skill -0.011 vs required 0.05"
+    },
+    "guideline14": {
+      "passed": true,
+      "detail": "not applicable"
+    },
+    "no_suspicious_inputs": {
+      "passed": true,
+      "detail": "none"
+    },
+    "enough_test_data": {
+      "passed": true,
+      "detail": "2677 test rows (need 200)"
+    }
+  }
+}

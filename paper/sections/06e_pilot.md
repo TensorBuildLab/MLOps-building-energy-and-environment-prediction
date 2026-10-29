@@ -16,7 +16,10 @@ because CO2 depends on who happens to be in the room more than on the hour.
 
 **T2 (chilled-water energy).** All agents reached a skill of 0.75–0.76
 against persistence. Against the time-of-day profile, the stronger baseline
-for this scheduled load, their skill was 0.65–0.67.
+for this scheduled load, their skill was 0.16–0.21. That profile was computed
+from the training period without the dead-meter days. With those days left
+in, the profile is much weaker and the skill would have looked like 0.65–0.67.
+This is the same distortion as in the Room 5 case study (Section 6.2).
 
 **With and without bemlops.** Within each task and model, the framework made
 no consistent difference to accuracy (Table 16):

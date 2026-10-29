@@ -1,0 +1,764 @@
+{
+  "run": {
+    "name": "aalborg-ventilation-elmeter-power-1h",
+    "created": "20261029-031716",
+    "environment": {
+      "bemlops": "0.2.0.dev0",
+      "code_commit": "8d12bd9",
+      "package_fingerprint": "f394d2e9ee9047c8",
+      "python": "3.12.10",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "config": {
+    "config_version": 1,
+    "name": "aalborg-ventilation-elmeter-power-1h",
+    "target": "Ventilation:EL_meter__power",
+    "task": "regression",
+    "horizon": "1h",
+    "columns": {
+      "Outdoor:Temperature_air": {
+        "name": "Outdoor:Temperature_air",
+        "quantity": "outdoor_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Outdoor:Wind__velocity": {
+        "name": "Outdoor:Wind__velocity",
+        "quantity": "wind_speed",
+        "unit": "m/s",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Outdoor:Solar__direct_radiation__east_fa\u00e7ade": {
+        "name": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "Outdoor:Solar__direct_radiation__south_fa\u00e7ade": {
+        "name": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "Outdoor:Solar__direct_radiation__west_fa\u00e7ade": {
+        "name": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": true
+      },
+      "Ventilation:EL_meter__power": {
+        "name": "Ventilation:EL_meter__power",
+        "quantity": "electric_power",
+        "unit": "W",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Ventilation:Fan__air_flow__supply": {
+        "name": "Ventilation:Fan__air_flow__supply",
+        "quantity": "airflow",
+        "unit": "m3/h",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Ventilation:Sensor__air_temperature__supply": {
+        "name": "Ventilation:Sensor__air_temperature__supply",
+        "quantity": "supply_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Heating:DH__power": {
+        "name": "Heating:DH__power",
+        "quantity": "thermal_power",
+        "unit": "W",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "Ventilation:HC__power": {
+        "name": "Ventilation:HC__power",
+        "quantity": "thermal_power",
+        "unit": "W",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      }
+    },
+    "timestamp": null,
+    "timestamp_format": null,
+    "tz": null,
+    "intended_use": "Forecast ventilation (AHU) electric power one hour ahead.",
+    "holidays": [],
+    "prepare": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "fit": {
+      "models": [
+        "ridge",
+        "gbm",
+        "gbm_change"
+      ],
+      "n_iter": 3,
+      "fractions": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "random_state": 0,
+      "backtest_blocks": 3
+    },
+    "accepted": {},
+    "notes": [
+      "Timestamps carry UTC offsets that switch at daylight saving; converted to Europe/Copenhagen local time with the zone kept, so the repeated autumn hour and the missing spring hour are handled exactly.",
+      "Units are not in the headers. Inferred from magnitudes and the dataset paper: district-heating, heating-coil and ventilation electric power in W, supply air flow in m3/h, temperatures in degC.",
+      "Facade solar sensors never read exactly zero (night offset of 2-4 W/m2), so long flat night stretches are real: declared flat_ok.",
+      "Heating:DH__energy_accumulated and Ventilation:EL_meter__energy_accumulated are cumulative meters; not used, since the matching power points carry the same information per interval.",
+      "Room CO2 is logged on change of value: in Room A the reading is unchanged in 95% of 5-minute steps and moves by at least ~34 ppm when it changes (vs 9% unchanged for room temperature). Long flat stretches are therefore expected, not stuck sensors: CO2 declared flat_ok in every room.",
+      "Outdoor temperature is NOT logged that way (34% unchanged, tiny steps), so its flat stretches (e.g. 4.99997 degC for 37 h in November) are real faults and stay masked. Wind speed looks change-of-value logged too, but 25-hour holds are implausible, so it is left to masking (it is only an input).",
+      "Room ventilation and heating are served by building systems that also serve other spaces; system points are inputs to room tasks, not room-level loads."
+    ]
+  },
+  "task": {
+    "target": "Ventilation:EL_meter__power",
+    "quantity": "electric_power",
+    "unit": "kW",
+    "mode": "forecast",
+    "task_type": "regression",
+    "horizon_steps": 4,
+    "step": "0 days 00:15:00",
+    "description": "forecast Ventilation:EL_meter__power (electric_power, kW) 1 h ahead (4 step(s) of 15 min)"
+  },
+  "data": {
+    "raw_fingerprint": "735e35c55fccbd76",
+    "prepared_fingerprint": "88c5bea951eaa9a2",
+    "raw_rows": 88705,
+    "prepared_rows": 29569,
+    "summary": {
+      "rows": 88705,
+      "start": "2023-02-27 00:00:00+01:00",
+      "end": "2024-01-01 00:00:00+01:00",
+      "step": "5 min",
+      "timezone": "Europe/Copenhagen",
+      "target": "Ventilation:EL_meter__power",
+      "declared_columns": 10
+    }
+  },
+  "data_check": {
+    "summary": {
+      "rows": "88705",
+      "start": "2023-02-27 00:00:00+01:00",
+      "end": "2024-01-01 00:00:00+01:00",
+      "step": "5 min",
+      "timezone": "Europe/Copenhagen",
+      "target": "Ventilation:EL_meter__power",
+      "declared_columns": "10"
+    },
+    "issues": [
+      {
+        "id": "columns:undeclared",
+        "severity": "info",
+        "column": null,
+        "message": "179 column(s) are not declared and will be ignored: Heating:Control__setpoint_water_temperature__supply, Heating:DH__energy_accumulated, Heating:DH__operation_hours_accumulated, Heating:DH__water_flow, Heating:DH__water_flow_accumulated, Heating:DH__water_temperature__return, Heating:DH__water_temperature__supply, Heating:Mixing_valve__control_signal ....",
+        "fix": "Declare any you want the model to use.",
+        "evidence": {}
+      },
+      {
+        "id": "stuck:Outdoor:Temperature_air",
+        "severity": "warning",
+        "column": "Outdoor:Temperature_air",
+        "message": "Sensor repeats exactly 4.99997 for 1 d 13 h 15 min (2023-11-19 06:15:00+01:00 to 2023-11-20 19:30:00+01:00); 60 such stretch(es), 26 d 10 h 30 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "60",
+          "n": "38070",
+          "unchanged_share": "0.3386641900080416"
+        }
+      },
+      {
+        "id": "stuck:Outdoor:Wind__velocity",
+        "severity": "warning",
+        "column": "Outdoor:Wind__velocity",
+        "message": "Sensor repeats exactly 0.64299 for 1 d 1 h 20 min (2023-02-28 11:15:00+01:00 to 2023-03-01 12:35:00+01:00); 116 such stretch(es), 46 d 3 h 20 min in total. The value is unchanged in 82% of steps and changes by at least ~0.20278 when it does: this looks like change-of-value logging with a deadband.",
+        "fix": "If so, flat stretches are normal: declare the column with flat_ok=True and note why. Otherwise prepare() treats them as missing.",
+        "evidence": {
+          "n_runs": "116",
+          "n": "66440",
+          "unchanged_share": "0.8200956182486525"
+        }
+      },
+      {
+        "id": "spikes:Outdoor:Wind__velocity",
+        "severity": "warning",
+        "column": "Outdoor:Wind__velocity",
+        "message": "289 single-sample spike(s), e.g. 4.20511, 4.61631, 4.64302 at 2023-03-23 11:10:00+01:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "289"
+        }
+      }
+    ]
+  },
+  "unresolved_errors": [],
+  "accepted_issues": {},
+  "notes": [
+    "Timestamps carry UTC offsets that switch at daylight saving; converted to Europe/Copenhagen local time with the zone kept, so the repeated autumn hour and the missing spring hour are handled exactly.",
+    "Units are not in the headers. Inferred from magnitudes and the dataset paper: district-heating, heating-coil and ventilation electric power in W, supply air flow in m3/h, temperatures in degC.",
+    "Facade solar sensors never read exactly zero (night offset of 2-4 W/m2), so long flat night stretches are real: declared flat_ok.",
+    "Heating:DH__energy_accumulated and Ventilation:EL_meter__energy_accumulated are cumulative meters; not used, since the matching power points carry the same information per interval.",
+    "Room CO2 is logged on change of value: in Room A the reading is unchanged in 95% of 5-minute steps and moves by at least ~34 ppm when it changes (vs 9% unchanged for room temperature). Long flat stretches are therefore expected, not stuck sensors: CO2 declared flat_ok in every room.",
+    "Outdoor temperature is NOT logged that way (34% unchanged, tiny steps), so its flat stretches (e.g. 4.99997 degC for 37 h in November) are real faults and stay masked. Wind speed looks change-of-value logged too, but 25-hour holds are implausible, so it is left to masking (it is only an input).",
+    "Room ventilation and heating are served by building systems that also serve other spaces; system points are inputs to room tasks, not room-level loads."
+  ],
+  "prepare": {
+    "options": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "log": [
+      {
+        "step": "mask_stuck",
+        "column": "Outdoor:Temperature_air",
+        "detail": "60 stuck stretch(es) set to missing.",
+        "count": 3354
+      },
+      {
+        "step": "mask_stuck",
+        "column": "Outdoor:Wind__velocity",
+        "detail": "116 stuck stretch(es) set to missing.",
+        "count": 5052
+      },
+      {
+        "step": "mask_spikes",
+        "column": "Outdoor:Wind__velocity",
+        "detail": "Single-sample spikes set to missing.",
+        "count": 286
+      },
+      {
+        "step": "convert_units",
+        "column": "Ventilation:EL_meter__power",
+        "detail": "Converted W to kW.",
+        "count": null
+      },
+      {
+        "step": "convert_units",
+        "column": "Ventilation:Fan__air_flow__supply",
+        "detail": "Converted m3/h to m3/s.",
+        "count": null
+      },
+      {
+        "step": "convert_units",
+        "column": "Heating:DH__power",
+        "detail": "Converted W to kW.",
+        "count": null
+      },
+      {
+        "step": "convert_units",
+        "column": "Ventilation:HC__power",
+        "detail": "Converted W to kW.",
+        "count": null
+      },
+      {
+        "step": "resample",
+        "column": null,
+        "detail": "Resampled to a regular 15 min grid (29569 rows).",
+        "count": 29569
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Temperature_air",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 279
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Wind__velocity",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 379
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:Fan__air_flow__supply",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:Sensor__air_temperature__supply",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Heating:DH__power",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      },
+      {
+        "step": "forward_fill",
+        "column": "Ventilation:HC__power",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 1
+      }
+    ]
+  },
+  "features": [
+    {
+      "name": "Ventilation:EL_meter__power__t-4",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 4,
+      "kind": "target_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__t-5",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 5,
+      "kind": "target_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__t-6",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 6,
+      "kind": "target_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__t-7",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 7,
+      "kind": "target_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__t-96",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 96,
+      "kind": "target_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__t-672",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 672,
+      "kind": "target_lag"
+    },
+    {
+      "name": "Ventilation:EL_meter__power__mean_1d",
+      "source": "Ventilation:EL_meter__power",
+      "shift": 4,
+      "kind": "target_rolling"
+    },
+    {
+      "name": "Outdoor:Temperature_air__t-4",
+      "source": "Outdoor:Temperature_air",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Wind__velocity__t-4",
+      "source": "Outdoor:Wind__velocity",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade__t-4",
+      "source": "Outdoor:Solar__direct_radiation__east_fa\u00e7ade",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade__t-4",
+      "source": "Outdoor:Solar__direct_radiation__south_fa\u00e7ade",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade__t-4",
+      "source": "Outdoor:Solar__direct_radiation__west_fa\u00e7ade",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:Fan__air_flow__supply__t-4",
+      "source": "Ventilation:Fan__air_flow__supply",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:Sensor__air_temperature__supply__t-4",
+      "source": "Ventilation:Sensor__air_temperature__supply",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Heating:DH__power__t-4",
+      "source": "Heating:DH__power",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "Ventilation:HC__power__t-4",
+      "source": "Ventilation:HC__power",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "hour_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "hour_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "is_weekend",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    }
+  ],
+  "split": {
+    "sizes": {
+      "train": 20694,
+      "val": 4430,
+      "test": 4432
+    },
+    "gap": "1 h",
+    "bounds": {
+      "train": [
+        "2023-02-27 01:00:00+01:00",
+        "2023-09-30 15:30:00+02:00"
+      ],
+      "val": [
+        "2023-09-30 16:45:00+02:00",
+        "2023-11-15 19:00:00+01:00"
+      ],
+      "test": [
+        "2023-11-15 20:15:00+01:00",
+        "2024-01-01 00:00:00+01:00"
+      ]
+    }
+  },
+  "validation": [
+    {
+      "model": "gbm_change",
+      "type": "ml",
+      "n": 4430,
+      "rmse": 0.27434101731987454,
+      "mae": 0.14307190478018308,
+      "r2": 0.9283149424950291,
+      "mean_actual": 0.9958040664679887,
+      "cvrmse_pct": 27.552808408754654,
+      "nmbe_pct": -1.3087065857969238,
+      "params": {
+        "base__min_samples_leaf": 100,
+        "base__max_leaf_nodes": 15,
+        "base__max_iter": 100,
+        "base__learning_rate": 0.1,
+        "base__l2_regularization": 1.0
+      },
+      "cv_score": 0.5257637447731197
+    },
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 4430,
+      "rmse": 0.32647279277235297,
+      "mae": 0.174285472860821,
+      "r2": 0.8984824478714706,
+      "mean_actual": 0.9958040664679887,
+      "cvrmse_pct": 32.788543243752294,
+      "nmbe_pct": 6.13067486195351,
+      "params": {
+        "min_samples_leaf": 20,
+        "max_leaf_nodes": 15,
+        "max_iter": 200,
+        "learning_rate": 0.05,
+        "l2_regularization": 0.1
+      },
+      "cv_score": 0.5056609703029505
+    },
+    {
+      "model": "ridge",
+      "type": "ml",
+      "n": 4430,
+      "rmse": 0.3427789853176762,
+      "mae": 0.23995885418726487,
+      "r2": 0.8880882914470097,
+      "mean_actual": 0.9958040664679887,
+      "cvrmse_pct": 34.42621814729653,
+      "nmbe_pct": 2.0482288356717753,
+      "params": {
+        "model__alpha": 19.549524484259873
+      },
+      "cv_score": 0.5389348176253151
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 4430,
+      "rmse": 0.4249173980190636,
+      "mae": 0.16289174184640556,
+      "r2": 0.8280286204201984,
+      "mean_actual": 0.9958040664679887,
+      "cvrmse_pct": 42.675600504590115,
+      "nmbe_pct": 0.03129593678723666,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "time_of_day_profile",
+      "type": "baseline",
+      "n": 4430,
+      "rmse": 0.6134889154389283,
+      "mae": 0.4508367600039037,
+      "r2": 0.6415235839502387,
+      "mean_actual": 0.9958040664679887,
+      "cvrmse_pct": 61.614346673777234,
+      "nmbe_pct": -31.40026635355646,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 4430,
+      "rmse": 0.9016225574106124,
+      "mae": 0.4925394539241972,
+      "r2": 0.22572241692617534,
+      "mean_actual": 0.9958040664679887,
+      "cvrmse_pct": 90.55238558214062,
+      "nmbe_pct": 2.093159308503416,
+      "params": {},
+      "cv_score": null
+    }
+  ],
+  "chosen_model": {
+    "name": "gbm_change",
+    "params": {
+      "base__min_samples_leaf": 100,
+      "base__max_leaf_nodes": 15,
+      "base__max_iter": 100,
+      "base__learning_rate": 0.1,
+      "base__l2_regularization": 1.0
+    }
+  },
+  "test": {
+    "model": {
+      "n": 4432,
+      "rmse": 0.28027041658967733,
+      "mae": 0.12455130449899313,
+      "r2": 0.9276199857000453,
+      "mean_actual": 0.9775043368436298,
+      "cvrmse_pct": 28.675273380515335,
+      "nmbe_pct": -0.4153038115670235
+    },
+    "baseline": {
+      "name": "persistence",
+      "n": 4432,
+      "rmse": 0.5203161118714518,
+      "mae": 0.16207968297383424,
+      "r2": 0.7505412768936737,
+      "mean_actual": 0.9775043368436298,
+      "cvrmse_pct": 53.2350396939832,
+      "nmbe_pct": -0.0033848919273995253
+    },
+    "skill": 0.4613458814842152,
+    "guideline14": {
+      "resolution": "hourly",
+      "cvrmse_pct": 26.529053479326322,
+      "nmbe_pct": -0.41873786902424653,
+      "cvrmse_limit": 30.0,
+      "nmbe_limit": 10.0,
+      "passes": true
+    }
+  },
+  "warnings": [],
+  "leakage_warnings": [],
+  "interval": {
+    "nominal": 0.9,
+    "half_width": 0.3827113624981046,
+    "test_coverage": 0.9126805054151624
+  },
+  "drivers": [
+    {
+      "input": "Ventilation:EL_meter__power (recent history)",
+      "share": 0.7926417961816241
+    },
+    {
+      "input": "Ventilation:Fan__air_flow__supply",
+      "share": 0.0991770361988076
+    },
+    {
+      "input": "calendar (time of day, weekday)",
+      "share": 0.09175623359510135
+    },
+    {
+      "input": "Ventilation:HC__power",
+      "share": 0.014466883466377778
+    }
+  ],
+  "backtest": {
+    "blocks": [
+      {
+        "from": "2023-09-30 15:45:00+02:00",
+        "to": "2023-10-31 09:45:00+01:00",
+        "rows": 2957,
+        "rmse": 0.23050973651064655,
+        "baseline_rmse": 0.3726306700438373,
+        "skill": 0.3813989157587895
+      },
+      {
+        "from": "2023-10-31 10:00:00+01:00",
+        "to": "2023-12-01 05:00:00+01:00",
+        "rows": 2957,
+        "rmse": 0.3117450253808521,
+        "baseline_rmse": 0.5030638863955895,
+        "skill": 0.3803072853937519
+      },
+      {
+        "from": "2023-12-01 05:15:00+01:00",
+        "to": "2024-01-01 00:00:00+01:00",
+        "rows": 2956,
+        "rmse": 0.2647407123623631,
+        "baseline_rmse": 0.5333280054322821,
+        "skill": 0.503606205438657
+      }
+    ],
+    "pooled_rmse": 0.27105257050645776,
+    "pooled_baseline_rmse": 0.4748142451150788,
+    "pooled_skill": 0.4291397671930339
+  },
+  "event_log": [
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Timestamps carry UTC offsets that switch at daylight saving; converted to Europe/Copenhagen local time with the zone kept, so the repeated autumn hour and the missing spring hour are handled exactly."
+    },
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Units are not in the headers. Inferred from magnitudes and the dataset paper: district-heating, heating-coil and ventilation electric power in W, supply air flow in m3/h, temperatures in degC."
+    },
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Facade solar sensors never read exactly zero (night offset of 2-4 W/m2), so long flat night stretches are real: declared flat_ok."
+    },
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Heating:DH__energy_accumulated and Ventilation:EL_meter__energy_accumulated are cumulative meters; not used, since the matching power points carry the same information per interval."
+    },
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Room CO2 is logged on change of value: in Room A the reading is unchanged in 95% of 5-minute steps and moves by at least ~34 ppm when it changes (vs 9% unchanged for room temperature). Long flat stretches are therefore expected, not stuck sensors: CO2 declared flat_ok in every room."
+    },
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Outdoor temperature is NOT logged that way (34% unchanged, tiny steps), so its flat stretches (e.g. 4.99997 degC for 37 h in November) are real faults and stay masked. Wind speed looks change-of-value logged too, but 25-hour holds are implausible, so it is left to masking (it is only an input)."
+    },
+    {
+      "time": "2026-10-29T03:15:43",
+      "kind": "note",
+      "detail": "Room ventilation and heating are served by building systems that also serve other spaces; system points are inputs to room tasks, not room-level loads."
+    },
+    {
+      "time": "2026-10-29T03:15:44",
+      "kind": "check",
+      "detail": "0 errors, 3 warnings"
+    },
+    {
+      "time": "2026-10-29T03:15:45",
+      "kind": "prepare",
+      "detail": "29569 rows on a 15 min grid"
+    },
+    {
+      "time": "2026-10-29T03:17:16",
+      "kind": "fit",
+      "detail": "chosen gbm_change, test rmse 0.2803"
+    }
+  ],
+  "gates": {
+    "data_check_resolved": {
+      "passed": true,
+      "detail": "all errors fixed or accepted with reasons"
+    },
+    "beats_baseline": {
+      "passed": true,
+      "detail": "skill 0.461 vs required 0.05"
+    },
+    "guideline14": {
+      "passed": true,
+      "detail": "CV(RMSE) 26.5%, NMBE -0.4%"
+    },
+    "no_suspicious_inputs": {
+      "passed": true,
+      "detail": "none"
+    },
+    "enough_test_data": {
+      "passed": true,
+      "detail": "4432 test rows (need 200)"
+    }
+  }
+}

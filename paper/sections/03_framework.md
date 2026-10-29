@@ -127,8 +127,9 @@ corresponds to an MSE skill of about 0.10.
 The record also contains:
 - errors in physical units;
 - for energy-like targets, the ASHRAE Guideline 14 hourly criteria
-  (CV(RMSE) ≤ 30% and |NMBE| ≤ 10%), computed on the test set at the task's
-  resolution [ASHRAE 2014];
+  (CV(RMSE) ≤ 30% and |NMBE| ≤ 10%) [ASHRAE 2014]. They are computed on the
+  test-set predictions aggregated to hours (hourly totals for energy, hourly
+  means for power), so a 15-minute model is judged on hourly values;
 - a rolling-origin backtest: the period after training is cut into three
   blocks, and before each block the chosen configuration is refitted on all
   earlier data. The backtest overlaps the validation period that chose the
