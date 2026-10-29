@@ -1,0 +1,894 @@
+{
+  "run": {
+    "name": "roomB-co2-1h",
+    "created": "20261029-015508",
+    "environment": {
+      "bemlops": "0.1.0.dev0",
+      "code_commit": "5c575a6-dirty",
+      "python": "3.12.10",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "config": {
+    "config_version": 1,
+    "name": "roomB-co2-1h",
+    "target": "co2_chg",
+    "task": "regression",
+    "horizon": "1h",
+    "columns": {
+      "co2_chg": {
+        "name": "co2_chg",
+        "quantity": "other",
+        "unit": "ppm",
+        "known_ahead": false,
+        "description": "15-min mean RoomB:Sensor__CO2 minus its value 1 h earlier",
+        "flat_ok": true
+      },
+      "co2": {
+        "name": "co2",
+        "quantity": "co2",
+        "unit": "ppm",
+        "known_ahead": false,
+        "description": "RoomB:Sensor__CO2, 15-min mean",
+        "flat_ok": true
+      },
+      "room_temp": {
+        "name": "room_temp",
+        "quantity": "zone_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "room_active": {
+        "name": "room_active",
+        "quantity": "occupancy_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "damper": {
+        "name": "damper",
+        "quantity": "position",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "light_on": {
+        "name": "light_on",
+        "quantity": "equipment_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "window": {
+        "name": "window",
+        "quantity": "equipment_status",
+        "unit": "binary",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "supply_flow": {
+        "name": "supply_flow",
+        "quantity": "airflow",
+        "unit": "m3/h",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "oat": {
+        "name": "oat",
+        "quantity": "outdoor_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "fan_on_24h": {
+        "name": "fan_on_24h",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "fan_on_7d": {
+        "name": "fan_on_7d",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "active_24h": {
+        "name": "active_24h",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "active_7d": {
+        "name": "active_7d",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "co2_d30": {
+        "name": "co2_d30",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "co2_d60": {
+        "name": "co2_d60",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "active_1h": {
+        "name": "active_1h",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "fan_change_exp": {
+        "name": "fan_change_exp",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "excess_vent": {
+        "name": "excess_vent",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "excess_novent": {
+        "name": "excess_novent",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "active_vent": {
+        "name": "active_vent",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "active_novent": {
+        "name": "active_novent",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      }
+    },
+    "timestamp": null,
+    "timestamp_format": null,
+    "intended_use": "1-hour-ahead forecast of the 15-min mean CO2 (ppm) in Room B, Aalborg.",
+    "prepare": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": false,
+      "mask_spikes": false,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "fit": {
+      "models": [
+        "ridge",
+        "gbm"
+      ],
+      "n_iter": 10,
+      "fractions": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "random_state": 0
+    },
+    "accepted": {},
+    "notes": [
+      "Timestamps carry +0100/+0200 offsets (DST); parsed to UTC and converted to Europe/Copenhagen.",
+      "One day (2023-05-24 23:05 to 2023-05-25 23:00) was exported twice with identical values; duplicate timestamps averaged.",
+      "Rows 2023-04-24 13:05-15:30 were exported in reverse order; sorted by time.",
+      "12 h gap 2023-04-02 07:40-19:45 left missing (inputs forward-filled at most 1 h, target never).",
+      "RoomB:Sensor__room_temperature switched from degC to degF on 2023-05-12 (values 72-83). Readings above 50 converted from degF reading by reading in the loader (causal).",
+      "Outdoor temperature has 8 isolated readings of 57-73 degC; masked in the loader as impossible.",
+      "CO2 has 16 placeholder readings of -999; masked. Wind speed has 'OFFLINE' text; not used.",
+      "CO2 sensor reports on change of value with ~50 ppm steps, so it is flat for days when the room is empty; declared flat_ok=True rather than masking those stretches.",
+      "Stuck and spike masking in prepare() disabled: both look at later readings to decide whether a reading is bad, which a live 1 h forecast cannot do; all cleaning is row-by-row in the loader.",
+      "RoomB:People__amount missing 62% (absent from 2023-04-18 on); not used.",
+      "Setpoints (22 / 20.5 / 23.5 degC) never change; not used. Heating, solar, lighting level and wind not used (no clear link to room CO2 at 1 h).",
+      "Operation change on 2023-05-04: ventilation schedule moved from 08:00-16:15 to 05:00-21:00 (plus 23:00 night flushing) and the window is open most of the time from 2023-05-08. Derived inputs describe the fan schedule seen 24 h / 7 d earlier at the target time of day.",
+      "Split fractions 0.8/0.1/0.1 instead of 0.7/0.15/0.15: with the default split the training set ends on 2023-05-03 and contains none of the summer ventilation schedule, so no model can learn it; persistence then wins validation. With 0.8/0.1/0.1 training includes ~9 days of it.",
+      "Target is the 1 h change of the 15-min mean CO2 (forecast = last known 15-min mean + predicted change). Tree models on the level could not reproduce flat periods exactly; on the same split the change target gave lower RMSE. NOTE: bemlops' 'persistence' baseline for this target means 'the last hour's change repeats'; the honest baseline is zero change (= CO2 persistence), computed separately in report.json.",
+      "random_forest left out: tuning it took >30 min on this (shared) machine and it did not beat ridge or gbm in a first run."
+    ]
+  },
+  "task": {
+    "target": "co2_chg",
+    "quantity": "other",
+    "unit": null,
+    "mode": "forecast",
+    "task_type": "regression",
+    "horizon_steps": 4,
+    "step": "0 days 00:15:00",
+    "description": "forecast co2_chg (other, None) 1 h ahead (4 step(s) of 15 min)"
+  },
+  "data": {
+    "raw_fingerprint": "73093ddcbb631269",
+    "prepared_fingerprint": "9a0c5aa0859e74e9",
+    "raw_rows": 9020,
+    "prepared_rows": 9020,
+    "summary": {
+      "rows": 9020,
+      "start": "2023-02-27 00:00:00+01:00",
+      "end": "2023-05-31 23:45:00+02:00",
+      "step": "15 min",
+      "timezone": "Europe/Copenhagen",
+      "target": "co2_chg",
+      "declared_columns": 21
+    }
+  },
+  "data_check": {
+    "summary": {
+      "rows": "9020",
+      "start": "2023-02-27 00:00:00+01:00",
+      "end": "2023-05-31 23:45:00+02:00",
+      "step": "15 min",
+      "timezone": "Europe/Copenhagen",
+      "target": "co2_chg",
+      "declared_columns": "21"
+    },
+    "issues": [
+      {
+        "id": "columns:undeclared",
+        "severity": "info",
+        "column": null,
+        "message": "10 column(s) are not declared and will be ignored: light_level, people, radiator_valve, vent_power, supply_temp, wind, sol_south, sol_east ....",
+        "fix": "Declare any you want the model to use.",
+        "evidence": {}
+      },
+      {
+        "id": "spikes:co2",
+        "severity": "warning",
+        "column": "co2",
+        "message": "1 single-sample spike(s), e.g. 893 at 2023-04-21 16:00:00+02:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "1"
+        }
+      },
+      {
+        "id": "stuck:oat",
+        "severity": "warning",
+        "column": "oat",
+        "message": "Sensor repeats exactly 7.16995 for 9 h 15 min (2023-03-21 21:15:00+01:00 to 2023-03-22 06:30:00+01:00); 5 such stretch(es), 1 d 14 h 30 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "5",
+          "n": "2310",
+          "unchanged_share": "0.19721137757947574"
+        }
+      }
+    ]
+  },
+  "unresolved_errors": [],
+  "accepted_issues": {},
+  "notes": [
+    "Timestamps carry +0100/+0200 offsets (DST); parsed to UTC and converted to Europe/Copenhagen.",
+    "One day (2023-05-24 23:05 to 2023-05-25 23:00) was exported twice with identical values; duplicate timestamps averaged.",
+    "Rows 2023-04-24 13:05-15:30 were exported in reverse order; sorted by time.",
+    "12 h gap 2023-04-02 07:40-19:45 left missing (inputs forward-filled at most 1 h, target never).",
+    "RoomB:Sensor__room_temperature switched from degC to degF on 2023-05-12 (values 72-83). Readings above 50 converted from degF reading by reading in the loader (causal).",
+    "Outdoor temperature has 8 isolated readings of 57-73 degC; masked in the loader as impossible.",
+    "CO2 has 16 placeholder readings of -999; masked. Wind speed has 'OFFLINE' text; not used.",
+    "CO2 sensor reports on change of value with ~50 ppm steps, so it is flat for days when the room is empty; declared flat_ok=True rather than masking those stretches.",
+    "Stuck and spike masking in prepare() disabled: both look at later readings to decide whether a reading is bad, which a live 1 h forecast cannot do; all cleaning is row-by-row in the loader.",
+    "RoomB:People__amount missing 62% (absent from 2023-04-18 on); not used.",
+    "Setpoints (22 / 20.5 / 23.5 degC) never change; not used. Heating, solar, lighting level and wind not used (no clear link to room CO2 at 1 h).",
+    "Operation change on 2023-05-04: ventilation schedule moved from 08:00-16:15 to 05:00-21:00 (plus 23:00 night flushing) and the window is open most of the time from 2023-05-08. Derived inputs describe the fan schedule seen 24 h / 7 d earlier at the target time of day.",
+    "Split fractions 0.8/0.1/0.1 instead of 0.7/0.15/0.15: with the default split the training set ends on 2023-05-03 and contains none of the summer ventilation schedule, so no model can learn it; persistence then wins validation. With 0.8/0.1/0.1 training includes ~9 days of it.",
+    "Target is the 1 h change of the 15-min mean CO2 (forecast = last known 15-min mean + predicted change). Tree models on the level could not reproduce flat periods exactly; on the same split the change target gave lower RMSE. NOTE: bemlops' 'persistence' baseline for this target means 'the last hour's change repeats'; the honest baseline is zero change (= CO2 persistence), computed separately in report.json.",
+    "random_forest left out: tuning it took >30 min on this (shared) machine and it did not beat ridge or gbm in a first run."
+  ],
+  "prepare": {
+    "options": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": false,
+      "mask_spikes": false,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "log": [
+      {
+        "step": "convert_units",
+        "column": "supply_flow",
+        "detail": "Converted m3/h to m3/s.",
+        "count": null
+      },
+      {
+        "step": "resample",
+        "column": null,
+        "detail": "Resampled to a regular 15 min grid (9020 rows).",
+        "count": 9020
+      },
+      {
+        "step": "forward_fill",
+        "column": "co2",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "room_temp",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "room_active",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "damper",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "light_on",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "window",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "supply_flow",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 5
+      },
+      {
+        "step": "forward_fill",
+        "column": "oat",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 6
+      },
+      {
+        "step": "forward_fill",
+        "column": "fan_on_24h",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      },
+      {
+        "step": "forward_fill",
+        "column": "fan_on_7d",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      },
+      {
+        "step": "forward_fill",
+        "column": "active_24h",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      },
+      {
+        "step": "forward_fill",
+        "column": "active_7d",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      },
+      {
+        "step": "forward_fill",
+        "column": "co2_d30",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      },
+      {
+        "step": "forward_fill",
+        "column": "co2_d60",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 8
+      },
+      {
+        "step": "forward_fill",
+        "column": "active_1h",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 4
+      },
+      {
+        "step": "forward_fill",
+        "column": "fan_change_exp",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 10
+      },
+      {
+        "step": "forward_fill",
+        "column": "excess_vent",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 11
+      },
+      {
+        "step": "forward_fill",
+        "column": "excess_novent",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 11
+      },
+      {
+        "step": "forward_fill",
+        "column": "active_vent",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      },
+      {
+        "step": "forward_fill",
+        "column": "active_novent",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 9
+      }
+    ]
+  },
+  "features": [
+    {
+      "name": "co2_chg__t-4",
+      "source": "co2_chg",
+      "shift": 4,
+      "kind": "target_lag"
+    },
+    {
+      "name": "co2_chg__t-5",
+      "source": "co2_chg",
+      "shift": 5,
+      "kind": "target_lag"
+    },
+    {
+      "name": "co2_chg__t-6",
+      "source": "co2_chg",
+      "shift": 6,
+      "kind": "target_lag"
+    },
+    {
+      "name": "co2_chg__t-7",
+      "source": "co2_chg",
+      "shift": 7,
+      "kind": "target_lag"
+    },
+    {
+      "name": "co2_chg__t-96",
+      "source": "co2_chg",
+      "shift": 96,
+      "kind": "target_lag"
+    },
+    {
+      "name": "co2_chg__t-672",
+      "source": "co2_chg",
+      "shift": 672,
+      "kind": "target_lag"
+    },
+    {
+      "name": "co2_chg__mean_1d",
+      "source": "co2_chg",
+      "shift": 4,
+      "kind": "target_rolling"
+    },
+    {
+      "name": "co2__t-4",
+      "source": "co2",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "room_temp__t-4",
+      "source": "room_temp",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "room_active__t-4",
+      "source": "room_active",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "damper__t-4",
+      "source": "damper",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "light_on__t-4",
+      "source": "light_on",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "window__t-4",
+      "source": "window",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "supply_flow__t-4",
+      "source": "supply_flow",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "oat__t-4",
+      "source": "oat",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "fan_on_24h__t-4",
+      "source": "fan_on_24h",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "fan_on_7d__t-4",
+      "source": "fan_on_7d",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "active_24h__t-4",
+      "source": "active_24h",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "active_7d__t-4",
+      "source": "active_7d",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "co2_d30__t-4",
+      "source": "co2_d30",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "co2_d60__t-4",
+      "source": "co2_d60",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "active_1h__t-4",
+      "source": "active_1h",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "fan_change_exp__t-4",
+      "source": "fan_change_exp",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "excess_vent__t-4",
+      "source": "excess_vent",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "excess_novent__t-4",
+      "source": "excess_novent",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "active_vent__t-4",
+      "source": "active_vent",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "active_novent__t-4",
+      "source": "active_novent",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "hour_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "hour_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "is_weekend",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    }
+  ],
+  "split": {
+    "sizes": {
+      "train": 7164,
+      "val": 891,
+      "test": 893
+    },
+    "gap": "1 h",
+    "bounds": {
+      "train": [
+        "2023-02-27 02:00:00+01:00",
+        "2023-05-13 07:15:00+02:00"
+      ],
+      "val": [
+        "2023-05-13 08:30:00+02:00",
+        "2023-05-22 15:30:00+02:00"
+      ],
+      "test": [
+        "2023-05-22 16:45:00+02:00",
+        "2023-05-31 23:45:00+02:00"
+      ]
+    }
+  },
+  "validation": [
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 891,
+      "rmse": 17.412564568018656,
+      "mae": 9.86960798423123,
+      "r2": 0.23728762656497826,
+      "mean_actual": 0.16610549943883277,
+      "cvrmse_pct": 10488.72205930407,
+      "nmbe_pct": -990.6102331186778,
+      "params": {
+        "min_samples_leaf": 100,
+        "max_leaf_nodes": 7,
+        "max_iter": 100,
+        "learning_rate": 0.1,
+        "l2_regularization": 0.1
+      },
+      "cv_score": 40.304159877404906
+    },
+    {
+      "model": "ridge",
+      "type": "ml",
+      "n": 891,
+      "rmse": 19.89106490124854,
+      "mae": 12.398629397147019,
+      "r2": 0.0047060111653727255,
+      "mean_actual": 0.16610549943883277,
+      "cvrmse_pct": 11981.684283081704,
+      "nmbe_pct": -467.1885909172039,
+      "params": {
+        "model__alpha": 605.3082080079017
+      },
+      "cv_score": 38.94467821053583
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 891,
+      "rmse": 25.34862569271611,
+      "mae": 12.287691732136174,
+      "r2": -0.6163825350186902,
+      "mean_actual": 0.16610549943883277,
+      "cvrmse_pct": 15269.128705174226,
+      "nmbe_pct": 14.629839525596417,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 891,
+      "rmse": 27.751624058935445,
+      "mae": 12.016482681520836,
+      "r2": -0.9373679886385493,
+      "mean_actual": 0.16610549943883277,
+      "cvrmse_pct": 16716.611175305527,
+      "nmbe_pct": -67.65661075648516,
+      "params": {},
+      "cv_score": null
+    }
+  ],
+  "chosen_model": {
+    "name": "gbm",
+    "params": {
+      "min_samples_leaf": 100,
+      "max_leaf_nodes": 7,
+      "max_iter": 100,
+      "learning_rate": 0.1,
+      "l2_regularization": 0.1
+    }
+  },
+  "test": {
+    "model": {
+      "n": 893,
+      "rmse": 27.176814980191534,
+      "mae": 15.033444347435134,
+      "r2": 0.34485146759665974,
+      "mean_actual": -0.026875699888017853,
+      "cvrmse_pct": -101177.06503290767,
+      "nmbe_pct": 8670.065578547918
+    },
+    "baseline": {
+      "name": "persistence",
+      "n": 893,
+      "rmse": 47.97754908159202,
+      "mae": 22.80179171332587,
+      "r2": -1.041826207717488,
+      "mean_actual": -0.026875699888017853,
+      "cvrmse_pct": -178616.50112737177,
+      "nmbe_pct": -0.0
+    },
+    "skill": 0.43355141101572636,
+    "guideline14": null
+  },
+  "warnings": [],
+  "leakage_warnings": [],
+  "event_log": [
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "check",
+      "detail": "0 errors, 2 warnings"
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Timestamps carry +0100/+0200 offsets (DST); parsed to UTC and converted to Europe/Copenhagen."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "One day (2023-05-24 23:05 to 2023-05-25 23:00) was exported twice with identical values; duplicate timestamps averaged."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Rows 2023-04-24 13:05-15:30 were exported in reverse order; sorted by time."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "12 h gap 2023-04-02 07:40-19:45 left missing (inputs forward-filled at most 1 h, target never)."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "RoomB:Sensor__room_temperature switched from degC to degF on 2023-05-12 (values 72-83). Readings above 50 converted from degF reading by reading in the loader (causal)."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Outdoor temperature has 8 isolated readings of 57-73 degC; masked in the loader as impossible."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "CO2 has 16 placeholder readings of -999; masked. Wind speed has 'OFFLINE' text; not used."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "CO2 sensor reports on change of value with ~50 ppm steps, so it is flat for days when the room is empty; declared flat_ok=True rather than masking those stretches."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Stuck and spike masking in prepare() disabled: both look at later readings to decide whether a reading is bad, which a live 1 h forecast cannot do; all cleaning is row-by-row in the loader."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "RoomB:People__amount missing 62% (absent from 2023-04-18 on); not used."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Setpoints (22 / 20.5 / 23.5 degC) never change; not used. Heating, solar, lighting level and wind not used (no clear link to room CO2 at 1 h)."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Operation change on 2023-05-04: ventilation schedule moved from 08:00-16:15 to 05:00-21:00 (plus 23:00 night flushing) and the window is open most of the time from 2023-05-08. Derived inputs describe the fan schedule seen 24 h / 7 d earlier at the target time of day."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Split fractions 0.8/0.1/0.1 instead of 0.7/0.15/0.15: with the default split the training set ends on 2023-05-03 and contains none of the summer ventilation schedule, so no model can learn it; persistence then wins validation. With 0.8/0.1/0.1 training includes ~9 days of it."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "Target is the 1 h change of the 15-min mean CO2 (forecast = last known 15-min mean + predicted change). Tree models on the level could not reproduce flat periods exactly; on the same split the change target gave lower RMSE. NOTE: bemlops' 'persistence' baseline for this target means 'the last hour's change repeats'; the honest baseline is zero change (= CO2 persistence), computed separately in report.json."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "note",
+      "detail": "random_forest left out: tuning it took >30 min on this (shared) machine and it did not beat ridge or gbm in a first run."
+    },
+    {
+      "time": "2026-10-29T01:47:07",
+      "kind": "prepare",
+      "detail": "9020 rows on a 15 min grid"
+    },
+    {
+      "time": "2026-10-29T01:55:07",
+      "kind": "fit",
+      "detail": "chosen gbm, test rmse 27.18"
+    }
+  ],
+  "gates": {
+    "data_check_resolved": {
+      "passed": true,
+      "detail": "all errors fixed or accepted with reasons"
+    },
+    "beats_baseline": {
+      "passed": true,
+      "detail": "skill 0.434 vs required 0.05"
+    },
+    "guideline14": {
+      "passed": true,
+      "detail": "not applicable"
+    },
+    "no_suspicious_inputs": {
+      "passed": true,
+      "detail": "none"
+    },
+    "enough_test_data": {
+      "passed": true,
+      "detail": "893 test rows (need 200)"
+    }
+  }
+}

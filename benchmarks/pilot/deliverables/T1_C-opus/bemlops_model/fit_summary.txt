@@ -1,0 +1,236 @@
+Task: forecast co2_chg (other, None) 1 h ahead (4 step(s) of 15 min)
+Rows used: train 7164, validation 891, test 893 (time-ordered, gap 1 h).
+Validation results (lower RMSE is better):
+              model   rmse    mae  cvrmse_pct  nmbe_pct     r2
+                gbm 17.413  9.870   10488.722  -990.610  0.237
+              ridge 19.891 12.399   11981.684  -467.189  0.005
+same_time_yesterday 25.349 12.288   15269.129    14.630 -0.616
+        persistence 27.752 12.016   16716.611   -67.657 -0.937
+Chosen: gbm. Test: RMSE 27.2 , MAE 15 , CV(RMSE) -101177.1%, NMBE 8670.1%.
+Skill vs persistence: 0.43 (1 = perfect, 0 = no better than the baseline).
+
+split: {"sizes": {"train": 7164, "val": 891, "test": 893}, "gap": "1 h", "bounds": {"train": ["2023-02-27 02:00:00+01:00", "2023-05-13 07:15:00+02:00"], "val": ["2023-05-13 08:30:00+02:00", "2023-05-22 15:30:00+02:00"], "test": ["2023-05-22 16:45:00+02:00", "2023-05-31 23:45:00+02:00"]}}
+
+test: {"n": 893, "rmse": 27.176814980191534, "mae": 15.033444347435134, "r2": 0.34485146759665974, "mean_actual": -0.026875699888017853, "cvrmse_pct": -101177.06503290767, "nmbe_pct": 8670.065578547918}
+baseline: {"n": 893, "rmse": 47.97754908159202, "mae": 22.80179171332587, "r2": -1.041826207717488, "mean_actual": -0.026875699888017853, "cvrmse_pct": -178616.50112737177, "nmbe_pct": -0.0}
+
+config: {
+ "config_version": 1,
+ "name": "roomB-co2-1h",
+ "target": "co2_chg",
+ "task": "regression",
+ "horizon": "1h",
+ "columns": {
+  "co2_chg": {
+   "name": "co2_chg",
+   "quantity": "other",
+   "unit": "ppm",
+   "known_ahead": false,
+   "description": "15-min mean RoomB:Sensor__CO2 minus its value 1 h earlier",
+   "flat_ok": true
+  },
+  "co2": {
+   "name": "co2",
+   "quantity": "co2",
+   "unit": "ppm",
+   "known_ahead": false,
+   "description": "RoomB:Sensor__CO2, 15-min mean",
+   "flat_ok": true
+  },
+  "room_temp": {
+   "name": "room_temp",
+   "quantity": "zone_air_temperature",
+   "unit": "degC",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "room_active": {
+   "name": "room_active",
+   "quantity": "occupancy_status",
+   "unit": "binary",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "damper": {
+   "name": "damper",
+   "quantity": "position",
+   "unit": "%",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "light_on": {
+   "name": "light_on",
+   "quantity": "equipment_status",
+   "unit": "binary",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "window": {
+   "name": "window",
+   "quantity": "equipment_status",
+   "unit": "binary",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "supply_flow": {
+   "name": "supply_flow",
+   "quantity": "airflow",
+   "unit": "m3/h",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "oat": {
+   "name": "oat",
+   "quantity": "outdoor_air_temperature",
+   "unit": "degC",
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "fan_on_24h": {
+   "name": "fan_on_24h",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "fan_on_7d": {
+   "name": "fan_on_7d",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "active_24h": {
+   "name": "active_24h",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "active_7d": {
+   "name": "active_7d",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "co2_d30": {
+   "name": "co2_d30",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "co2_d60": {
+   "name": "co2_d60",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "active_1h": {
+   "name": "active_1h",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "fan_change_exp": {
+   "name": "fan_change_exp",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "excess_vent": {
+   "name": "excess_vent",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "excess_novent": {
+   "name": "excess_novent",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "active_vent": {
+   "name": "active_vent",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  },
+  "active_novent": {
+   "name": "active_novent",
+   "quantity": "other",
+   "unit": null,
+   "known_ahead": false,
+   "description": "",
+   "flat_ok": false
+  }
+ },
+ "timestamp": null,
+ "timestamp_format": null,
+ "intended_use": "1-hour-ahead forecast of the 15-min mean CO2 (ppm) in Room B, Aalborg.",
+ "prepare": {
+  "freq": "15min",
+  "mask_sentinels": true,
+  "mask_out_of_range": true,
+  "mask_stuck": false,
+  "mask_spikes": false,
+  "stuck_hours": 6.0,
+  "fill_limit": "1h"
+ },
+ "fit": {
+  "models": [
+   "ridge",
+   "gbm"
+  ],
+  "n_iter": 10,
+  "fractions": [
+   0.8,
+   0.1,
+   0.1
+  ],
+  "random_state": 0
+ },
+ "accepted": {},
+ "notes": [
+  "Timestamps carry +0100/+0200 offsets (DST); parsed to UTC and converted to Europe/Copenhagen.",
+  "One day (2023-05-24 23:05 to 2023-05-25 23:00) was exported twice with identical values; duplicate timestamps averaged.",
+  "Rows 2023-04-24 13:05-15:30 were exported in reverse order; sorted by time.",
+  "12 h gap 2023-04-02 07:40-19:45 left missing (inputs forward-filled at most 1 h, target never).",
+  "RoomB:Sensor__room_temperature switched from degC to degF on 2023-05-12 (values 72-83). Readings above 50 converted from degF reading by reading in the loader (causal).",
+  "Outdoor temperature has 8 isolated readings of 57-73 degC; masked in the loader as impossible.",
+  "CO2 has 16 placeholder readings of -999; masked. Wind speed has 'OFFLINE' text; not used.",
+  "CO2 sensor reports on change of value with ~50 ppm steps, so it is flat for days when the room is empty; declared flat_ok=True rather than masking those stretches.",
+  "Stuck and spike masking in prepare() disabled: both look at later readings to decide whether a reading is bad, which a live 1 h forecast cannot do; all cleaning is row-by-row in the loader.",
+  "RoomB:People__amount missing 62% (absent from 2023-04-18 on); not used.",
+  "Setpoints (22 / 20.5 / 23.5 degC) never change; not used. Heating, solar, lighting level and wind not used (no clear link to room CO2 at 1 h).",
+  "Operation change on 2023-05-04: ventilation schedule moved from 08:00-16:15 to 05:00-21:00 (plus 23:00 night flushing) and the window is open most of the time from 2023-05-08. Derived inputs describe the fan schedule seen 24 h / 7 d earlier at the target time of day.",
+  "Split fractions 0.8/0.1/0.1 instead of 0.7/0.15/0.15: with the default split the training set ends on 2023-05-03 and contains none of the summer ventilation schedule, so no model can learn it; persistence then wins validation. With 0.8/0.1/0.1 training includes ~9 days of it.",
+  "Target is the 1 h change of the 15-min mean CO2 (forecast = last known 15-min mean + predicted change). Tree models on the level could not reproduce flat periods exactly; on the same split the change target gave lower RMSE. NOTE: bemlops' 'persistence' baseline for this target means 'the last hour's change repeats'; the honest baseline is zero change (= CO2 persistence), computed separately in report.json.",
+  "random_forest left out: tuning it took >30 min on this (shared) machine and it did not beat ridge or gbm in a first run."
+ ]
+}

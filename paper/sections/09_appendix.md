@@ -1,13 +1,21 @@
-### 6.7 What the evaluation changed in the framework
+## Appendix A. Problems found by the evaluation, and how they were fixed
 
-The framework was revised twice during this study. A first version was run
-on the real datasets. It was then reviewed by an independent agent that read
-the code with no other instructions than to find correctness problems, and
-used by the pilot agents of E5. Every problem found was fixed with a
-regression test before the final runs reported here (Table 9). Most problems
-were invisible on synthetic data.
+The framework was revised during this study in three rounds:
+1. A first version was run on the real datasets.
+2. An independent agent reviewed it, with instructions only to find
+   correctness problems in the code.
+3. The pilot agents of E5 used it.
 
-**Table 9.** Problems found by the evaluation and how they were fixed.
+Every problem found was fixed with a regression test. Most were invisible on
+synthetic data. Table A1 lists the fixes in the version used for every
+result in Section 6 (0.2.0.dev0, fingerprint `f394d2e9ee9047c8`). Table A2
+lists the changes made after the experiments. Those changes are in the
+released code but were not evaluated, with one exception: the three ROBOD
+chilled-water tasks that were re-run after the dead-meter mask used the
+boosting fix in Table A2. That fix cannot change any other result, because
+every earlier fit of these models would have failed at the same point.
+
+**Table A1.** Fixes before the reported experiments.
 
 | Found by | Problem | Fix |
 |---|---|---|
@@ -33,6 +41,16 @@ were invisible on synthetic data.
 | Pilot agents | No way to add the agent's own model; no "change from the last value" model | `custom_models` hook; `gbm_change` candidate |
 | Pilot agents | No range on forecasts; no view of what the model relies on | 90% prediction intervals with test coverage; grouped input drivers |
 
+**Table A2.** Changes after the reported experiments (not evaluated in Section 6).
+
+| Found by | Problem | Fix |
+|---|---|---|
+| Pilot agents | The deployed model never trained on the most recent (test) period | `refit_all` option: after evaluation, refit the chosen configuration on all data for deployment, recorded as such |
+| Pilot agents | Missing quantities: VOC, sound level, barometric pressure, water flow | Added |
+| Pilot agents | Saved forests predicted in parallel threads, so repeated forecasts differed by about 1e-15 | Saved models predict single-threaded and repeat exactly |
+| Lifecycle experiment (E4) | Monitoring compared a model only with its own test-time error, so a model worse than persistence (district heating in summer) was never flagged | Drift checks also score the baseline on the same recent rows and recommend falling back to it |
+| Case-study re-run (ROBOD Room 3, after the dead-meter mask) | Gradient boosting crashed when an input had no values at all in an early tuning fold | Such inputs are left out of that fit; otherwise identical to the plain estimator (test added) |
+| Pilot agents (T2) | A meter reading zero while the equipment it measures is running is not flagged by any single-column check | Not fixed in the package; the case-study loader masks such days, and the skill asks the agent to look for contradictions between related points |
+
 This is principle P9 of Kreuzberger et al. [2023], feedback loops, applied to
-the framework itself. The agents that used the framework were also its most
-useful testers.
+the framework itself.

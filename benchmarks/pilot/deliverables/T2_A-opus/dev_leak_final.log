@@ -1,0 +1,13 @@
+full predict s: 6.3 n = 9028 2021-09-07 00:00:00+08:00 2021-12-10 00:45:00+08:00 nan: 0
+cut 2021-09-13 08:10: compared 612 intervals up to 2021-09-13 08:45:00, max|diff| = 0.00e+00, has T=08:45:00 -> True
+cut 2021-09-21 09:05: compared 1384 intervals up to 2021-09-21 09:45:00, max|diff| = 0.00e+00, has T=09:45:00 -> True
+cut 2021-10-26 10:35: compared 4750 intervals up to 2021-10-26 11:15:00, max|diff| = 0.00e+00, has T=11:15:00 -> True
+cut 2021-10-28 22:00: compared 4988 intervals up to 2021-10-28 22:45:00, max|diff| = 0.00e+00, has T=22:45:00 -> True
+cut 2021-11-04 10:00: compared 5612 intervals up to 2021-11-04 10:45:00, max|diff| = 0.00e+00, has T=10:45:00 -> True
+cut 2021-11-08 07:55: compared 5987 intervals up to 2021-11-08 08:30:00, max|diff| = 0.00e+00, has T=08:30:00 -> True
+cut 2021-11-15 18:20: compared 6701 intervals up to 2021-11-15 19:00:00, max|diff| = 0.00e+00, has T=19:00:00 -> True
+cut 2021-11-16 01:00: compared 6728 intervals up to 2021-11-16 01:45:00, max|diff| = 0.00e+00, has T=01:45:00 -> True
+cut 2021-12-09 12:40: compared 8982 intervals up to 2021-12-09 13:15:00, max|diff| = 0.00e+00, has T=13:15:00 -> True
+garble from 2021-11-09 12:15:00: forecast(2021-11-09 13:00:00) full=7.9121 garbled=7.9121; max|diff| for all T'<=T: 0.00e+00
+garble from 2021-11-12 07:45:00: forecast(2021-11-12 08:30:00) full=8.0017 garbled=8.0017; max|diff| for all T'<=T: 0.00e+00
+WORST 0.0

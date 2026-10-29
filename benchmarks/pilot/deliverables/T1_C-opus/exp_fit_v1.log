@@ -1,0 +1,61 @@
+{'step': 'convert_units', 'column': 'supply_flow', 'detail': 'Converted m3/h to m3/s.', 'count': None}
+{'step': 'resample', 'column': None, 'detail': 'Resampled to a regular 15 min grid (9020 rows).', 'count': 9020}
+{'step': 'forward_fill', 'column': 'room_temp', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 5}
+{'step': 'forward_fill', 'column': 'room_active', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 5}
+{'step': 'forward_fill', 'column': 'damper', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'light_on', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'window', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'supply_flow', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 5}
+{'step': 'forward_fill', 'column': 'oat', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+(9020, 8) DatetimeIndex(['2023-02-27 00:00:00+01:00', '2023-02-27 00:15:00+01:00',
+               '2023-02-27 00:30:00+01:00'],
+              dtype='datetime64[us, Europe/Copenhagen]', name='timestamp',
+              freq=None)
+Task: forecast co2 (co2, ppm) 1 h ahead (4 step(s) of 15 min)
+Rows used: train 6276, validation 1340, test 1342 (time-ordered, gap 1 h).
+Validation results (lower RMSE is better):
+              model   rmse    mae  cvrmse_pct  nmbe_pct     r2
+        persistence 26.269 11.970       5.574     0.001  0.803
+              ridge 26.524 17.188       5.628    -0.591  0.800
+      random_forest 28.023 19.612       5.946    -2.863  0.776
+                gbm 29.860 20.150       6.336    -3.155  0.746
+same_time_yesterday 63.966 46.307      13.573    -0.773 -0.166
+Chosen: persistence. Test: RMSE 29.5 ppm, MAE 12.4 ppm, CV(RMSE) 6.3%, NMBE -0.0%.
+Skill vs persistence: 0.00 (1 = perfect, 0 = no better than the baseline).
+Warning: No machine-learning model beat the 'persistence' baseline on validation data. Look for better inputs before deploying anything more complex.
+{'name': 'co2__t-4', 'source': 'co2', 'shift': 4, 'kind': 'target_lag'}
+{'name': 'co2__t-5', 'source': 'co2', 'shift': 5, 'kind': 'target_lag'}
+{'name': 'co2__t-6', 'source': 'co2', 'shift': 6, 'kind': 'target_lag'}
+{'name': 'co2__t-7', 'source': 'co2', 'shift': 7, 'kind': 'target_lag'}
+{'name': 'co2__t-96', 'source': 'co2', 'shift': 96, 'kind': 'target_lag'}
+{'name': 'co2__t-672', 'source': 'co2', 'shift': 672, 'kind': 'target_lag'}
+{'name': 'co2__mean_1d', 'source': 'co2', 'shift': 4, 'kind': 'target_rolling'}
+{'name': 'room_temp__t-4', 'source': 'room_temp', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'room_active__t-4', 'source': 'room_active', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'damper__t-4', 'source': 'damper', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'light_on__t-4', 'source': 'light_on', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'window__t-4', 'source': 'window', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'supply_flow__t-4', 'source': 'supply_flow', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'oat__t-4', 'source': 'oat', 'shift': 4, 'kind': 'input_lag'}
+{'name': 'hour_sin', 'source': 'calendar', 'shift': 0, 'kind': 'calendar'}
+{'name': 'hour_cos', 'source': 'calendar', 'shift': 0, 'kind': 'calendar'}
+{'name': 'dow_sin', 'source': 'calendar', 'shift': 0, 'kind': 'calendar'}
+{'name': 'dow_cos', 'source': 'calendar', 'shift': 0, 'kind': 'calendar'}
+{'name': 'is_weekend', 'source': 'calendar', 'shift': 0, 'kind': 'calendar'}
+{'sizes': {'train': 6276, 'val': 1340, 'test': 1342}, 'gap': '1 h', 'bounds': {'train': ('2023-02-27 01:00:00+01:00', '2023-05-03 23:00:00+02:00'), 'val': ('2023-05-04 00:15:00+02:00', '2023-05-17 23:15:00+02:00'), 'test': ('2023-05-18 00:30:00+02:00', '2023-05-31 23:45:00+02:00')}}
+                 model  ...   cv_score
+0          persistence  ...        NaN
+1                ridge  ...  41.937928
+2        random_forest  ...  49.892524
+3                  gbm  ...  52.764621
+4  same_time_yesterday  ...        NaN
+
+[5 rows x 11 columns]
+                           actual  predicted  persistence
+timestamp                                                
+2023-05-18 00:30:00+02:00   470.0      470.0        470.0
+2023-05-18 00:45:00+02:00   470.0      470.0        470.0
+2023-05-18 01:00:00+02:00   470.0      470.0        470.0
+2023-05-18 01:15:00+02:00   470.0      470.0        470.0
+2023-05-18 01:30:00+02:00   470.0      470.0        470.0
+elapsed 2401.058834552765

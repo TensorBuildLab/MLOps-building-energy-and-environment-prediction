@@ -10,22 +10,24 @@ gated deployment, monitoring and retraining ([checklist](docs/mlops.md)).
 
 It is built for a world where an AI agent does much of the data-science work:
 
-> **The AI agent handles the mess. The package guarantees the parts that must never go wrong.**
+> **The AI agent handles the mess. The package checks the parts that must not go wrong, the same way every time.**
 
 Real building data is messy in endless ways: cryptic point names, mixed
 units, text in number columns, stuck sensors, odd export formats. No fixed
 set of rules can anticipate all of it, but an LLM agent can reason through
-each case and write the code it needs. Some mistakes, though, must be
-impossible no matter who writes the code: wrong units, a time series split
-at random, future values leaking into inputs, a model reported without a
-baseline. `bemlops` makes those impossible, and records every decision.
+each case and write the code it needs. Some mistakes, though, should be
+caught no matter who writes the code: wrong units, a time series split at
+random, future values leaking into inputs, a model reported without a
+baseline. Everything that goes through `bemlops` is checked for those, and
+every decision is recorded. (An agent can still bypass the package by writing
+its own model; the checks cover what goes through it.)
 
 | The agent (or engineer) | bemlops |
 |---|---|
 | Loads any export format, in its own code | Accepts any pandas table with a time index |
 | Works out what `RM204_ZN_T` or `AI-3.PV` means | Requires every used column to be declared, and checks each declaration against physics |
 | Decides what to do about faults and odd periods | Detects stuck sensors, spikes, `-999` placeholders, wrong units, duplicates, gaps |
-| Designs extra features | Builds lags so that nothing comes from the future |
+| Designs extra features | Shifts every measured input by the horizon and audits how far each reaches |
 | Explains the results | Splits by time, compares with baselines, applies ASHRAE Guideline 14, writes a full run record |
 
 ## A quick look
@@ -53,9 +55,9 @@ p.fit()        # refuses: the unit error needs a decision first
 p.update(columns={"RM204_ZN_T": "zone_air_temperature [degF]"}, note="degF per BAS point config")
 p.prepare(freq="15min")
 print(p.fit())
-# Chosen: random_forest. Test: RMSE 0.118 kW, CV(RMSE) 20.0%, NMBE -8.8%.
-# Skill vs persistence: 0.58
-# ASHRAE Guideline 14 (hourly): CV(RMSE) 17.9% (limit 30%), NMBE -8.9% (limit +/-10%): passes.
+# Validation and test results against the strongest no-ML baseline (persistence, same time
+# yesterday, or the time-of-day profile), a 3-block rolling-origin backtest, a 90% prediction
+# interval with its test coverage, the inputs the model relies on, and ASHRAE Guideline 14.
 folder = p.save_run("runs/")   # report, model card, full audit record, model, predictions, plots
 
 reg = bemlops.Registry("models/")
@@ -63,7 +65,7 @@ v = reg.register(folder)["version"]   # promotion gates evaluated and stored
 reg.promote(p.name, v, reason="First production model.")   # refused if a gate fails
 
 model = reg.load(p.name)
-model.predict(latest_data)            # checks the live data first, then forecasts
+model.predict(last_eight_days)        # checks the live data first; forecasts with a 90% range
 model.check_drift(last_two_weeks)     # accuracy, input shift, new sensor faults
 bemlops.retrain(history, reg, p.name) # challenger vs champion on unseen data; promotes only if better
 ```
@@ -72,6 +74,11 @@ The same steps run from the command line for scheduled jobs:
 `bemlops train | predict | monitor | retrain | reproduce`.
 
 Run the full example on a synthetic messy BAS export: `python examples/quickstart.py`.
+
+Your own inputs and models fit in: compute extra columns from past values and
+declare them (they are lagged like any measured input, so they cannot leak),
+or pass `p.fit(custom_models={"mine": (estimator, search_space)})`. Either is
+judged by exactly the same split, baselines and gates.
 
 ## What the checks catch
 
@@ -131,9 +138,10 @@ skills/             the Agent Skill (SKILL.md + point-name reference)
 examples/           runnable examples
 tests/              tests, including leakage and fault-detection tests
 docs/design.md      why the package works the way it does
-benchmarks/         protocol for the agent-vs-AutoML-vs-agent+bemlops study
-case_studies/       synthetic demo, v1 reproduction, real buildings
-paper/              the research paper (v1 and the v2 plan)
+benchmarks/         pilot study with independent agents (prompts, deliverables, scores)
+case_studies/       real buildings: ROBOD, Aalborg, BDG2; fault injection; lifecycle;
+                    results tables and the run record behind every reported number
+paper/              the paper: sections, generated tables and figures, build script
 ```
 
 ## Research

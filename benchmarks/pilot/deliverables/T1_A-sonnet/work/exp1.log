@@ -1,0 +1,65 @@
+loaded 91.38353228569031
+== hgb residual all 67
+  fold 2023-04-03 n=1344 model=46.94 persist=45.48
+  fold 2023-04-17 n=1344 model=43.61 persist=54.16
+  fold 2023-05-01 n=1344 model=31.98 persist=29.77
+  fold 2023-05-15 n=1631 model=24.67 persist=28.89
+  POOLED model=37.31 persist=40.47
+   time 130.0
+== hgb direct all 67
+  fold 2023-04-03 n=1344 model=50.38 persist=45.48
+  fold 2023-04-17 n=1344 model=42.79 persist=54.16
+  fold 2023-05-01 n=1344 model=32.27 persist=29.77
+  fold 2023-05-15 n=1631 model=25.08 persist=28.89
+  POOLED model=38.28 persist=40.47
+   time 47.6
+== hgb residual noenv 59
+  fold 2023-04-03 n=1344 model=47.50 persist=45.48
+  fold 2023-04-17 n=1344 model=42.97 persist=54.16
+  fold 2023-05-01 n=1344 model=32.28 persist=29.77
+  fold 2023-05-15 n=1631 model=24.66 persist=28.89
+  POOLED model=37.37 persist=40.47
+   time 9.7
+== hgb residual noenv_nostat 44
+  fold 2023-04-03 n=1344 model=46.89 persist=45.48
+  fold 2023-04-17 n=1344 model=45.38 persist=54.16
+  fold 2023-05-01 n=1344 model=27.91 persist=29.77
+  fold 2023-05-15 n=1631 model=26.10 persist=28.89
+  POOLED model=37.30 persist=40.47
+   time 8.3
+== hgb residual co2+cal 44
+  fold 2023-04-03 n=1344 model=46.89 persist=45.48
+  fold 2023-04-17 n=1344 model=45.38 persist=54.16
+  fold 2023-05-01 n=1344 model=27.91 persist=29.77
+  fold 2023-05-15 n=1631 model=26.10 persist=28.89
+  POOLED model=37.30 persist=40.47
+   time 8.1
+== hgb residual all winsor150 67
+  fold 2023-04-03 n=1344 model=48.11 persist=45.48
+  fold 2023-04-17 n=1344 model=44.82 persist=54.16
+  fold 2023-05-01 n=1344 model=31.35 persist=29.77
+  fold 2023-05-15 n=1631 model=24.51 persist=28.89
+  POOLED model=37.85 persist=40.47
+   time 10.2
+== hgb residual all shallow 67
+  fold 2023-04-03 n=1344 model=46.74 persist=45.48
+  fold 2023-04-17 n=1344 model=45.34 persist=54.16
+  fold 2023-05-01 n=1344 model=30.33 persist=29.77
+  fold 2023-05-15 n=1631 model=24.87 persist=28.89
+  POOLED model=37.46 persist=40.47
+   time 8.3
+== ridge residual noenv 59
+  fold 2023-04-03 n=1344 model=44.30 persist=45.48
+  fold 2023-04-17 n=1344 model=51.59 persist=54.16
+  fold 2023-05-01 n=1344 model=30.19 persist=29.77
+  fold 2023-05-15 n=1631 model=26.48 persist=28.89
+  POOLED model=38.93 persist=40.47
+   time 0.9
+== ET residual noenv 59
+  fold 2023-04-03 n=1344 model=44.95 persist=45.48
+  fold 2023-04-17 n=1344 model=44.60 persist=54.16
+  fold 2023-05-01 n=1344 model=28.51 persist=29.77
+  fold 2023-05-15 n=1631 model=24.86 persist=28.89
+  POOLED model=36.37 persist=40.47
+   time 32.5
+done 347.05628657341003

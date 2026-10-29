@@ -1,6 +1,6 @@
 # Design
 
-## The split: judgment vs guarantees
+## The split: judgment vs checks
 
 Building data is too varied for a fixed pipeline, and too easy to get wrong
 for free-form code alone. `bemlops` splits the work:
@@ -8,7 +8,7 @@ for free-form code alone. `bemlops` splits the work:
 - **Judgment** (agent or engineer, in their own code): reading any export
   format, decoding point names, deciding what a fault means for this
   building, choosing the target, horizon and time step, designing extra features.
-- **Guarantees** (the package, the same every time): units checked against
+- **Checks** (the package, the same every time): units checked against
   physics, time-ordered evaluation, no leakage, honest baselines, standard
   metrics, a complete record.
 

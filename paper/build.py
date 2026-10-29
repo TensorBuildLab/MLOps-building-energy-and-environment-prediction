@@ -12,13 +12,14 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ORDER = ["00_front", "01_introduction", "02_related_work", "03_framework", "04_implementation",
-         "05_case_studies", "06_results", "07_discussion", "08_conclusion"]
+         "05_case_studies", "06a_protocol", "06b_targets", "06c_faults", "06d_lifecycle", "06e_pilot",
+         "07_discussion", "08_conclusion", "references", "09_appendix"]
 
 
 def main() -> None:
     parts = []
     for name in ORDER:
-        f = HERE / "sections" / f"{name}.md"
+        f = HERE / "references.md" if name == "references" else HERE / "sections" / f"{name}.md"
         if f.exists():
             text = f.read_text(encoding="utf-8")
             text = re.sub(r"<!-- table: (\w+) -->",
@@ -26,7 +27,6 @@ def main() -> None:
                           if (HERE / "tables" / f"{m.group(1)}.md").exists() else f"*[table {m.group(1)} missing]*",
                           text)
             parts.append(text.strip())
-    parts.append((HERE / "references.md").read_text(encoding="utf-8").strip())
     out = "\n\n".join(parts) + "\n"
     (HERE / "manuscript.md").write_text(out, encoding="utf-8")
     words = len(re.sub(r"\|.*\|", "", out).split())

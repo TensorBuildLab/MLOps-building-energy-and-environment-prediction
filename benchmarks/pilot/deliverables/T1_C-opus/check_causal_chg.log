@@ -1,0 +1,8 @@
+full predict: 27.6 s, 9024 forecasts, 0 NaN, index tz=Europe/Copenhagen, 2023-02-27 00:00:00+01:00 .. 2023-06-01 00:45:00+02:00
+cutoff 2023-03-26 02:10+01:00: 2604 comparable forecasts, max |diff| = 0 ppm, NaN mismatch = 0, forecasts beyond cutoff+45min = 0, 3.1 s
+cutoff 2023-04-02 08:00+02:00: 3295 comparable forecasts, max |diff| = 0 ppm, NaN mismatch = 0, forecasts beyond cutoff+45min = 0, 2.2 s
+cutoff 2023-04-24 14:07+02:00: 5432 comparable forecasts, max |diff| = 0 ppm, NaN mismatch = 0, forecasts beyond cutoff+45min = 0, 4.3 s
+cutoff 2023-05-12 10:00+02:00: 7144 comparable forecasts, max |diff| = 0 ppm, NaN mismatch = 0, forecasts beyond cutoff+45min = 0, 5.3 s
+cutoff 2023-05-25 10:43+02:00: 8394 comparable forecasts, max |diff| = 0 ppm, NaN mismatch = 0, forecasts beyond cutoff+45min = 1, 4.9 s
+cutoff 2023-05-31 17:22+02:00: 8997 comparable forecasts, max |diff| = 0 ppm, NaN mismatch = 0, forecasts beyond cutoff+45min = 0, 3.7 s
+WORST 0.0 total 53.9 s

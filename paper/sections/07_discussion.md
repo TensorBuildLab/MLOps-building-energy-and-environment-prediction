@@ -1,63 +1,171 @@
 ## 7. Discussion
 
-### 7.1 What the division of labour buys
+### 7.1 Where the guardrails mattered, and where they did not
 
-The checks did not replace judgment; they directed it. On the real data, every
-judgment call the agent made was prompted by a specific warning, and every one
-was settled with evidence that is now part of the record. Examples: a CO2
-sensor floor, change-of-value logging recognised from the share of unchanged
-steps, saturation of outdoor humidity, and gaps in camera counts. A fixed
-pipeline would have had to either mask these stretches (and lose most
-nights of CO2 data) or ignore stuck sensors (and train on a weather station that
-repeated one value for 37 hours). An agent without checks would not have been
-asked the question. The converse also held. Several warnings on real data
-were wrong at first: stuck runs and spikes counted across gaps, and cloud
-transients flagged as spikes. They were corrected in the package, with tests,
-because the agent challenged them with evidence. The guardrails improved by
-being used.
+The experiments separate four places where checks can make a difference.
 
-### 7.2 Choosing the baseline is a feature
+**Evaluation protocol: large effect.** A random split understated error on
+every task tested (Section 6.1), by a margin larger than most differences
+between models in this study. This is the protocol of our 2024 study and a
+common one in published building-ML work. None of the pilot agents used it:
+all eight split in time order unprompted, although their prompts announced a
+leakage check. The framework's contribution here is to make the time-ordered
+protocol, and the strongest baseline, the default for whoever uses it,
+including less careful users and agents.
 
-In a substantial share of tasks the best model on validation data was a
-baseline, and the framework deployed nothing more complex. Promotion gates
-also refused models that beat persistence on validation but not on test. In
-the 2024 setting, every task produced a model and a mean squared error,
-with nothing to say whether that error was any good. A building operator
-needs the opposite default: a model that does not clearly beat "same as an
-hour ago" should not be deployed.
+**Baselines and gates: large effect on what gets deployed.** Across 92 tasks
+the strongest no-ML rule was often hard to beat (Section 6.2). In a
+substantial minority of tasks the framework kept the baseline or refused to
+promote a model. A pipeline that always reports its best model would have
+deployed all of them. For an operator, a forecast that is no better than
+"same as an hour ago" adds maintenance without adding value.
 
-### 7.3 Limitations
+**Fault handling: small, consistent effect.** On real data with planted
+faults, the framework's standard handling made the result on faulty data
+match the result on clean data. A quick script was 1.6–1.9 ppm worse in MAE,
+and three to five times less stable between seeds (Section 6.3). The
+difference is real but small in absolute terms. The detectors also miss
+things: a stuck meter at its idle floor half the time, and a dead meter that
+only a cross-sensor check could reveal.
 
-- **One agent, which also built the package.** The case studies show the
-  framework operated by an LLM agent; they do not measure how different
-  agents, or agents without the framework, perform. That requires the
-  multi-agent, multi-LLM benchmark with hidden test periods described in the
-  repository (`benchmarks/`), which is the next study.
-- **Public datasets.** All three datasets are public, documented and partly
-  curated by their authors. Commercial BAS exports are messier. The
-  fault-injection study mitigates this, but planted faults are simpler than
-  real ones.
-- **Short records.** ROBOD covers 29–47 weekdays per room, and Aalborg ten
-  months. Effects of season are only partly visible, and test periods are
-  short.
-- **No weather forecasts.** Day-ahead tasks use measured weather up to the
-  forecast time only. With forecasts declared as known in advance, accuracy
-  would be higher.
-- **Conventional models and point forecasts.** The framework's claims concern
-  the process, not the model family. Probabilistic forecasts, deep and
-  foundation models [Emami et al. 2023] are natural additions.
-- **MLOps scope.** Feature stores and online serving endpoints are out of
-  scope at single-building scale (Section 3.4).
-- **Guideline 14.** Its criteria were written for measurement-and-verification
-  baselines. We use them as a familiar reference for forecasts, not as a claim
-  of compliance.
+**Capable agents: no measurable effect on accuracy.** Capable agents, told
+that their work would be checked for leakage, built equally accurate,
+leak-free models with or without the framework (Section 6.5). They found as
+many planted faults, and wrote their own causality tests. The framework arm
+cost more tokens, tool calls and time. For RQ5, the answer is that with
+capable, primed agents the framework did not change accuracy or leakage.
 
-### 7.4 Implications
+Taken together, these results place the framework's measured value in four
+things:
+- **making the time-ordered protocol and the strongest baseline the default**,
+  rather than something that depends on a careful prompt;
+- **making work comparable.** The eight pilot agents produced eight different
+  pipelines with eight different evaluation designs, which an operator would
+  have to audit one by one. The framework gives every model the same record,
+  baselines, gates and monitoring;
+- **supporting the lifecycle after the first model** (Section 6.4);
+- **recording decisions**, so that they can be re-executed.
 
-For researchers, the evaluation results argue that a random split should
-not be accepted for building time series in any paper, and that results
-should come with a no-skill baseline. For practitioners, the framework turns a
-building-specific modeling project into a configuration that can be
-reviewed, re-run, monitored and retrained. For agent developers, it suggests a
-pattern beyond building data: let the agent write code freely, but route its
-results through domain-specific checks that it cannot skip.
+Whether the defaults matter more for weaker or unprimed agents is the main
+open question. The pilot was not designed to answer it.
+
+### 7.2 Lifecycle: monitoring helps; persistence is the bar
+
+Monitoring with gated retraining clearly beat a model left alone (Section
+6.4). It did not clearly beat persistence for district heating, and it was
+close to naive monthly retraining. Two lessons follow.
+
+**A drift check must compare with a baseline, not only with the model's own
+past error.** In summer the district-heating load barely changes, so
+persistence was nearly perfect, and every model looked poor next to it. The
+check in the evaluated version compared only with test-time error and never
+recommended falling back to persistence. The fallback rule we added
+afterwards would have helped for district heating and hurt slightly for CO2
+in this one trajectory. That is why it is a recommendation to the operator,
+not an automatic switch.
+
+**Gates cost little and protect against bad retraining.** Monthly retraining
+without gates did about as well here, because the data were clean enough that
+retraining rarely made things worse. The gates exist for the months when a
+fault or an unusual period would otherwise be trained into production. Two
+tasks over eight months do not contain enough such months to measure that
+benefit.
+
+### 7.3 Judgment stays with the agent
+
+The checks directed judgment rather than replacing it. On the real data,
+every judgment call in the case studies was prompted by a warning and
+settled with evidence that is now in the record. Examples:
+- a CO2 sensor floor;
+- change-of-value logging, recognised from the share of unchanged steps;
+- outdoor humidity saturating on tropical nights;
+- gaps in the camera counts.
+
+A fixed pipeline would have had two bad options. It could mask those
+stretches and lose most nights of CO2 data. Or it could ignore stuck sensors
+and train on a weather station that repeated one value for 37 hours.
+
+The dead chilled-water meter shows the limit of this division of labour. The
+case-study agent, following the skill, did not look for contradictions
+between related points. The independent pilot agents, without the framework's
+checks to lean on, all did. A guardrail that reports no problem can make an
+agent less curious. The skill now asks the agent to check related points
+against each other, and cross-sensor checks are the natural next guardrail.
+
+### 7.4 Threats to validity
+
+**Internal validity.**
+- **The same agent built the framework and ran the case studies.** The
+  framework is therefore not an independent tool tested by a neutral user.
+  Several detectors were revised on ROBOD and Aalborg (Appendix A), so the
+  data checks are partly in-sample on those datasets. The fault-injection
+  detection rates are optimistic for the same reason. BDG2 is closer to held
+  out but not strictly so (Section 5.2).
+- **The agent missed a real fault, and independent agents caught it.** We
+  report the affected tasks before and after the fix.
+- **The fault-cost comparison uses a fix written by the authors.** The unit
+  fix in E3 was coded by the authors, who knew what had been planted. We gave
+  the same fix to the unguarded arm, and it made no difference.
+
+**Construct validity.**
+- **Skill is defined on RMSE**, and the promotion threshold of 0.05 depends
+  on that choice.
+- **Fault detection is counted per column and type**, not per located
+  sample.
+- **The pilot prompts announced a leakage check and asked for rigour**, and
+  only the framework arm was asked for a usability report. Its cost figures
+  include that extra reporting.
+- **The pilot's framework arm used an earlier package version** than the case
+  studies.
+- **Guideline 14 criteria were written for measurement and verification.** We
+  use them as a familiar reference for forecasts, not as a claim of
+  compliance.
+
+**Statistical conclusion validity.**
+- **Each E1 task was run once and scored on one test window.** The
+  Diebold–Mariano tests and the backtest address this partly. Where test and
+  backtest disagreed in sign, the gates followed the test window.
+- **The pilot has one run per cell**, two tasks, and two models of one
+  family, the same family as the agent that built the framework.
+- **The lifecycle experiment is one trajectory for each of two tasks.**
+
+**External validity.**
+- **The three datasets are public, documented, and partly curated by their
+  authors.** Commercial BAS exports are messier.
+- **The records are short.** ROBOD covers 29–47 weekdays per room, and
+  Aalborg ten months.
+- **There were no weather forecasts.** Day-ahead tasks used measured weather
+  up to the forecast time only.
+- **The models and searches were deliberately ordinary.** Stronger models,
+  including probabilistic, deep and foundation models [Emami et al. 2023],
+  would beat the baselines more often.
+
+### 7.5 What the error gaps mean in operation
+
+In the protocol comparison, a random split understated RMSE by a median of
+about a quarter (Section 6.1). For a model predictive controller sized on
+the reported error, that means comfort or demand constraints tighter than
+the evidence supports. For demand response, it means overstated confidence
+in hour-ahead load. For measurement and verification, it means a baseline
+model that looks compliant when it is not.
+
+The prediction intervals were too narrow wherever the test period differed
+from the period they were calibrated on. District heating is the clearest
+case: calibrated on October to mid-November, its intervals covered only about
+a quarter of the values from mid-November to December, when the heating load
+was larger and more variable. Intervals of this kind should be recalibrated as part of
+monitoring.
+
+### 7.6 Implications
+
+- **For researchers:** building time series should not be evaluated with a
+  random split. Results should be reported against the strongest simple
+  baseline, with a test of the difference.
+- **For practitioners:** the framework turns a building-specific modeling
+  project into a configuration that can be reviewed, re-run, monitored and
+  retrained. Its gates will often recommend a simple rule. That is a result,
+  not a failure.
+- **For agent developers:** domain checks are worth building, but capable
+  agents can already reproduce much of what such checks do. What they do not
+  provide by default is a common record and a lifecycle. Agents are also
+  effective testers of the checks.

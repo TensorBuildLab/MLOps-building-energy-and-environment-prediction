@@ -1,205 +1,205 @@
 scoring T1_A-opus
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
    {'delivered': True, 'rmse': 21.186654555321457, 'skill': -0.011451530354296358, 'expected_rmse': 26.0, 'leakage': False}
 scoring T1_A-sonnet
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
    {'delivered': True, 'rmse': 19.92491448282923, 'skill': 0.04878397893289599, 'expected_rmse': 34.0, 'leakage': False}
 scoring T1_C-sonnet
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
    {'delivered': True, 'rmse': 21.721290407984757, 'skill': -0.03697506215808222, 'expected_rmse': 35.0, 'leakage': False}
 scoring T2_A-opus
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
    {'delivered': True, 'rmse': 0.5589236602801306, 'skill': 0.7502353122539107, 'expected_rmse': 0.85, 'leakage': False}
 scoring T2_A-sonnet
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
    {'delivered': True, 'rmse': 0.5263825130587306, 'skill': 0.7647768857320829, 'expected_rmse': 0.8, 'leakage': False}
 scoring T2_C-sonnet
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
-C:\Users\liangzhang1\Documents\Claude\MLOPS Building Energy and Environment Prediction\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+<repo>\.wt\benchmarks\pilot\score.py:55: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   if raw.str.contains(r"([+-]\d\d:?\d\d|Z)$").all():
    {'delivered': True, 'rmse': 0.558684063585462, 'skill': 0.750342380173703, 'expected_rmse': 0.85, 'leakage': False}
 done

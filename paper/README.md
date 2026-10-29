@@ -1,52 +1,37 @@
 # Paper
 
-## v1 (2024, preliminary)
+**Where domain guardrails matter for LLM-agent-built prediction models in buildings:
+an open MLOps framework evaluated on real data** (draft, version 2 of arXiv:2407.03469).
 
-Khadka, S. and Zhang, L. *Scaling Data-Driven Building Energy Modelling
-using Large Language Models.* arXiv:2407.03469.
-<https://arxiv.org/abs/2407.03469>
+- [`manuscript.md`](manuscript.md): the assembled draft (generated; do not edit by hand).
+- `sections/`: the sections, edited by hand.
+- `tables/`, `figures/`: generated from the results by `case_studies/make_results.py` and
+  `paper/figure_framework.py`. Every number in the text comes from these tables or from the
+  result files in `case_studies/` and `benchmarks/pilot/`.
+- `references.md`: the reference list, checked against Crossref, arXiv or the publisher.
 
-A prompt template following MLOps steps (data preparation, feature
-selection, splitting, model selection, tuning, evaluation, plots) had
-ChatGPT-4 write modeling code for a simulated DOE small office in Tucson.
-Bi-sequential prompting produced runnable code in 34 of 35 attempts.
+Rebuild everything after the case studies have run:
 
-What v2 must fix:
+```bash
+python case_studies/stats.py           # Diebold-Mariano tests, pilot statistics
+python case_studies/make_results.py    # tables and figures
+python paper/figure_framework.py       # Figure 1
+python paper/build.py                  # paper/manuscript.md
+```
 
-- Random train/validation/test split on time-series data (leakage)
-- Feature selection on the full dataset before splitting (leakage)
-- "Code accuracy" measured as "runs without error", not model correctness
-- One simulated building, one LLM version, one beginner as the human baseline
-- Results in ChatGPT share links that cannot be re-run
+## What changed from v1 (2024)
 
-## v2 (planned)
+| v1 | v2 |
+|---|---|
+| Random train/test split on time series | Time-ordered split with a horizon gap; random-split error measured as a protocol comparison (RQ2) |
+| Feature selection on the full dataset | Inputs shifted by the horizon and audited; selection effect measured |
+| "Accuracy" = code runs without error | Skill against the strongest no-ML baseline, tests of the difference, promotion gates |
+| One simulated building, energy only | 92 tasks in 3 public real-building datasets (energy, thermal load, temperature, CO2, humidity, PM2.5, occupancy), including a 20-building portfolio |
+| No deployment | Registry, monitoring, gated retraining over eight months (RQ4) |
+| One LLM, results in chat links | Independent Claude Opus 5.5 and Sonnet 5.5 agents with and without the framework; prompts, deliverables and scores in the repository (RQ5) |
 
-**Thesis**: generalization from the LLM, reliability from domain guardrails.
-LLM agents can handle the endless variety of real building data, but only
-domain guardrails make the results trustworthy enough for industry use.
+## Before submission (authors)
 
-**Contributions** (draft):
-
-1. A framework that splits building-prediction work between an LLM agent
-   (judgment) and a domain package (guarantees), covering the full lifecycle:
-   data checks, preparation, modeling, evaluation, deployment, drift monitoring
-2. `bemlops`, an open-source implementation, with an Agent Skill
-3. A benchmark on real buildings and many prediction targets (energy,
-   load, temperature, CO2, humidity, occupancy), with a hidden test period
-   and fault injection
-4. Evidence comparing an agent alone, AutoML alone, and the agent with the
-   framework, across several LLMs
-
-**Outline** (draft):
-
-1. Introduction: scaling data-driven building models; what changed since 2024
-2. Related work: data-driven building prediction; AutoML; LLM agents for
-   buildings (mostly simulation-based so far); data quality in BAS
-3. Framework: the split, the guardrails, the lifecycle
-4. Implementation: bemlops and the skill
-5. Benchmark design: buildings, tasks, arms, hidden test, fault injection
-6. Results
-7. Discussion: where agents fail, where guardrails help, cost, limitations
-8. Conclusion
-
-Target venue: to be decided.
+- Confirm the author list, affiliations and the Acknowledgements.
+- Choose the venue and run its author guidelines (highlights, abstract length, declarations).
+- Tag a release and archive it on Zenodo; put the DOI in the data-availability statement.

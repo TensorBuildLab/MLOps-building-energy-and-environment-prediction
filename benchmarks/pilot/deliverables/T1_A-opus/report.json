@@ -1,0 +1,18 @@
+{
+  "expected_rmse": 26.0,
+  "evaluation": "Expanding-window weekly backtest (train on everything before each week, forecast that week). Every feature uses only rows timestamped before T-45 min; I checked this by truncating and corrupting the file at several cutoffs, and no earlier forecast changed. Over the 5 weeks of May, which run on the current summer ventilation schedule, RMSE against the cleaned 15-min means was 25.3 ppm (persistence 29.3); the last 4 weeks gave 23.6 ppm (persistence 28.5). The April weeks, on the old 08:00-16:15 fan schedule, were harder (about 36 vs 40 over all 9 weeks). I quote 26 to allow for seasonal drift; if the scored truth keeps the -999 sentinel samples, expect about 33.",
+  "model": "Forecast = persistence base (cleaned mean of the interval [T-60, T-45)) + predicted 1-hour change. The change is the average of 3 regularised HistGradientBoosting regressors over 47 features: CO2 level, lags, slopes and rolling min/max; time CO2 has been flat; occupancy/light state; fan state; room-temperature trend; the target time-of-day, workday and Danish holiday flag; and the fan, occupancy and CO2 change at the same time on the most recent day of the same type. They are trained on all of train.csv. Saved in co2_model.joblib; predict() only loads it.",
+  "data_findings": [
+    "One day (2023-05-24 23:05 to 2023-05-25 23:00 local, 288 rows) appears twice with identical values: I removed the duplicate timestamps and sorted by time.",
+    "Rows 2023-04-24 13:05-15:30 are written in reverse time order: they are fine once sorted by timestamp.",
+    "Timestamps are local time with +01:00/+02:00 offsets and cross the 2023-03-26 DST change: I parse them to UTC for all computation and return a tz-aware Europe/Copenhagen index.",
+    "Gaps: the first hour is all #N/A, 2023-04-02 07:40-19:45 is missing (12 h), and there are a few scattered #N/A rows. I do not interpolate (that would use future data). Features are forward-filled with an 'age of last CO2 reading' feature, and intervals with no truth are skipped in training.",
+    "CO2 has 15 isolated -999 sentinel samples and one 1521 ppm single-sample spike (2023-04-21 16:10, between 579 and 583). I treat values outside 250-5000 ppm as missing and use a causal despike filter: a jump over 300 ppm is accepted only once a second sample confirms it. Training targets are the cleaned 15-min means.",
+    "CO2 is logged with a change-of-value deadband of about 50 ppm, so the series is step-like and stays constant for whole weekends and holidays. This is real logging behaviour, so I kept it; the model learns to stay at persistence when CO2 has been flat.",
+    "Room temperature switches from degC to degF on 2023-05-12 (values 72-83). I convert values above 45 back to degC.",
+    "Outdoor temperature has 8 isolated spikes of 57-73 degC: set to missing. Wind velocity contains 'OFFLINE' strings: parsed as missing.",
+    "People__amount is missing about 60% of the time, including whole weeks, so I do not use it. The setpoint and limit columns are constant and unused.",
+    "Damper position sticks at 66% for days, and the window contact reads 'open' continuously from 2023-05-08. Both look unreliable and made the backtest worse, so I excluded them, along with outdoor/solar/supply-air signals.",
+    "Regime change: in early May the ventilation schedule changed from about 08:00-16:15 to 05:00-21:00 on weekdays (and it also runs on holidays). Under the old schedule CO2 jumped by 200-400 ppm when the fan stopped while the room was occupied. I handle this with current-fan-state and expected-fan-state features, and I judged the model mainly on the May weeks."
+  ]
+}

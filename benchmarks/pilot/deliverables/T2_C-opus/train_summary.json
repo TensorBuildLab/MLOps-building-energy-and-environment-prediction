@@ -1,0 +1,107 @@
+{
+  "chosen": "random_forest",
+  "params": {
+    "model__min_samples_leaf": "1",
+    "model__max_features": "0.3",
+    "model__max_depth": "16"
+  },
+  "test": {
+    "n": 445,
+    "rmse": 0.7183129316896804,
+    "mae": 0.35674854133482203,
+    "r2": 0.9644159826997707,
+    "mean_actual": 3.281169088249438,
+    "cvrmse_pct": 21.916620824828183,
+    "nmbe_pct": 4.072096432656643
+  },
+  "test_baseline": {
+    "n": 445,
+    "rmse": 2.549327009658187,
+    "mae": 1.1195327750421258,
+    "r2": 0.5517929316929429,
+    "mean_actual": 3.281169088249438,
+    "cvrmse_pct": 77.78313735455512,
+    "nmbe_pct": 0.42021440127992304
+  },
+  "skill": 0.7182342912586991,
+  "validation": [
+    {
+      "model": "random_forest",
+      "type": "ml",
+      "n": 443,
+      "rmse": 0.626018128505057,
+      "mae": 0.3175369398211808,
+      "r2": 0.968039998707031,
+      "mean_actual": 3.085569732144469,
+      "cvrmse_pct": 20.31151288484095,
+      "nmbe_pct": 2.50106320971575,
+      "params": {
+        "model__min_samples_leaf": 1,
+        "model__max_features": 0.3,
+        "model__max_depth": 16
+      },
+      "cv_score": 0.7652773997975414
+    },
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 443,
+      "rmse": 0.6491477234041204,
+      "mae": 0.3321036847607535,
+      "r2": 0.9656347074704781,
+      "mean_actual": 3.085569732144469,
+      "cvrmse_pct": 21.06196569670338,
+      "nmbe_pct": -1.736197708963008,
+      "params": {
+        "min_samples_leaf": 100,
+        "max_leaf_nodes": 7,
+        "max_iter": 100,
+        "learning_rate": 0.1,
+        "l2_regularization": 0.1
+      },
+      "cv_score": 0.8263534753155399
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 443,
+      "rmse": 1.9552183583193874,
+      "mae": 1.1608806727174374,
+      "r2": 0.6882377686477368,
+      "mean_actual": 3.085569732144469,
+      "cvrmse_pct": 63.43816747370918,
+      "nmbe_pct": 4.836818212832876,
+      "params": {},
+      "cv_score": NaN
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 443,
+      "rmse": 2.142338985194808,
+      "mae": 0.8879627702966418,
+      "r2": 0.6257090293937423,
+      "mean_actual": 3.085569732144469,
+      "cvrmse_pct": 69.50940223631225,
+      "nmbe_pct": -2.3772566453405517,
+      "params": {},
+      "cv_score": NaN
+    }
+  ],
+  "split": {
+    "sizes": "{'train': 2088, 'val': 443, 'test': 445}",
+    "gap": "1 h",
+    "bounds": "{'train': ('2021-09-07 00:00:00', '2021-11-05 10:15:00'), 'val': ('2021-11-05 11:30:00', '2021-11-12 02:45:00'), 'test': ('2021-11-12 04:00:00', '2021-12-09 23:45:00')}"
+  },
+  "guideline14": {
+    "resolution": "hourly",
+    "cvrmse_pct": 17.680717278725307,
+    "nmbe_pct": 4.099221954639829,
+    "cvrmse_limit": 30.0,
+    "nmbe_limit": 10.0,
+    "passes": true
+  },
+  "warnings": [],
+  "run_folder": "<repo>\\data\\benchmark\\runs\\T2_C-opus\\runs\\t2-chilled-water-1h-20261029-010136",
+  "train_seconds": 485.8029887676239
+}

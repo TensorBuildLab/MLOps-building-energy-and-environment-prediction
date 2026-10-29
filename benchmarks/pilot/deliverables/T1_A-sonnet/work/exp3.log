@@ -1,0 +1,43 @@
+loaded 74.24905300140381
+== ET20 44
+  04-03 44.6/45.5 | 04-17 46.8/54.2 | 05-01 26.5/29.8 | 05-15 25.4/28.9 || POOLED 36.65 (persist 40.47)
+   time 17.5
+== ET40 44
+  04-03 44.7/45.5 | 04-17 48.5/54.2 | 05-01 26.7/29.8 | 05-15 25.5/28.9 || POOLED 37.30 (persist 40.47)
+   time 14.8
+== ET40 mf0.3 44
+  04-03 44.4/45.5 | 04-17 49.1/54.2 | 05-01 26.9/29.8 | 05-15 25.7/28.9 || POOLED 37.45 (persist 40.47)
+   time 10.5
+== ET80 44
+  04-03 44.5/45.5 | 04-17 50.0/54.2 | 05-01 27.0/29.8 | 05-15 25.8/28.9 || POOLED 37.80 (persist 40.47)
+   time 12.4
+== HGB 44
+  04-03 46.5/45.5 | 04-17 45.5/54.2 | 05-01 27.8/29.8 | 05-15 26.1/28.9 || POOLED 37.21 (persist 40.47)
+   time 8.0
+== HGB slow 44
+  04-03 44.7/45.5 | 04-17 46.4/54.2 | 05-01 27.6/29.8 | 05-15 25.9/28.9 || POOLED 36.84 (persist 40.47)
+   time 11.7
+blend ('ET20', 'HGB') 36.47
+blend ('ET40', 'HGB') 36.7
+blend ('ET40', 'HGB slow') 36.77
+blend ('ET80', 'HGB slow') 36.93
+blend ('ET20', 'ET40', 'HGB', 'HGB slow') 36.54
+shrink w 0.0 40.47
+shrink w 0.25 39.35
+shrink w 0.5 38.45
+shrink w 0.75 37.76
+shrink w 1.0 37.3
+shrink w 1.25 37.07
+hour 0 n 472 model 14.0 persist 16.5
+hour 2 n 472 model 12.6 persist 14.9
+hour 4 n 472 model 13.1 persist 13.5
+hour 6 n 472 model 14.4 persist 16.0
+hour 8 n 472 model 38.8 persist 49.1
+hour 10 n 472 model 45.9 persist 55.1
+hour 12 n 471 model 42.4 persist 42.6
+hour 14 n 472 model 35.0 persist 36.4
+hour 16 n 472 model 73.9 persist 77.1
+hour 18 n 472 model 51.5 persist 57.8
+hour 20 n 472 model 19.8 persist 21.1
+hour 22 n 472 model 18.7 persist 19.9
+done 149.305193901062

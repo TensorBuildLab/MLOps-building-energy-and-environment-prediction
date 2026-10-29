@@ -1,0 +1,17 @@
+exec(open("explore2.py").read().split("def models")[0])
+cols = default + ["tod_min", "sched_window", "holiday"]
+a = "2021-11-08"
+tr = m & (X.index < pd.Timestamp(a) - pd.Timedelta("1h")); te = m & (X.index >= pd.Timestamp(a))
+Xt = X.loc[tr, cols]; med = Xt.median()
+rf = RandomForestRegressor(n_estimators=200, min_samples_leaf=3, max_features=0.5, n_jobs=3, random_state=0).fit(Xt.fillna(med), y[tr])
+pr = pd.Series(np.clip(rf.predict(X.loc[te, cols].fillna(med)), 0, None), index=X.index[te])
+e = (pr - y[te])
+tod = e.index.strftime("%H:%M")
+g = (e**2).groupby(tod).agg(["sum", "count"])
+g["share"] = g["sum"] / g["sum"].sum()
+g["rmse"] = np.sqrt(g["sum"] / g["count"])
+print(g.sort_values("share", ascending=False).head(15).round(3))
+print("total rmse", np.sqrt((e**2).mean()))
+print("daily rmse", e.groupby(e.index.date).apply(lambda s: np.sqrt((s**2).mean())).round(3))
+imp = pd.Series(rf.feature_importances_, index=cols).sort_values(ascending=False)
+print(imp.head(15).round(3))

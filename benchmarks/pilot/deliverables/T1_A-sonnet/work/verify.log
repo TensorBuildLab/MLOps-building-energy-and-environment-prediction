@@ -1,0 +1,20 @@
+import 0.2
+predict(train.csv) took 54.2 s; n = 9024 type DatetimeIndex tz None
+2023-02-27 00:00:00 2023-06-01 00:45:00 nan 0 unique idx True min/max 386.440138109849 972.8807459985657
+timestamp
+2023-02-27 00:00:00    498.716308
+2023-02-27 00:15:00    498.716308
+2023-02-27 00:30:00    498.716308
+Name: CO2_forecast, dtype: float64
+timestamp
+2023-06-01 00:15:00    452.676664
+2023-06-01 00:30:00    452.498163
+2023-06-01 00:45:00    452.378940
+Name: CO2_forecast, dtype: float64
+in-sample RMSE (not an estimate of future error): 23.78 n 8966
+cut 2023-04-12 09:05:00+00:00: compared 4268 forecasts (trunc has 4268 non-null); max|full-trunc|=5.68e-14  max|full-garbage|=1.14e-13  last common T=2023-04-12 11:45:00
+cut 2023-04-26 13:20:00+00:00: compared 5629 forecasts (trunc has 5629 non-null); max|full-trunc|=1.14e-13  max|full-garbage|=1.14e-13  last common T=2023-04-26 16:00:00
+cut 2023-05-03 07:50:00+00:00: compared 6279 forecasts (trunc has 6279 non-null); max|full-trunc|=1.14e-13  max|full-garbage|=1.14e-13  last common T=2023-05-03 10:30:00
+cut 2023-05-17 15:35:00+00:00: compared 7654 forecasts (trunc has 7654 non-null); max|full-trunc|=1.14e-13  max|full-garbage|=1.14e-13  last common T=2023-05-17 18:15:00
+cut 2023-05-24 10:10:00+00:00: compared 8304 forecasts (trunc has 8304 non-null); max|full-trunc|=1.14e-13  max|full-garbage|=1.14e-13  last common T=2023-05-24 12:45:00
+LEAK TEST PASSED  total time 96.7

@@ -1,0 +1,631 @@
+{
+  "run": {
+    "name": "t2_cw_B",
+    "created": "20261029-002919",
+    "environment": {
+      "bemlops": "0.1.0.dev0",
+      "code_commit": "5c575a6",
+      "python": "3.12.10",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "config": {
+    "config_version": 1,
+    "name": "t2_cw_B",
+    "target": "chilled_water_energy",
+    "task": "regression",
+    "horizon": "1h",
+    "columns": {
+      "chilled_water_energy": {
+        "name": "chilled_water_energy",
+        "quantity": "energy",
+        "unit": "kWh",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "ahu_fan_energy": {
+        "name": "ahu_fan_energy",
+        "quantity": "energy",
+        "unit": "kWh",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "cooling_coil_valve_command": {
+        "name": "cooling_coil_valve_command",
+        "quantity": "position",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "ahu_fan_speed": {
+        "name": "ahu_fan_speed",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "offcoil_air_temp": {
+        "name": "offcoil_air_temp",
+        "quantity": "supply_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "dry_bulb_temp": {
+        "name": "dry_bulb_temp",
+        "quantity": "outdoor_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "global_horizontal_solar_radiation": {
+        "name": "global_horizontal_solar_radiation",
+        "quantity": "solar_irradiance",
+        "unit": "W/m2",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "outdoor_relative_humidity": {
+        "name": "outdoor_relative_humidity",
+        "quantity": "relative_humidity",
+        "unit": "%",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "air_temperature": {
+        "name": "air_temperature",
+        "quantity": "zone_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "minute_of_day": {
+        "name": "minute_of_day",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": true,
+        "description": "",
+        "flat_ok": false
+      }
+    },
+    "timestamp": null,
+    "timestamp_format": null,
+    "intended_use": "1 h ahead forecast of 15-min chilled water energy (AHU, library room)",
+    "prepare": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": false,
+      "mask_spikes": false,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "fit": {
+      "models": [
+        "ridge",
+        "gbm"
+      ],
+      "n_iter": 6,
+      "fractions": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "random_state": 0
+    },
+    "accepted": {},
+    "notes": [
+      "chilled_water_energy: -999 placeholders and negative values set missing; zeros while cooling-coil valve command >15% (meter outage 2021-09-21..2021-10-26, 2021-11-17 15:15..18:35) and repeated identical non-zero readings (stuck, 2021-11-03/04) set missing in own code.",
+      "air_temperature: values >45 are degF (from 2021-11-08), converted to degC.",
+      "wifi/occupancy columns not used: stuck for hours and unreliable; supply_air_flow/damper_position mostly missing."
+    ]
+  },
+  "task": {
+    "target": "chilled_water_energy",
+    "quantity": "energy",
+    "unit": "kWh",
+    "mode": "forecast",
+    "task_type": "regression",
+    "horizon_steps": 4,
+    "step": "0 days 00:15:00",
+    "description": "forecast chilled_water_energy (energy, kWh) 1 h ahead (4 step(s) of 15 min)"
+  },
+  "data": {
+    "raw_fingerprint": "a4f4efaf843604cf",
+    "prepared_fingerprint": "e9cbcd42078e3b18",
+    "raw_rows": 3504,
+    "prepared_rows": 9024,
+    "summary": {
+      "rows": 3504,
+      "start": "2021-09-07 00:00:00",
+      "end": "2021-12-09 23:45:00",
+      "step": "15 min",
+      "timezone": "none",
+      "target": "chilled_water_energy",
+      "declared_columns": 10
+    }
+  },
+  "data_check": {
+    "summary": {
+      "rows": "3504",
+      "start": "2021-09-07 00:00:00",
+      "end": "2021-12-09 23:45:00",
+      "step": "15 min",
+      "timezone": "none",
+      "target": "chilled_water_energy",
+      "declared_columns": "10"
+    },
+    "issues": [
+      {
+        "id": "index:gaps",
+        "severity": "warning",
+        "column": null,
+        "message": "10 gap(s) longer than 3 time steps, 57 d 14 h 30 min in total; longest 23 d 15 min from 2021-10-01 23:45:00 to 2021-10-25 00:00:00.",
+        "fix": "Gaps stay missing. Short gaps in inputs are forward-filled; the target is never filled.",
+        "evidence": {
+          "n": "10"
+        }
+      },
+      {
+        "id": "index:no_timezone",
+        "severity": "info",
+        "column": null,
+        "message": "Timestamps carry no time zone.",
+        "fix": "Fine if all are local time; check for daylight-saving jumps (Arizona and Hawaii have none).",
+        "evidence": {}
+      },
+      {
+        "id": "columns:undeclared",
+        "severity": "info",
+        "column": null,
+        "message": "4 column(s) are not declared and will be ignored: wind_speed, indoor_co2, y, y_complete.",
+        "fix": "Declare any you want the model to use.",
+        "evidence": {}
+      },
+      {
+        "id": "stuck:offcoil_air_temp",
+        "severity": "warning",
+        "column": "offcoil_air_temp",
+        "message": "Sensor repeats exactly 26.1402 for 6 h 30 min (2021-11-01 00:00:00 to 2021-11-01 06:30:00); 2 such stretch(es), 12 h 30 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "2",
+          "n": "750",
+          "unchanged_share": "0.2874678846702826"
+        }
+      },
+      {
+        "id": "spikes:dry_bulb_temp",
+        "severity": "warning",
+        "column": "dry_bulb_temp",
+        "message": "8 single-sample spike(s), e.g. 38.6328, 29.9333, 31.6333 at 2021-09-15 15:00:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "8"
+        }
+      },
+      {
+        "id": "stuck:outdoor_relative_humidity",
+        "severity": "warning",
+        "column": "outdoor_relative_humidity",
+        "message": "Sensor repeats exactly 99.9 for 16 h 45 min (2021-11-02 15:15:00 to 2021-11-03 08:00:00); 9 such stretch(es), 3 d 10 h 45 min in total.",
+        "fix": "prepare() treats these stretches as missing.",
+        "evidence": {
+          "n_runs": "9",
+          "n": "4965",
+          "unchanged_share": "0.17356551527262346"
+        }
+      },
+      {
+        "id": "spikes:outdoor_relative_humidity",
+        "severity": "warning",
+        "column": "outdoor_relative_humidity",
+        "message": "1 single-sample spike(s), e.g. 89.9908 at 2021-12-09 14:30:00.",
+        "fix": "prepare() treats them as missing.",
+        "evidence": {
+          "n": "1"
+        }
+      }
+    ]
+  },
+  "unresolved_errors": [],
+  "accepted_issues": {},
+  "notes": [
+    "chilled_water_energy: -999 placeholders and negative values set missing; zeros while cooling-coil valve command >15% (meter outage 2021-09-21..2021-10-26, 2021-11-17 15:15..18:35) and repeated identical non-zero readings (stuck, 2021-11-03/04) set missing in own code.",
+    "air_temperature: values >45 are degF (from 2021-11-08), converted to degC.",
+    "wifi/occupancy columns not used: stuck for hours and unreliable; supply_air_flow/damper_position mostly missing."
+  ],
+  "prepare": {
+    "options": {
+      "freq": "15min",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": false,
+      "mask_spikes": false,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "log": [
+      {
+        "step": "resample",
+        "column": null,
+        "detail": "Resampled to a regular 15 min grid (9024 rows).",
+        "count": 9024
+      },
+      {
+        "step": "forward_fill",
+        "column": "ahu_fan_energy",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "cooling_coil_valve_command",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "ahu_fan_speed",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "offcoil_air_temp",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "dry_bulb_temp",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "global_horizontal_solar_radiation",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "outdoor_relative_humidity",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "air_temperature",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      },
+      {
+        "step": "forward_fill",
+        "column": "minute_of_day",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 40
+      }
+    ]
+  },
+  "features": [
+    {
+      "name": "chilled_water_energy__t-4",
+      "source": "chilled_water_energy",
+      "shift": 4,
+      "kind": "target_lag"
+    },
+    {
+      "name": "chilled_water_energy__t-5",
+      "source": "chilled_water_energy",
+      "shift": 5,
+      "kind": "target_lag"
+    },
+    {
+      "name": "chilled_water_energy__t-6",
+      "source": "chilled_water_energy",
+      "shift": 6,
+      "kind": "target_lag"
+    },
+    {
+      "name": "chilled_water_energy__t-7",
+      "source": "chilled_water_energy",
+      "shift": 7,
+      "kind": "target_lag"
+    },
+    {
+      "name": "chilled_water_energy__t-96",
+      "source": "chilled_water_energy",
+      "shift": 96,
+      "kind": "target_lag"
+    },
+    {
+      "name": "chilled_water_energy__t-672",
+      "source": "chilled_water_energy",
+      "shift": 672,
+      "kind": "target_lag"
+    },
+    {
+      "name": "chilled_water_energy__mean_1d",
+      "source": "chilled_water_energy",
+      "shift": 4,
+      "kind": "target_rolling"
+    },
+    {
+      "name": "ahu_fan_energy__t-4",
+      "source": "ahu_fan_energy",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "cooling_coil_valve_command__t-4",
+      "source": "cooling_coil_valve_command",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "ahu_fan_speed__t-4",
+      "source": "ahu_fan_speed",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "offcoil_air_temp__t-4",
+      "source": "offcoil_air_temp",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "dry_bulb_temp__t-4",
+      "source": "dry_bulb_temp",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "global_horizontal_solar_radiation__t-4",
+      "source": "global_horizontal_solar_radiation",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "outdoor_relative_humidity__t-4",
+      "source": "outdoor_relative_humidity",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "air_temperature__t-4",
+      "source": "air_temperature",
+      "shift": 4,
+      "kind": "input_lag"
+    },
+    {
+      "name": "minute_of_day",
+      "source": "minute_of_day",
+      "shift": 0,
+      "kind": "known_ahead"
+    },
+    {
+      "name": "hour_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "hour_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "is_weekend",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    }
+  ],
+  "split": {
+    "sizes": {
+      "train": 2086,
+      "val": 443,
+      "test": 444
+    },
+    "gap": "1 h",
+    "bounds": {
+      "train": [
+        "2021-09-07 00:00:00",
+        "2021-11-05 10:15:00"
+      ],
+      "val": [
+        "2021-11-05 11:30:00",
+        "2021-11-12 03:00:00"
+      ],
+      "test": [
+        "2021-11-12 04:15:00",
+        "2021-12-09 23:45:00"
+      ]
+    }
+  },
+  "validation": [
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 443,
+      "rmse": 0.6754551080764175,
+      "mae": 0.3644713638906803,
+      "r2": 0.9628565576568624,
+      "mean_actual": 3.0776427994401803,
+      "cvrmse_pct": 21.97197043136652,
+      "nmbe_pct": 0.18779304900245755,
+      "params": {
+        "min_samples_leaf": 100,
+        "max_leaf_nodes": 31,
+        "max_iter": 100,
+        "learning_rate": 0.2,
+        "l2_regularization": 0.0
+      },
+      "cv_score": 0.8682206738957046
+    },
+    {
+      "model": "ridge",
+      "type": "ml",
+      "n": 443,
+      "rmse": 1.2553178990618674,
+      "mae": 0.8661491158336224,
+      "r2": 0.8717088753710185,
+      "mean_actual": 3.0776427994401803,
+      "cvrmse_pct": 40.834405470262624,
+      "nmbe_pct": -4.944254206904091,
+      "params": {
+        "model__alpha": 19.549524484259873
+      },
+      "cv_score": 1.5174208865227268
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 443,
+      "rmse": 1.9596770497631983,
+      "mae": 1.1624226968776983,
+      "r2": 0.6873501801733608,
+      "mean_actual": 3.0776427994401803,
+      "cvrmse_pct": 63.74659940768886,
+      "nmbe_pct": 5.0391060029682455,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 443,
+      "rmse": 2.1332236134596645,
+      "mae": 0.8779197588755759,
+      "r2": 0.629522417131031,
+      "mean_actual": 3.0776427994401803,
+      "cvrmse_pct": 69.39191901577246,
+      "nmbe_pct": -2.0551975791944654,
+      "params": {},
+      "cv_score": null
+    }
+  ],
+  "chosen_model": {
+    "name": "gbm",
+    "params": {
+      "min_samples_leaf": 100,
+      "max_leaf_nodes": 31,
+      "max_iter": 100,
+      "learning_rate": 0.2,
+      "l2_regularization": 0.0
+    }
+  },
+  "test": {
+    "model": {
+      "n": 444,
+      "rmse": 0.798417494142274,
+      "mae": 0.41992583165257197,
+      "r2": 0.9560622804831956,
+      "mean_actual": 3.2885591087184687,
+      "cvrmse_pct": 24.306029119586814,
+      "nmbe_pct": 5.064868543610321
+    },
+    "baseline": {
+      "name": "persistence",
+      "n": 444,
+      "rmse": 2.5520372096768527,
+      "mae": 1.1218668257847928,
+      "r2": 0.5510981158393039,
+      "mean_actual": 3.2885591087184687,
+      "cvrmse_pct": 77.69104658623777,
+      "nmbe_pct": 0.4269670799188895
+    },
+    "skill": 0.6871450419630158,
+    "guideline14": {
+      "resolution": "hourly",
+      "cvrmse_pct": 17.604696937656808,
+      "nmbe_pct": 5.098581371150842,
+      "cvrmse_limit": 30.0,
+      "nmbe_limit": 10.0,
+      "passes": true
+    }
+  },
+  "warnings": [],
+  "leakage_warnings": [],
+  "event_log": [
+    {
+      "time": "2026-10-29T00:19:51",
+      "kind": "check",
+      "detail": "0 errors, 5 warnings"
+    },
+    {
+      "time": "2026-10-29T00:19:51",
+      "kind": "note",
+      "detail": "chilled_water_energy: -999 placeholders and negative values set missing; zeros while cooling-coil valve command >15% (meter outage 2021-09-21..2021-10-26, 2021-11-17 15:15..18:35) and repeated identical non-zero readings (stuck, 2021-11-03/04) set missing in own code."
+    },
+    {
+      "time": "2026-10-29T00:19:51",
+      "kind": "note",
+      "detail": "air_temperature: values >45 are degF (from 2021-11-08), converted to degC."
+    },
+    {
+      "time": "2026-10-29T00:19:51",
+      "kind": "note",
+      "detail": "wifi/occupancy columns not used: stuck for hours and unreliable; supply_air_flow/damper_position mostly missing."
+    },
+    {
+      "time": "2026-10-29T00:19:52",
+      "kind": "prepare",
+      "detail": "9024 rows on a 15 min grid"
+    },
+    {
+      "time": "2026-10-29T00:29:18",
+      "kind": "fit",
+      "detail": "chosen gbm, test rmse 0.7984"
+    }
+  ],
+  "gates": {
+    "data_check_resolved": {
+      "passed": true,
+      "detail": "all errors fixed or accepted with reasons"
+    },
+    "beats_baseline": {
+      "passed": true,
+      "detail": "skill 0.687 vs required 0.05"
+    },
+    "guideline14": {
+      "passed": true,
+      "detail": "CV(RMSE) 17.6%, NMBE 5.1%"
+    },
+    "no_suspicious_inputs": {
+      "passed": true,
+      "detail": "none"
+    },
+    "enough_test_data": {
+      "passed": true,
+      "detail": "444 test rows (need 200)"
+    }
+  }
+}

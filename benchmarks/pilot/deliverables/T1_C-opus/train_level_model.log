@@ -1,0 +1,50 @@
+Data check: 26916 rows, 2023-02-27 00:00:00+01:00 to 2023-05-31 23:55:00+02:00, typical step 5 min. 0 error(s), 4 warning(s).
+[WARNING] index:gaps: 1 gap(s) longer than 3 time steps, 12 h 5 min in total; longest 12 h 5 min from 2023-04-02 07:40:00+02:00 to 2023-04-02 19:45:00+02:00.
+    -> Gaps stay missing. Short gaps in inputs are forward-filled; the target is never filled.
+[WARNING] spikes:co2: 2 single-sample spike(s), e.g. 1521, 504 at 2023-04-21 16:10:00+02:00.
+    -> prepare() treats them as missing.
+[WARNING] spikes:room_temp: 15 single-sample spike(s), e.g. 23.27, 23.45, 23.43 at 2023-03-05 12:50:00+01:00.
+    -> prepare() treats them as missing.
+[WARNING] stuck:oat: Sensor repeats exactly 7.16995 for 9 h 30 min (2023-03-21 21:15:00+01:00 to 2023-03-22 06:45:00+01:00); 6 such stretch(es), 1 d 22 h in total.
+    -> prepare() treats these stretches as missing.
+[INFO] columns:undeclared: 10 column(s) are not declared and will be ignored: light_level, people, radiator_valve, vent_power, supply_temp, wind, sol_south, sol_east ....
+    -> Declare any you want the model to use.
+{'step': 'convert_units', 'column': 'supply_flow', 'detail': 'Converted m3/h to m3/s.', 'count': None}
+{'step': 'resample', 'column': None, 'detail': 'Resampled to a regular 15 min grid (9020 rows).', 'count': 9020}
+{'step': 'forward_fill', 'column': 'room_temp', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 5}
+{'step': 'forward_fill', 'column': 'room_active', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 5}
+{'step': 'forward_fill', 'column': 'damper', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'light_on', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'window', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'supply_flow', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 5}
+{'step': 'forward_fill', 'column': 'oat', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 6}
+{'step': 'forward_fill', 'column': 'fan_on_24h', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+{'step': 'forward_fill', 'column': 'fan_on_7d', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+{'step': 'forward_fill', 'column': 'active_24h', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+{'step': 'forward_fill', 'column': 'active_7d', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+{'step': 'forward_fill', 'column': 'co2_d30', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+{'step': 'forward_fill', 'column': 'co2_d60', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 8}
+{'step': 'forward_fill', 'column': 'active_1h', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 4}
+{'step': 'forward_fill', 'column': 'fan_change_exp', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 10}
+{'step': 'forward_fill', 'column': 'excess_vent', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 11}
+{'step': 'forward_fill', 'column': 'excess_novent', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 11}
+{'step': 'forward_fill', 'column': 'active_vent', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+{'step': 'forward_fill', 'column': 'active_novent', 'detail': 'Filled input gaps up to 1h with the last known value.', 'count': 9}
+Task: forecast co2 (co2, ppm) 1 h ahead (4 step(s) of 15 min)
+Rows used: train 7172, validation 892, test 894 (time-ordered, gap 1 h).
+Validation results (lower RMSE is better):
+              model   rmse    mae  cvrmse_pct  nmbe_pct     r2
+                gbm 18.800 11.108       4.107    -0.400  0.790
+        persistence 20.026  7.448       4.375     0.022  0.762
+              ridge 20.818 14.334       4.548     0.322  0.743
+same_time_yesterday 45.004 26.954       9.832     0.479 -0.202
+Chosen: gbm. Test: RMSE 28.2 ppm, MAE 18 ppm, CV(RMSE) 6.0%, NMBE -1.3%.
+Skill vs persistence: 0.16 (1 = perfect, 0 = no better than the baseline).
+                 model      type    n       rmse        mae        r2  mean_actual  cvrmse_pct  nmbe_pct                                                                                                           params   cv_score
+0                  gbm        ml  892  18.800286  11.108175  0.790235   458.013453    4.107048 -0.400049  {'min_samples_leaf': 100, 'max_leaf_nodes': 7, 'max_iter': 100, 'learning_rate': 0.1, 'l2_regularization': 0.1}  51.139967
+1          persistence  baseline  892  20.026371   7.448445  0.761983   458.013453    4.374895  0.021724                                                                                                               {}        NaN
+2                ridge        ml  892  20.817673  14.333705  0.742802   458.013453    4.547760  0.322491                                                                              {'model__alpha': 224.2012371372442}  40.533500
+3  same_time_yesterday  baseline  892  45.004349  26.954395 -0.202022   458.013453    9.831501  0.478649                                                                                                               {}        NaN
+model saved to <repo>\data\benchmark\runs\T1_C-opus\bemlops_model
+save_run failed: TypeError Start and end cannot both be tz-aware with different timezones
+elapsed 507.5 s

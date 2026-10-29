@@ -1,0 +1,33 @@
+(3504, 38) 2021-09-07 00:00:00 2021-12-09 23:45:00
+Data check: 3504 rows, 2021-09-07 00:00:00 to 2021-12-09 23:45:00, typical step 15 min. 0 error(s), 6 warning(s).
+[WARNING] index:gaps: 10 gap(s) longer than 3 time steps, 57 d 14 h 30 min in total; longest 23 d 15 min from 2021-10-01 23:45:00 to 2021-10-25 00:00:00.
+    -> Gaps stay missing. Short gaps in inputs are forward-filled; the target is never filled.
+[WARNING] stuck:offcoil_air_temp: Sensor repeats exactly 26.1402 for 6 h 30 min (2021-11-01 00:00:00 to 2021-11-01 06:30:00); 2 such stretch(es), 12 h 30 min in total.
+    -> prepare() treats these stretches as missing.
+[WARNING] stuck:supply_air_temperature: Sensor repeats exactly 27.4455 for 6 h (2021-11-01 00:00:00 to 2021-11-01 06:00:00); 1 such stretch(es), 6 h in total.
+    -> prepare() treats these stretches as missing.
+[WARNING] spikes:indoor_relative_humidity: 7 single-sample spike(s), e.g. 67.8574, 70.8451, 69.9967 at 2021-09-13 00:00:00.
+    -> prepare() treats them as missing.
+[WARNING] stuck:outdoor_relative_humidity: Sensor repeats exactly 99.9 for 16 h 45 min (2021-11-02 15:15:00 to 2021-11-03 08:00:00); 9 such stretch(es), 3 d 10 h 45 min in total.
+    -> prepare() treats these stretches as missing.
+[WARNING] spikes:outdoor_relative_humidity: 1 single-sample spike(s), e.g. 89.9908 at 2021-12-09 14:30:00.
+    -> prepare() treats them as missing.
+[INFO] index:no_timezone: Timestamps carry no time zone.
+    -> Fine if all are local time; check for daylight-saving jumps (Arizona and Hawaii have none).
+{'step': 'resample', 'column': None, 'detail': 'Resampled to a regular 15 min grid (9024 rows).', 'count': 9024}
+Task: forecast chilled_water_energy (energy, kWh) 1 h ahead (4 step(s) of 15 min)
+Rows used: train 2088, validation 443, test 445 (time-ordered, gap 1 h).
+Validation results (lower RMSE is better):
+              model  rmse   mae  cvrmse_pct  nmbe_pct    r2
+      random_forest 0.626 0.318      20.312     2.501 0.968
+                gbm 0.649 0.332      21.062    -1.736 0.966
+same_time_yesterday 1.955 1.161      63.438     4.837 0.688
+        persistence 2.142 0.888      69.509    -2.377 0.626
+Chosen: random_forest. Test: RMSE 0.718 kWh, MAE 0.357 kWh, CV(RMSE) 21.9%, NMBE 4.1%.
+Skill vs persistence: 0.72 (1 = perfect, 0 = no better than the baseline).
+ASHRAE Guideline 14 (hourly): CV(RMSE) 17.7% (limit 30%), NMBE 4.1% (limit +/-10%): passes.
+warnings: [] []
+split: {'sizes': {'train': 2088, 'val': 443, 'test': 445}, 'gap': '1 h', 'bounds': {'train': ('2021-09-07 00:00:00', '2021-11-05 10:15:00'), 'val': ('2021-11-05 11:30:00', '2021-11-12 02:45:00'), 'test': ('2021-11-12 04:00:00', '2021-12-09 23:45:00')}}
+model train_start/end: 2021-09-07 00:00:00 2021-11-12 02:45:00
+saved run to <repo>\data\benchmark\runs\T2_C-opus\runs\t2-chilled-water-1h-20261029-010136
+done in 485.80861592292786
