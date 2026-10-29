@@ -474,7 +474,7 @@ reg = bemlops.Registry("models/")
 reg.promote(p.name, reg.register(folder)["version"], reason="...")  # gates checked here
 ```
 
-**Table 4.** Package modules (version 0.2.0.dev0).
+**Table 4.** Package modules (evaluated version 0.2.0.dev0; release 0.2.0 has 28 quantities).
 
 | Module | Role |
 |---|---|
@@ -493,11 +493,12 @@ framework's claims concern the process around the model, not the model
 family. A model can be added through a `custom_models` argument in a few
 lines.
 
-The evaluated version has 43 automated tests. They include:
+The evaluated version has 45 automated tests (48 in release 0.2.0). They
+include:
 - a test that perturbs every value after the forecast time and checks that no
   input changes;
 - tests that every planted fault in a synthetic export is detected;
-- regression tests for each defect in Appendix A;
+- regression tests for the defects in Appendix A;
 - tests of the full registry, retraining and reproduction loop.
 
 Every run record carries:
@@ -976,15 +977,15 @@ trained four ways. Table 12 gives paired tests.
   21.6 ± 1.7 ppm, 1.9 ppm worse in the median paired seed (Wilcoxon
   *p* = 0.010).
 - **Quick script with the same unit fix.** Giving the script the agent's unit
-  fix changed almost nothing: MAE 21.7 ± 1.8 ppm, 1.6 ppm worse than the
+  fix changed almost nothing: MAE 21.6 ± 1.8 ppm, 1.6 ppm worse than the
   framework (*p* = 0.010).
 
 The gain therefore came from the framework's standard handling of the other
 faults: masking the placeholder values, text, spikes and stuck stretches, and
 not filling the outage. It did not come from the one decision the agent made.
-The unit fix mattered little here for a simple reason. The affected input lay
-entirely outside its training range in the test period, so the forest treated
-it as constant.
+The unit fix mattered little here, probably because room temperature carries
+little information about CO2 an hour ahead. On a target that depends on the
+switched input, it would matter more.
 
 **RMSE.** The effect did not appear in RMSE, the metric used everywhere else
 in this paper. All three faulty-data arms averaged 34.4–34.5 ppm, against
@@ -1017,10 +1018,10 @@ absolute terms.
 
 | Paired difference (same seed) | Metric | Median (ppm) | Wilcoxon p | Pairs |
 |---|---|---|---|---|
-| unguarded script minus bemlops | rmse_ppm | -0.03 | 0.922 | 10 |
-| unguarded script minus bemlops | mae_ppm | +1.85 | 0.010 | 10 |
-| unguarded script + same unit fix minus bemlops | rmse_ppm | +0.01 | 1.000 | 10 |
-| unguarded script + same unit fix minus bemlops | mae_ppm | +1.64 | 0.010 | 10 |
+| unguarded script minus bemlops | RMSE | -0.03 | 0.922 | 10 |
+| unguarded script minus bemlops | MAE | +1.85 | 0.010 | 10 |
+| unguarded script + same unit fix minus bemlops | RMSE | +0.01 | 1.000 | 10 |
+| unguarded script + same unit fix minus bemlops | MAE | +1.64 | 0.010 | 10 |
 
 ### 6.4 Deployment, monitoring and retraining over eight months (RQ4)
 
@@ -1233,10 +1234,9 @@ protocol, and the strongest baseline, the default for whoever uses it,
 including less careful users and agents.
 
 **Baselines and gates: large effect on what gets deployed.** Across 92 tasks
-the strongest no-ML rule was often hard to beat (Section 6.2). In a
-substantial minority of tasks the framework kept the baseline or refused to
-promote a model. A pipeline that always reports its best model would have
-deployed all of them. For an operator, a forecast that is no better than
+the strongest no-ML rule was often hard to beat (Section 6.2). The framework
+kept the baseline in 20 tasks, and 41 models failed the promotion gates. A
+pipeline that always reports its best model would have deployed all of them. For an operator, a forecast that is no better than
 "same as an hour ago" adds maintenance without adding value.
 
 **Fault handling: small, consistent effect.** On real data with planted
@@ -1271,8 +1271,8 @@ open question. The pilot was not designed to answer it.
 ### 7.2 Lifecycle: monitoring helps; persistence is the bar
 
 Monitoring with gated retraining clearly beat a model left alone (Section
-6.4). It did not clearly beat persistence for district heating, and it was
-close to naive monthly retraining. Two lessons follow.
+6.4). It did not beat persistence for district heating, and simple monthly
+retraining did better on both tasks. Three lessons follow.
 
 **A drift check must compare with a baseline, not only with the model's own
 past error.** In summer the district-heating load barely changes, so
@@ -1283,12 +1283,20 @@ afterwards would have helped for district heating and hurt slightly for CO2
 in this one trajectory. That is why it is a recommendation to the operator,
 not an automatic switch.
 
-**Gates cost little and protect against bad retraining.** Monthly retraining
-without gates did about as well here, because the data were clean enough that
+**Retrain on a schedule, not only on an alarm.** The drift alarm compared
+recent error with test-time error, with a tolerance of 1.5. Over the summer,
+district heating lost skill slowly and never crossed that threshold, so the
+production model was not retrained from June to October, while a monthly
+model kept adapting. The framework's `retrain` pipeline can run on any schedule.
+The evidence here favours using it monthly, with the drift check as a second
+line of defence.
+
+**Gates cost little, but their value was not tested.** Monthly retraining
+without gates did well here because the data were clean enough that
 retraining rarely made things worse. The gates exist for the months when a
 fault or an unusual period would otherwise be trained into production. Two
-tasks over eight months do not contain enough such months to measure that
-benefit.
+clean trajectories over eight months do not contain enough such months to
+measure that benefit.
 
 ### 7.3 Judgment stays with the agent
 

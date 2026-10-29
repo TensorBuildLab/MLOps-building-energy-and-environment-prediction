@@ -29,15 +29,15 @@ trained four ways. Table 12 gives paired tests.
   21.6 ± 1.7 ppm, 1.9 ppm worse in the median paired seed (Wilcoxon
   *p* = 0.010).
 - **Quick script with the same unit fix.** Giving the script the agent's unit
-  fix changed almost nothing: MAE 21.7 ± 1.8 ppm, 1.6 ppm worse than the
+  fix changed almost nothing: MAE 21.6 ± 1.8 ppm, 1.6 ppm worse than the
   framework (*p* = 0.010).
 
 The gain therefore came from the framework's standard handling of the other
 faults: masking the placeholder values, text, spikes and stuck stretches, and
 not filling the outage. It did not come from the one decision the agent made.
-The unit fix mattered little here for a simple reason. The affected input lay
-entirely outside its training range in the test period, so the forest treated
-it as constant.
+The unit fix mattered little here, probably because room temperature carries
+little information about CO2 an hour ahead. On a target that depends on the
+switched input, it would matter more.
 
 **RMSE.** The effect did not appear in RMSE, the metric used everywhere else
 in this paper. All three faulty-data arms averaged 34.4–34.5 ppm, against

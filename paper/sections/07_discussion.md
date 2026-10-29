@@ -14,10 +14,9 @@ protocol, and the strongest baseline, the default for whoever uses it,
 including less careful users and agents.
 
 **Baselines and gates: large effect on what gets deployed.** Across 92 tasks
-the strongest no-ML rule was often hard to beat (Section 6.2). In a
-substantial minority of tasks the framework kept the baseline or refused to
-promote a model. A pipeline that always reports its best model would have
-deployed all of them. For an operator, a forecast that is no better than
+the strongest no-ML rule was often hard to beat (Section 6.2). The framework
+kept the baseline in 20 tasks, and 41 models failed the promotion gates. A
+pipeline that always reports its best model would have deployed all of them. For an operator, a forecast that is no better than
 "same as an hour ago" adds maintenance without adding value.
 
 **Fault handling: small, consistent effect.** On real data with planted
@@ -52,8 +51,8 @@ open question. The pilot was not designed to answer it.
 ### 7.2 Lifecycle: monitoring helps; persistence is the bar
 
 Monitoring with gated retraining clearly beat a model left alone (Section
-6.4). It did not clearly beat persistence for district heating, and it was
-close to naive monthly retraining. Two lessons follow.
+6.4). It did not beat persistence for district heating, and simple monthly
+retraining did better on both tasks. Three lessons follow.
 
 **A drift check must compare with a baseline, not only with the model's own
 past error.** In summer the district-heating load barely changes, so
@@ -64,12 +63,20 @@ afterwards would have helped for district heating and hurt slightly for CO2
 in this one trajectory. That is why it is a recommendation to the operator,
 not an automatic switch.
 
-**Gates cost little and protect against bad retraining.** Monthly retraining
-without gates did about as well here, because the data were clean enough that
+**Retrain on a schedule, not only on an alarm.** The drift alarm compared
+recent error with test-time error, with a tolerance of 1.5. Over the summer,
+district heating lost skill slowly and never crossed that threshold, so the
+production model was not retrained from June to October, while a monthly
+model kept adapting. The framework's `retrain` pipeline can run on any schedule.
+The evidence here favours using it monthly, with the drift check as a second
+line of defence.
+
+**Gates cost little, but their value was not tested.** Monthly retraining
+without gates did well here because the data were clean enough that
 retraining rarely made things worse. The gates exist for the months when a
 fault or an unusual period would otherwise be trained into production. Two
-tasks over eight months do not contain enough such months to measure that
-benefit.
+clean trajectories over eight months do not contain enough such months to
+measure that benefit.
 
 ### 7.3 Judgment stays with the agent
 

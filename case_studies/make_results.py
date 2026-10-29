@@ -271,6 +271,7 @@ def tables_faults():
         t3 = pd.read_csv(tests_file)
         t3["comparison"] = t3["comparison"].str.replace("faulty data, ", "").str.replace(" vs bemlops",
                                                                                           " minus bemlops")
+        t3["metric"] = t3["metric"].map({"rmse_ppm": "RMSE", "mae_ppm": "MAE"}).fillna(t3["metric"])
         t3["median_difference"] = t3["median_difference"].map(lambda v: f"{v:+.2f}")
         t3["p_value"] = t3["p_value"].map(lambda v: f"{v:.3f}")
         t3 = t3.rename(columns={"comparison": "Paired difference (same seed)", "metric": "Metric",
