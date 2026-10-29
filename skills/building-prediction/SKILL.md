@@ -175,6 +175,13 @@ bemlops.retrain(all_data, reg, p.name)         # challenger vs champion on unsee
 Never force a promotion past failed gates unless the human asks; if they
 do, `promote(..., force=True, reason="...")` records it.
 
+Suggest a retraining schedule (for example monthly, `bemlops retrain` from a
+scheduler) rather than retraining only on a drift alarm: slow loss of skill
+can stay below the alarm threshold for months. The gates and the
+champion/challenger comparison keep a bad retrain out of production. If
+`check_drift` reports that the model no longer beats persistence, tell the
+human and suggest serving persistence until a retrained model wins again.
+
 If `predict` raises `InvalidInputData`, the live feed has a problem (a unit
 changed, a sensor died, a column vanished). Report it; do not silence it with
 `on_error="warn"` unless the human agrees.

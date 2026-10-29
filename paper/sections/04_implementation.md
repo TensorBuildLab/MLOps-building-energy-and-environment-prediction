@@ -17,7 +17,7 @@ reg = bemlops.Registry("models/")
 reg.promote(p.name, reg.register(folder)["version"], reason="...")  # gates checked here
 ```
 
-**Table 4.** Package modules (version 0.2.0.dev0).
+**Table 4.** Package modules (evaluated version 0.2.0.dev0; release 0.2.0 has 28 quantities).
 
 | Module | Role |
 |---|---|
@@ -36,11 +36,12 @@ framework's claims concern the process around the model, not the model
 family. A model can be added through a `custom_models` argument in a few
 lines.
 
-The evaluated version has 43 automated tests. They include:
+The evaluated version has 45 automated tests (48 in release 0.2.0). They
+include:
 - a test that perturbs every value after the forecast time and checks that no
   input changes;
 - tests that every planted fault in a synthetic export is detected;
-- regression tests for each defect in Appendix A;
+- regression tests for the defects in Appendix A;
 - tests of the full registry, retraining and reproduction loop.
 
 Every run record carries:
