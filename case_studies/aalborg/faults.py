@@ -35,13 +35,14 @@ TARGET = "RoomA:Sensor__CO2"
 TEMP = "RoomA:Sensor__room_temperature"
 
 
-def rf_predictions(data: pd.DataFrame, specs, test_start: pd.Timestamp, h: int, step: pd.Timedelta) -> pd.Series:
+def rf_predictions(data: pd.DataFrame, specs, test_start: pd.Timestamp, h: int, step: pd.Timedelta,
+                   seed: int = 0) -> pd.Series:
     """Fixed random forest on leakage-safe inputs; train before test_start, predict from test_start."""
     lags = target_shifts(h, step, len(data))
     X, y, _ = build_features(data, TARGET, specs, h, step, target_lags=lags)
     train = (X.index < test_start - h * step) & y.notna().to_numpy()
     test = X.index >= test_start
-    m = common._rf(0).fit(X[train], y[train])
+    m = common._rf(seed).fit(X[train], y[train])
     return pd.Series(m.predict(X[test]), index=X.index[test])
 
 
@@ -68,7 +69,10 @@ def main(seeds=range(10)) -> None:
         return {"rmse_ppm": m["rmse"], "mae_ppm": m["mae"], "r2": m["r2"], "rows": m["n"]}
 
     detections, costs, blocking = [], [], []
-    costs.append({"seed": None, "pipeline": "clean data (reference)", **score(reference)})
+    # Model noise: the same random forest with different seeds on clean data (no faults at all).
+    for seed in seeds:
+        ref = reference if seed == 0 else rf_predictions(clean_p.data, clean_p.specs, test_start, h, step, seed)
+        costs.append({"seed": seed, "pipeline": "clean data (reference)", **score(ref)})
     for seed in seeds:
         faulty_raw, truth = common.inject_faults(
             clean_raw, cols, TARGET, temperature_col=TEMP, stuck_col="Ventilation:EL_meter__power",
@@ -81,6 +85,15 @@ def main(seeds=range(10)) -> None:
         ung = common.unguarded_prepare(faulty_raw, keep, "15min")
         costs.append({"seed": seed, "pipeline": "faulty data, unguarded script",
                       **score(rf_predictions(ung, clean_p.specs, test_start, h, step))})
+
+        # (a2) unguarded, but given the same unit fix the agent applies in (b): isolates what the
+        #      framework's masking and preparation add beyond that one decision.
+        fixed_u = faulty_raw.copy()
+        tu = pd.to_numeric(fixed_u[TEMP], errors="coerce")
+        fixed_u[TEMP] = tu.where(tu < 50, (tu - 32) * 5 / 9)
+        ung2 = common.unguarded_prepare(fixed_u, keep, "15min")
+        costs.append({"seed": seed, "pipeline": "faulty data, unguarded script + same unit fix",
+                      **score(rf_predictions(ung2, clean_p.specs, test_start, h, step))})
 
         # (b) bemlops: the unit change is a blocking error; the agent fixes it, the rest is automatic.
         blocked = [i.id for i in faulty_p.unresolved()]
@@ -102,6 +115,19 @@ def main(seeds=range(10)) -> None:
     summary = cost.groupby("pipeline", sort=False)[["rmse_ppm", "mae_ppm", "r2"]].agg(["mean", "std"])
     print(rate.to_string(index=False))
     print(summary.round(2).to_string())
+    # Paired (same seed = same planted faults) Wilcoxon signed-rank tests against the framework arm.
+    from scipy.stats import wilcoxon
+    tests = []
+    b = cost[cost.pipeline == "faulty data, bemlops"].set_index("seed")
+    for other in ("faulty data, unguarded script", "faulty data, unguarded script + same unit fix"):
+        o = cost[cost.pipeline == other].set_index("seed").loc[b.index]
+        for metric in ("rmse_ppm", "mae_ppm"):
+            stat = wilcoxon(o[metric], b[metric])
+            tests.append({"comparison": f"{other} vs bemlops", "metric": metric,
+                          "median_difference": float((o[metric] - b[metric]).median()),
+                          "p_value": float(stat.pvalue), "n_pairs": len(b)})
+    pd.DataFrame(tests).to_csv(OUT / "fault_tests.csv", index=False)
+    print(pd.DataFrame(tests).round(4).to_string(index=False))
     OUT.mkdir(parents=True, exist_ok=True)
     det.to_csv(OUT / "fault_detection.csv", index=False)
     rate.to_csv(OUT / "fault_detection_rate.csv", index=False)

@@ -1,0 +1,9 @@
+fault,detection_rate
+unit change mid-series (degC to degF),1.0
+stuck sensor (3 days),0.5
+10 single-sample spikes,0.9
+20 placeholder values (-999),1.0
+20 'OFFLINE' text entries,1.0
+12-hour outage,1.0
+one day of rows exported twice,1.0
+30 rows out of order,1.0

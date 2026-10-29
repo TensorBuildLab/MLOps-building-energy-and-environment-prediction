@@ -1,0 +1,81 @@
+fault,column,detected,as,seed
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),0
+stuck sensor (3 days),Ventilation:EL_meter__power,False,,0
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),0
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),0
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),0
+12-hour outage,,True,index:gaps (warning),0
+one day of rows exported twice,,True,index:duplicates (warning),0
+30 rows out of order,,True,index:unsorted (warning),0
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),1
+stuck sensor (3 days),Ventilation:EL_meter__power,True,stuck:Ventilation:EL_meter__power (warning),1
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),1
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),1
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),1
+12-hour outage,,True,index:gaps (warning),1
+one day of rows exported twice,,True,index:duplicates (warning),1
+30 rows out of order,,True,index:unsorted (warning),1
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),2
+stuck sensor (3 days),Ventilation:EL_meter__power,False,,2
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),2
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),2
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),2
+12-hour outage,,True,index:gaps (warning),2
+one day of rows exported twice,,True,index:duplicates (warning),2
+30 rows out of order,,True,index:unsorted (warning),2
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),3
+stuck sensor (3 days),Ventilation:EL_meter__power,True,stuck:Ventilation:EL_meter__power (warning),3
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),3
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),3
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),3
+12-hour outage,,True,index:gaps (warning),3
+one day of rows exported twice,,True,index:duplicates (warning),3
+30 rows out of order,,True,index:unsorted (warning),3
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),4
+stuck sensor (3 days),Ventilation:EL_meter__power,False,,4
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),4
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),4
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),4
+12-hour outage,,True,index:gaps (warning),4
+one day of rows exported twice,,True,index:duplicates (warning),4
+30 rows out of order,,True,index:unsorted (warning),4
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),5
+stuck sensor (3 days),Ventilation:EL_meter__power,False,,5
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),5
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),5
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),5
+12-hour outage,,True,index:gaps (warning),5
+one day of rows exported twice,,True,index:duplicates (warning),5
+30 rows out of order,,True,index:unsorted (warning),5
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),6
+stuck sensor (3 days),Ventilation:EL_meter__power,True,stuck:Ventilation:EL_meter__power (warning),6
+10 single-sample spikes,Outdoor:Temperature_air,False,,6
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),6
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),6
+12-hour outage,,True,index:gaps (warning),6
+one day of rows exported twice,,True,index:duplicates (warning),6
+30 rows out of order,,True,index:unsorted (warning),6
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),7
+stuck sensor (3 days),Ventilation:EL_meter__power,True,stuck:Ventilation:EL_meter__power (warning),7
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),7
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),7
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),7
+12-hour outage,,True,index:gaps (warning),7
+one day of rows exported twice,,True,index:duplicates (warning),7
+30 rows out of order,,True,index:unsorted (warning),7
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),8
+stuck sensor (3 days),Ventilation:EL_meter__power,False,,8
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),8
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),8
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),8
+12-hour outage,,True,index:gaps (warning),8
+one day of rows exported twice,,True,index:duplicates (warning),8
+30 rows out of order,,True,index:unsorted (warning),8
+unit change mid-series (degC to degF),RoomA:Sensor__room_temperature,True,out_of_range:RoomA:Sensor__room_temperature (error),9
+stuck sensor (3 days),Ventilation:EL_meter__power,True,stuck:Ventilation:EL_meter__power (warning),9
+10 single-sample spikes,Outdoor:Temperature_air,True,spikes:Outdoor:Temperature_air (warning),9
+20 placeholder values (-999),RoomA:Sensor__CO2,True,sentinel:RoomA:Sensor__CO2 (warning),9
+20 'OFFLINE' text entries,Outdoor:Wind__velocity,True,non_numeric:Outdoor:Wind__velocity (warning),9
+12-hour outage,,True,index:gaps (warning),9
+one day of rows exported twice,,True,index:duplicates (warning),9
+30 rows out of order,,True,index:unsorted (warning),9

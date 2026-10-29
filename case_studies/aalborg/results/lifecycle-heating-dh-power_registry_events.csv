@@ -1,0 +1,12 @@
+time,action,version,gates_passed,reason,forced,metric,from,rows,champion,challenger,challenger_better
+2026-10-29T02:02:58,register,1.0,True,,,,,,,,
+2026-10-29T02:02:58,promote,1.0,,Initial deployment after the February-April training period.,False,,,,,,
+2026-10-29T02:09:45,register,2.0,True,,,,,,,,
+2026-10-29T02:09:46,compare,,,,,rmse,2023-05-17 22:30:00+02:00,1349.0,"{'version': 1, 'rmse': 1.0110979810972331}","{'version': 2, 'rmse': 0.5750004394318926}",True
+2026-10-29T02:09:46,promote,2.0,,Retrained; rmse 0.575 vs 1.011 on 1349 unseen rows.,False,,,,,,
+2026-10-29T02:20:28,register,3.0,True,,,,,,,,
+2026-10-29T02:20:31,compare,,,,,rmse,2023-10-20 12:30:00+02:00,3985.0,"{'version': 2, 'rmse': 2.716553317538793}","{'version': 3, 'rmse': 2.4142436005381045}",True
+2026-10-29T02:20:32,promote,3.0,,Retrained; rmse 2.414 vs 2.717 on 3985 unseen rows.,False,,,,,,
+2026-10-29T02:24:41,register,4.0,True,,,,,,,,
+2026-10-29T02:24:44,compare,,,,,rmse,2023-11-15 20:00:00+01:00,4431.0,"{'version': 3, 'rmse': 4.0700911383561635}","{'version': 4, 'rmse': 4.056991702622377}",True
+2026-10-29T02:24:44,promote,4.0,,Retrained; rmse 4.057 vs 4.07 on 4431 unseen rows.,False,,,,,,
