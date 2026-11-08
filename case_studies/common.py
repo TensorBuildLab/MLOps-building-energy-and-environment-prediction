@@ -258,6 +258,23 @@ def detection_table(clean_report, faulty_report, truth: List[Dict[str, str]]) ->
 
 
 # ----- 3. Training on faulty data with and without the guardrails -------------------------
+SENTINELS = (-999, -9999, 9999, 32767, -32768)
+
+
+def competent_prepare(raw: pd.DataFrame, cols: List[str], freq: str, plausible: Dict[str, tuple]) -> pd.DataFrame:
+    """What a competent analyst's script does: coerce to numbers, drop sentinel values and physically impossible
+    readings, de-duplicate and sort, resample, and fill forward only across gaps of up to 1 h."""
+    d = raw[cols].apply(pd.to_numeric, errors="coerce")
+    d = d.mask(d.isin(SENTINELS))
+    for c, (lo, hi) in plausible.items():
+        if c in d.columns:
+            d[c] = d[c].where((d[c] >= lo) & (d[c] <= hi))
+    d = d[~d.index.duplicated(keep="first")].sort_index()
+    d = d.resample(freq).mean()
+    steps = max(1, int(pd.Timedelta("1h") / pd.Timedelta(freq)))
+    return d.ffill(limit=steps)
+
+
 def unguarded_prepare(raw: pd.DataFrame, cols: List[str], freq: str) -> pd.DataFrame:
     """What a quick script does: coerce to numbers, sort, average duplicates, resample, forward-fill."""
     d = raw[cols].apply(pd.to_numeric, errors="coerce").sort_index()

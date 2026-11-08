@@ -27,8 +27,8 @@ import run as aalborg  # noqa: E402
 import bemlops  # noqa: E402
 from bemlops.metrics import regression_metrics  # noqa: E402
 
-OUT = HERE / "results"
-WORK = aalborg.REPO / "runs" / "aalborg-lifecycle"
+OUT = HERE.parent / "results_v3" / "lifecycle_aalborg"
+WORK = aalborg.REPO / "runs" / "v3" / "aalborg-lifecycle"
 TASKS = [
     ("Heating:DH__power", None, "District-heating power, 1 h ahead"),
     ("RoomA:Sensor__CO2", "RoomA", "Room A CO2, 1 h ahead"),

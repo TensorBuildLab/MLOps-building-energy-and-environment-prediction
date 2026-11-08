@@ -22,8 +22,8 @@ import run as aalborg  # noqa: E402
 
 import bemlops  # noqa: E402
 
-OUT = HERE / "results"
-WORK = aalborg.REPO / "runs" / "aalborg-lifecycle-naive"
+OUT = HERE.parent / "results_v3" / "lifecycle_aalborg"
+WORK = aalborg.REPO / "runs" / "v3" / "aalborg-lifecycle-naive"
 
 
 def main() -> None:

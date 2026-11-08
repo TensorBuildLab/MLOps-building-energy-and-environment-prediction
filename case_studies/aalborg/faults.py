@@ -30,7 +30,7 @@ import bemlops  # noqa: E402
 from bemlops.features import build_features, target_shifts  # noqa: E402
 from bemlops.metrics import regression_metrics  # noqa: E402
 
-OUT = HERE / "results"
+OUT = HERE.parent / "results_v3" / "faults"
 TARGET = "RoomA:Sensor__CO2"
 TEMP = "RoomA:Sensor__room_temperature"
 
@@ -70,9 +70,15 @@ def main(seeds=range(10)) -> None:
 
     detections, costs, blocking = [], [], []
     # Model noise: the same random forest with different seeds on clean data (no faults at all).
+    plausible = {c: clean_p.specs[c].q.plausible for c in keep
+                 if c in clean_p.specs and clean_p.specs[c].unit == clean_p.specs[c].q.canonical_unit}
     for seed in seeds:
         ref = reference if seed == 0 else rf_predictions(clean_p.data, clean_p.specs, test_start, h, step, seed)
         costs.append({"seed": seed, "pipeline": "clean data (reference)", **score(ref)})
+        # the quick script's own preparation on clean data, to separate preparation from fault handling
+        q_clean = common.unguarded_prepare(clean_raw, keep, "15min")
+        costs.append({"seed": seed, "pipeline": "clean data, unguarded script",
+                      **score(rf_predictions(q_clean, clean_p.specs, test_start, h, step, seed))})
     for seed in seeds:
         faulty_raw, truth = common.inject_faults(
             clean_raw, cols, TARGET, temperature_col=TEMP, stuck_col="Ventilation:EL_meter__power",
@@ -94,6 +100,12 @@ def main(seeds=range(10)) -> None:
         ung2 = common.unguarded_prepare(fixed_u, keep, "15min")
         costs.append({"seed": seed, "pipeline": "faulty data, unguarded script + same unit fix",
                       **score(rf_predictions(ung2, clean_p.specs, test_start, h, step))})
+
+        # (a3) a competent analyst's script with the same unit fix: drops sentinels and impossible readings,
+        #      de-duplicates, fills only short gaps
+        comp = common.competent_prepare(fixed_u, keep, "15min", plausible)
+        costs.append({"seed": seed, "pipeline": "faulty data, competent script + same unit fix",
+                      **score(rf_predictions(comp, clean_p.specs, test_start, h, step))})
 
         # (b) bemlops: the unit change is a blocking error; the agent fixes it, the rest is automatic.
         blocked = [i.id for i in faulty_p.unresolved()]
@@ -119,16 +131,17 @@ def main(seeds=range(10)) -> None:
     from scipy.stats import wilcoxon
     tests = []
     b = cost[cost.pipeline == "faulty data, bemlops"].set_index("seed")
-    for other in ("faulty data, unguarded script", "faulty data, unguarded script + same unit fix"):
+    for other in ("faulty data, unguarded script", "faulty data, unguarded script + same unit fix",
+                  "faulty data, competent script + same unit fix", "clean data (reference)"):
         o = cost[cost.pipeline == other].set_index("seed").loc[b.index]
         for metric in ("rmse_ppm", "mae_ppm"):
             stat = wilcoxon(o[metric], b[metric])
             tests.append({"comparison": f"{other} vs bemlops", "metric": metric,
                           "median_difference": float((o[metric] - b[metric]).median()),
                           "p_value": float(stat.pvalue), "n_pairs": len(b)})
+    OUT.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(tests).to_csv(OUT / "fault_tests.csv", index=False)
     print(pd.DataFrame(tests).round(4).to_string(index=False))
-    OUT.mkdir(parents=True, exist_ok=True)
     det.to_csv(OUT / "fault_detection.csv", index=False)
     rate.to_csv(OUT / "fault_detection_rate.csv", index=False)
     cost.to_csv(OUT / "fault_cost.csv", index=False)
