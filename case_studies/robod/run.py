@@ -23,7 +23,7 @@ import common  # noqa: E402
 
 RAW = REPO / "data" / "raw" / "robod"
 OUT = HERE / "results"
-RUNS = REPO / "runs" / "robod"
+RUNS = REPO / "runs" / "v3" / "robod"
 
 ROOMS = {1: "lecture room", 2: "lecture room", 3: "office", 4: "research office", 5: "library"}
 PROTOCOL_ROOMS = {4, 5}  # the evaluation-protocol comparison (costly) runs on the two rooms with the most data
@@ -115,11 +115,16 @@ TASKS = [
 
 
 # ----- Part 2: bemlops does the rest ------------------------------------------------------
-def main() -> None:
-    rows, protocol = [], []
+def main(part: int = 0, parts: int = 1) -> None:
+    """parts > 1 runs every parts-th task; `merge()` joins the parts. The protocol comparison (E2) has its
+    own script, case_studies/protocol_v3.py."""
+    rows, k = [], -1
     for room, kind in ROOMS.items():
         df = load(room)
         for target, horizon, drop, use in TASKS:
+            k += 1
+            if k % parts != part:
+                continue
             mode = "now" if horizon == 0 else horizon
             name = f"robod-room{room}-{target.replace('.', '')}-{mode}"
             notes = NOTES + ([f"{', '.join(drop)} excluded: it comes from the same camera ground truth as the "
@@ -129,14 +134,31 @@ def main() -> None:
             row.update({"dataset": "ROBOD", "building": f"Room {room} ({kind})"})
             rows.append(row)
             print(f"{name}: {row['status']} skill={row.get('skill')}", flush=True)
-            if r is not None and p.task == "regression" and room in PROTOCOL_ROOMS:
-                comp = common.protocol_comparison(p)
-                protocol.append(common.protocol_row("ROBOD", name, target, horizon, comp))
     OUT.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(rows).to_csv(OUT / "summary.csv", index=False)
-    pd.DataFrame(protocol).to_csv(OUT / "protocol_comparison.csv", index=False)
+    suffix = "" if parts == 1 else f"_part{part}"
+    pd.DataFrame(rows).to_csv(OUT / f"summary{suffix}.csv", index=False)
     print(f"Wrote {OUT}")
 
 
+def task_order() -> dict:
+    names = [f"robod-room{r}-{t.replace('.', '')}-{'now' if h == 0 else h}" for r in ROOMS for t, h, _, _ in TASKS]
+    return {n: i for i, n in enumerate(names)}
+
+
+def merge() -> None:
+    parts = sorted(OUT.glob("summary_part*.csv"))
+    df = pd.concat([pd.read_csv(f) for f in parts], ignore_index=True)
+    df.sort_values("task", key=lambda s: s.map(task_order())).to_csv(OUT / "summary.csv", index=False)
+    for f in parts:
+        f.unlink()
+    print(f"Merged {len(parts)} parts in {OUT}")
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "merge":
+        merge()
+    elif len(sys.argv) > 1:
+        i, n = map(int, sys.argv[1].split("/"))
+        main(i, n)
+    else:
+        main()

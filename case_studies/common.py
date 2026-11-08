@@ -86,6 +86,11 @@ def run_task(df: pd.DataFrame, target: str, columns: Dict[str, Any], horizon, na
         "g14_pass": (record["test"].get("guideline14") or {}).get("passes"),
         "backtest_skill": (record.get("backtest") or {}).get("pooled_skill"),
         "interval_coverage": (record.get("interval") or {}).get("test_coverage"),
+        "interval_half_width": (record.get("interval") or {}).get("half_width"),
+        "test_days": record["split"].get("test_days"),
+        "test_completeness": record["split"].get("test_completeness"),
+        "base_g14_pass": ((record["test"].get("guideline14") or {}).get("baseline") or {}).get("passes"),
+        "package_fingerprint": record["run"]["environment"].get("package_fingerprint"),
         "top_driver": drivers[0]["input"] if drivers else None,
         "top_driver_share": drivers[0]["share"] if drivers else None,
     })

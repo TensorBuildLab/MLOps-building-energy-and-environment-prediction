@@ -22,7 +22,7 @@ import common  # noqa: E402
 
 RAW = REPO / "data" / "raw" / "aalborg" / "dataset__2023_02_27__2023_12_31.csv"
 OUT = HERE / "results"
-RUNS = REPO / "runs" / "aalborg"
+RUNS = REPO / "runs" / "v3" / "aalborg"
 ROOMS = ["RoomA", "RoomB", "RoomC", "RoomD", "RoomE", "RoomF"]
 
 
@@ -127,12 +127,9 @@ def main(part: int = 0, parts: int = 1) -> None:
         row.update({"dataset": "Aalborg", "building": room or "building systems"})
         rows.append(row)
         print(f"{name}: {row['status']} skill={row.get('skill')}", flush=True)
-        if r is not None and p.task == "regression" and room in PROTOCOL_ROOMS:
-            protocol.append(common.protocol_row("Aalborg", name, target, horizon, common.protocol_comparison(p)))
     OUT.mkdir(parents=True, exist_ok=True)
     suffix = "" if parts == 1 else f"_part{part}"
     pd.DataFrame(rows).to_csv(OUT / f"summary{suffix}.csv", index=False)
-    pd.DataFrame(protocol).to_csv(OUT / f"protocol_comparison{suffix}.csv", index=False)
     print(f"Wrote {OUT}")
 
 
