@@ -174,3 +174,23 @@ def test_guideline14_is_reported_not_gated_for_forecasts():
     assert gates["guideline14"]["passed"] and "not gated" in gates["guideline14"]["detail"]
     record["test"]["guideline14"]["applies_as_gate"] = True
     assert not evaluate_gates(record)["guideline14"]["passed"]
+
+
+def test_towt_merges_sparse_temperature_segments():
+    """A temperature segment with a handful of training hours must not get its own slope: in v0.3.0 such a
+    segment made the fit unstable and one cross-validation fold produced errors of 400 kWh."""
+    import numpy as np
+    import pandas as pd
+
+    from bemlops.models import TOWTBaseline
+
+    idx = pd.date_range("2024-01-01", periods=24 * 7 * 6, freq="1h")
+    rng = np.random.default_rng(1)
+    temp = rng.normal(15, 3, len(idx))
+    temp[:5] = -10.0                       # five cold hours: a sparse segment below the first knot
+    load = 20 + 0.5 * temp + rng.normal(0, 1, len(idx))
+    X, y = pd.DataFrame({"oat": temp}, index=idx), pd.Series(load, index=idx)
+    m = TOWTBaseline("oat").fit(X.iloc[5:], y.iloc[5:])  # the cold hours are not in training
+    assert all(k > -1.2 for k in m.knots_) and len(m.knots_) < len(TOWTBaseline.KNOTS_C)
+    pred = m.predict(X.iloc[:5])
+    assert np.all(np.abs(pred - load[:5]) < 25)   # no wild extrapolation

@@ -103,12 +103,30 @@ class TOWTBaseline(BaseEstimator, RegressorMixin):
 
     KNOTS_C = (-1.111, 7.222, 12.778, 18.333, 23.889, 32.222)
 
-    def __init__(self, temperature: str = "", ridge: float = 1e-6):
+    def __init__(self, temperature: str = "", ridge: float = 1e-6, min_hours: int = 20):
         self.temperature = temperature
         self.ridge = ridge
+        self.min_hours = min_hours
+
+    def _fit_knots(self, t: np.ndarray) -> list:
+        """Drop knots until every temperature segment holds at least `min_hours` training points (as CalTRACK
+        merges sparse temperature bins); a slope fitted on a handful of points extrapolates wildly."""
+        t = t[np.isfinite(t)]
+        knots = list(self.KNOTS_C)
+        while knots:
+            edges = [-np.inf] + knots + [np.inf]
+            counts = [int(((t > a) & (t <= b)).sum()) for a, b in zip(edges[:-1], edges[1:])]
+            sparse = [i for i, c in enumerate(counts) if c < self.min_hours]
+            if not sparse:
+                break
+            i = sparse[0]
+            knots.pop(0 if i == 0 else i - 1)
+        return knots
 
     def _temp_basis(self, t: np.ndarray) -> np.ndarray:
-        k = self.KNOTS_C
+        k = self.knots_
+        if not k:
+            return t.reshape(-1, 1)
         cols = [np.minimum(t, k[0])]
         for a, b in zip(k[:-1], k[1:]):
             cols.append(np.clip(t, a, b) - a)
@@ -134,6 +152,7 @@ class TOWTBaseline(BaseEstimator, RegressorMixin):
         self.levels_ = np.unique(self._tow_keys(X.index))
         t = X[self.temperature].to_numpy(dtype=float)
         self.t_mean_ = float(np.nanmean(t)) if np.isfinite(t).any() else 0.0
+        self.knots_ = self._fit_knots(t[np.isfinite(np.asarray(y, dtype=float))])
         A, _ = self._design(X)
         ok = np.isfinite(yy)
         A, yy = A[ok], yy[ok]

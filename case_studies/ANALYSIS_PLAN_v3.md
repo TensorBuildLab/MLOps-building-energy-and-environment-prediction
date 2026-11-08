@@ -1,10 +1,16 @@
 # Pre-specified analysis plan, revision v3 (2026-11-07)
 
 Written and committed before any v3 result was computed, in response to a mock review for Applied Energy.
-Every v3 experiment runs on one frozen package version, bemlops 0.3.0; each run record carries its
+Every v3 experiment runs on one frozen package version, bemlops 0.3.1; each run record carries its
 package fingerprint. Earlier (v2) results stay in the repository as `results_v2/` and `records_v2/`.
 
-## Package changes in 0.3.0 (before any run)
+## Amendment (2026-11-07, before any v3 result was used)
+A smoke test of the M&V script showed that the TOWT baseline of 0.3.0 was numerically unstable when a
+temperature segment had few training hours (one cross-validation fold produced errors of about 400 kWh).
+The first E1 launch on 0.3.0 was stopped and its runs discarded. 0.3.1 merges sparse temperature segments
+(at least 20 training hours per segment, as CalTRACK merges sparse bins); everything below runs on 0.3.1.
+
+## Package changes in 0.3.0/0.3.1 (before any run)
 - Extra no-ML baselines, all chosen among on validation like the existing ones: same time last week
   (forecasts); a 168-hour time-of-week profile; a time-of-week-and-temperature (TOWT) regression with fixed
   CalTRACK knots, using the temperature available at prediction time (lagged by the horizon for forecasts,
