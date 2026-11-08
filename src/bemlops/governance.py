@@ -40,6 +40,12 @@ def check_gates(record: Dict[str, Any], policy: PromotionPolicy = PromotionPolic
     g14 = test.get("guideline14")
     if g14 is None or not policy.require_guideline14:
         gates["guideline14"] = {"passed": True, "detail": "not applicable"}
+    elif not g14.get("applies_as_gate", True):
+        # Guideline 14's criteria are for baseline models of measured energy use (M&V). A forecast that uses
+        # lags of the metered target passes them about as often as persistence does, so for forecasts they are
+        # reported, not gated.
+        gates["guideline14"] = {"passed": True, "detail": (
+            f"reported, not gated (forecast): CV(RMSE) {g14.get('cvrmse_pct'):.1f}%, NMBE {g14.get('nmbe_pct'):.1f}%")}
     else:
         gates["guideline14"] = {"passed": bool(g14.get("passes")),
                                 "detail": f"CV(RMSE) {g14.get('cvrmse_pct'):.1f}%, NMBE {g14.get('nmbe_pct'):.1f}%"}

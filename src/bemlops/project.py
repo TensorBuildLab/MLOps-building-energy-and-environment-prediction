@@ -17,6 +17,7 @@ task type follows from the declared quantity.
 
 from __future__ import annotations
 
+import dataclasses
 import datetime as _dt
 import warnings
 from dataclasses import dataclass, field
@@ -36,8 +37,11 @@ from .models import (
     DEFAULT_MODELS,
     Persistence,
     PersistenceClassifier,
+    ProbabilityProfile,
     ProfileBaseline,
     ShareOfOnes,
+    TimeOfWeekProfile,
+    TOWTBaseline,
     TrainMean,
     candidates,
     scores,
@@ -74,6 +78,7 @@ class Results:
     interval: Optional[Dict[str, float]] = None  # nominal 90% prediction interval and its test coverage
     drivers: List[Dict[str, Any]] = field(default_factory=list)  # share of accuracy owed to each input
     backtest: Optional[Dict[str, Any]] = None  # rolling-origin blocks: per-block and pooled skill
+    reference_model: Optional[ForecastModel] = None  # the reference baseline, deployable like the model
 
     def summary(self) -> str:
         t, u = self.task, self.task.get("unit") or ""
@@ -379,10 +384,19 @@ class Project:
             day = steps_in("1D", step)
             if f"{target}__t-{day}" in X.columns:
                 baselines["same_time_yesterday"] = P(f"{target}__t-{day}")
+            week = steps_in("7D", step)
+            if f"{target}__t-{week}" in X.columns:
+                baselines["same_time_last_week"] = P(f"{target}__t-{week}")
         else:
             baselines = {"share_of_ones" if cls else "training_mean": ShareOfOnes() if cls else TrainMean()}
-        if not cls:
+        if cls:
+            baselines["time_of_day_probability"] = ProbabilityProfile()
+        else:
             baselines["time_of_day_profile"] = ProfileBaseline()
+            baselines["time_of_week_profile"] = TimeOfWeekProfile()
+            temperature = self._temperature_input(X, h)
+            if temperature:
+                baselines["towt"] = TOWTBaseline(temperature)
 
         primary = PRIMARY_METRIC[task]
         rows, fitted, val_models = [], {}, {}
@@ -446,9 +460,15 @@ class Project:
         drivers = input_drivers(final, Xte, yte, feats, target, task, random_state)
         backtest = (self._backtest(Xu, yu, sp, base_est, params, baselines[ref_name], task, primary, gap,
                                    backtest_blocks) if backtest_blocks else None)
+        g14_ref = None
         if not cls and q.headline_metric == "cvrmse" and step <= pd.Timedelta("1h"):
-            # Guideline 14's hourly criteria, applied to hourly totals or means.
+            # Guideline 14's hourly criteria, applied to hourly totals or means; also for the reference,
+            # so that a reader can see whether the criteria separate the model from the baseline.
             g14 = guideline14(predictions["actual"], predictions["predicted"], aggregate=q.aggregate)
+            g14_ref = guideline14(predictions["actual"], predictions[ref_name], aggregate=q.aggregate)
+            if g14 is not None:
+                g14["baseline"] = g14_ref
+                g14["applies_as_gate"] = h == 0  # M&V use: an estimate from concurrent inputs only
         if chosen in baselines:
             warnings_.append(f"No machine-learning model beat the '{chosen}' baseline on validation data. "
                              f"Look for better inputs before deploying anything more complex.")
@@ -488,15 +508,34 @@ class Project:
             tz=self.tz, index_tz=None if self.raw.index.tz is None else str(self.raw.index.tz))
         self.results = Results(
             task=task_info,
-            split={"sizes": sp.sizes(), "gap": fmt_td(gap),
+            split={"sizes": sp.sizes(), "gap": fmt_td(gap), **self._test_window(Xte.index, step),
                    "bounds": {k: (str(a), str(b)) for k, (a, b) in sp.bounds.items()}},
             validation=validation, chosen=chosen, chosen_params=params, test=test_m,
             baseline_name=ref_name, test_baseline=ref_m, skill=skill, guideline14=g14,
             predictions=predictions, features=[f.to_dict() for f in feats], model=model,
             warnings=warnings_, leakage_warnings=leak_warnings, interval=interval, drivers=drivers,
-            backtest=backtest)
+            backtest=backtest,
+            reference_model=dataclasses.replace(model, estimator=ref, model_name=ref_name,
+                                                test_error=ref_m[primary]))
         self._event("fit", f"chosen {chosen}, test {primary} {test_m[primary]:.4g}")
         return self.results
+
+    @staticmethod
+    def _test_window(idx: pd.DatetimeIndex, step: pd.Timedelta) -> Dict[str, Any]:
+        """Length of the test window: distinct days, and the share of its span that has data."""
+        if len(idx) == 0:
+            return {"test_days": 0, "test_completeness": float("nan")}
+        span = int((idx[-1] - idx[0]) / step) + 1
+        return {"test_days": int(pd.Index(idx.normalize()).nunique()), "test_completeness": float(len(idx) / span)}
+
+    def _temperature_input(self, X: pd.DataFrame, h: int) -> Optional[str]:
+        """The outdoor-temperature input available at prediction time, if one was declared."""
+        for c, spec in self.specs.items():
+            if c != self.target and spec.quantity == "outdoor_air_temperature":
+                for name in ((c,) if (spec.known_ahead or h == 0) else (f"{c}__t-{h}",)):
+                    if name in X.columns:
+                        return name
+        return None
 
     @staticmethod
     def _backtest(Xu, yu, sp, base_est, params, baseline, task, primary, gap, k) -> Optional[Dict[str, Any]]:

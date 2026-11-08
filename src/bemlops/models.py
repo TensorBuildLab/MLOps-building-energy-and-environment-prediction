@@ -71,6 +71,97 @@ class ProfileBaseline(BaseEstimator, RegressorMixin):
         return self.table_.reindex(self._keys(X.index)).fillna(self.mean_).to_numpy(dtype=float)
 
 
+class TimeOfWeekProfile(BaseEstimator, RegressorMixin):
+    """Mean of the target for each time of week (day of week x time of day), training data only.
+
+    Stronger than the weekday/weekend profile for buildings whose schedule differs between weekdays.
+    Times of week never seen in training fall back to the weekday/weekend profile."""
+
+    @staticmethod
+    def _keys(idx: pd.DatetimeIndex) -> pd.MultiIndex:
+        return pd.MultiIndex.from_arrays([idx.day_of_week, idx.hour, idx.minute])
+
+    def fit(self, X: pd.DataFrame, y):
+        yy = pd.Series(np.asarray(y, dtype=float), index=self._keys(X.index))
+        self.table_ = yy.groupby(level=[0, 1, 2]).mean()
+        self.fallback_ = ProfileBaseline().fit(X, y)
+        return self
+
+    def predict(self, X: pd.DataFrame):
+        p = self.table_.reindex(self._keys(X.index)).to_numpy(dtype=float)
+        return np.where(np.isfinite(p), p, self.fallback_.predict(X))
+
+
+class TOWTBaseline(BaseEstimator, RegressorMixin):
+    """Time-of-week-and-temperature regression (Mathieu et al. 2011), fitted by least squares.
+
+    One level per time of week plus a piecewise-linear term in outdoor temperature with fixed knots at
+    30, 45, 55, 65, 75 and 90 degF (the CalTRACK hourly knots), without occupancy splitting. It is the
+    standard no-machine-learning reference in measurement and verification. `temperature` names the
+    temperature input available at prediction time: the measured value for estimates, the value lagged
+    by the horizon for forecasts (no weather forecast is assumed)."""
+
+    KNOTS_C = (-1.111, 7.222, 12.778, 18.333, 23.889, 32.222)
+
+    def __init__(self, temperature: str = "", ridge: float = 1e-6):
+        self.temperature = temperature
+        self.ridge = ridge
+
+    def _temp_basis(self, t: np.ndarray) -> np.ndarray:
+        k = self.KNOTS_C
+        cols = [np.minimum(t, k[0])]
+        for a, b in zip(k[:-1], k[1:]):
+            cols.append(np.clip(t, a, b) - a)
+        cols.append(np.maximum(t, k[-1]) - k[-1])
+        return np.column_stack(cols)
+
+    def _design(self, X: pd.DataFrame) -> np.ndarray:
+        keys = self._tow_keys(X.index)
+        onehot = np.zeros((len(X), len(self.levels_)))
+        pos = pd.Index(self.levels_).get_indexer(keys)
+        seen = pos >= 0
+        onehot[np.flatnonzero(seen), pos[seen]] = 1.0
+        t = X[self.temperature].to_numpy(dtype=float)
+        t = np.where(np.isfinite(t), t, self.t_mean_)
+        return np.column_stack([onehot, self._temp_basis(t)]), seen
+
+    @staticmethod
+    def _tow_keys(idx: pd.DatetimeIndex) -> np.ndarray:
+        return (idx.day_of_week * 1440 + idx.hour * 60 + idx.minute).to_numpy()
+
+    def fit(self, X: pd.DataFrame, y):
+        yy = np.asarray(y, dtype=float)
+        self.levels_ = np.unique(self._tow_keys(X.index))
+        t = X[self.temperature].to_numpy(dtype=float)
+        self.t_mean_ = float(np.nanmean(t)) if np.isfinite(t).any() else 0.0
+        A, _ = self._design(X)
+        ok = np.isfinite(yy)
+        A, yy = A[ok], yy[ok]
+        self.coef_ = np.linalg.solve(A.T @ A + self.ridge * np.eye(A.shape[1]), A.T @ yy)
+        self.fallback_ = TimeOfWeekProfile().fit(X, y)
+        return self
+
+    def predict(self, X: pd.DataFrame):
+        A, seen = self._design(X)
+        return np.where(seen, A @ self.coef_, self.fallback_.predict(X))
+
+
+class ProbabilityProfile(BaseEstimator, ClassifierMixin):
+    """Probability of 'yes' = its share at that time of day in training, weekdays and weekends apart."""
+
+    def fit(self, X: pd.DataFrame, y):
+        self.classes_ = np.array([0, 1])
+        self.profile_ = ProfileBaseline().fit(X, np.asarray(y, dtype=float))
+        return self
+
+    def predict_proba(self, X: pd.DataFrame):
+        p = np.clip(self.profile_.predict(X), 0.0, 1.0)
+        return np.column_stack([1 - p, p])
+
+    def predict(self, X):
+        return (self.predict_proba(X)[:, 1] >= 0.5).astype(int)
+
+
 class PersistenceClassifier(BaseEstimator, ClassifierMixin):
     """Probability of 'yes' = the latest known state (e.g. occupied an hour ago)."""
 

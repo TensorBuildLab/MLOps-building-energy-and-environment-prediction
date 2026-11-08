@@ -31,7 +31,8 @@ def test_forecast_beats_persistence(fitted):
     assert r.task["mode"] == "forecast" and r.task["horizon_steps"] == 4
     assert r.task["task_type"] == "regression"
     assert r.skill > 0.1  # against the strongest no-ML baseline (persistence, yesterday or daily profile)
-    assert r.baseline_name in ("persistence", "same_time_yesterday", "time_of_day_profile")
+    assert r.baseline_name in ("persistence", "same_time_yesterday", "same_time_last_week", "time_of_day_profile",
+                               "time_of_week_profile", "towt")
     assert r.guideline14 is not None and "cvrmse_pct" in r.test
     assert r.backtest and len(r.backtest["blocks"]) == 3
 
@@ -101,9 +102,10 @@ def test_yes_no_target_is_classification(messy, tmp_path):
     p.check_data()
     p.prepare(freq="15min")
     r = p.fit(models=("logistic", "gbm"), n_iter=2)
-    assert r.baseline_name in ("persistence", "same_time_yesterday")
+    assert r.baseline_name in ("persistence", "same_time_yesterday", "same_time_last_week",
+                               "time_of_day_probability")
     assert {"brier", "accuracy", "roc_auc"} <= set(r.test)
-    assert r.skill > 0.2  # Brier skill score vs "same as an hour ago"
+    assert r.skill >= 0  # Brier skill score vs the strongest baseline (on this synthetic schedule, the profile)
     folder = p.save_run(tmp_path)
     out = bemlops.load_model(folder / "model.joblib").predict(p.raw.iloc[-3000:], on_error="warn")
     assert out["probability"].between(0, 1).all() and set(out["predicted"].unique()) <= {0, 1}
@@ -134,3 +136,41 @@ def test_holidays_become_a_known_ahead_input(messy):
     p.prepare(freq="15min")
     r = p.fit(models=("ridge",), n_iter=1)
     assert "is_holiday" in r.model.feature_names and p.config()["holidays"] == ["2025-10-13", "2025-11-11"]
+
+
+def test_extended_baselines_towt_and_time_of_week():
+    """v0.3.0 baselines: a time-of-week profile, a time-of-week-and-temperature regression and, for yes/no
+    targets, a time-of-day probability profile. TOWT must recover a load driven by schedule and temperature."""
+    import numpy as np
+    import pandas as pd
+
+    from bemlops.models import ProbabilityProfile, TimeOfWeekProfile, TOWTBaseline
+
+    idx = pd.date_range("2024-01-01", periods=24 * 7 * 8, freq="1h")
+    rng = np.random.default_rng(0)
+    temp = 15 + 10 * np.sin(2 * np.pi * np.arange(len(idx)) / (24 * 30)) + rng.normal(0, 1, len(idx))
+    sched = np.where((idx.day_of_week < 5) & (idx.hour >= 8) & (idx.hour < 18), 50.0, 10.0)
+    load = sched + 2.0 * np.maximum(temp - 18, 0) + rng.normal(0, 1, len(idx))
+    X = pd.DataFrame({"oat": temp}, index=idx)
+    y = pd.Series(load, index=idx)
+    train, test = slice(0, 24 * 7 * 6), slice(24 * 7 * 6, None)
+    towt = TOWTBaseline("oat").fit(X.iloc[train], y.iloc[train])
+    tow = TimeOfWeekProfile().fit(X.iloc[train], y.iloc[train])
+    rmse = lambda p: float(np.sqrt(np.mean((y.iloc[test].to_numpy() - p) ** 2)))  # noqa: E731
+    assert rmse(towt.predict(X.iloc[test])) < 2.0                      # close to the noise level
+    assert rmse(towt.predict(X.iloc[test])) < rmse(tow.predict(X.iloc[test]))
+    occ = pd.Series((sched > 20).astype(int), index=idx)
+    prob = ProbabilityProfile().fit(X.iloc[train], occ.iloc[train]).predict_proba(X.iloc[test])[:, 1]
+    assert np.all((prob >= 0) & (prob <= 1))
+
+
+def test_guideline14_is_reported_not_gated_for_forecasts():
+    from bemlops.governance import check_gates as evaluate_gates
+
+    record = {"unresolved_errors": [], "leakage_warnings": [], "split": {"sizes": {"test": 500}},
+              "test": {"skill": 0.2, "guideline14": {"passes": False, "cvrmse_pct": 40.0, "nmbe_pct": 1.0,
+                                                     "applies_as_gate": False}}}
+    gates = evaluate_gates(record)
+    assert gates["guideline14"]["passed"] and "not gated" in gates["guideline14"]["detail"]
+    record["test"]["guideline14"]["applies_as_gate"] = True
+    assert not evaluate_gates(record)["guideline14"]["passed"]
