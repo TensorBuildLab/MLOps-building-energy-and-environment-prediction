@@ -1,0 +1,47 @@
+# Discussion {#sec:discussion}
+
+## Where the guardrails mattered and where they did not
+
+The experiments separate four places where checks can make a difference, and the size of the effect differs between them.
+
+The evaluation protocol had a large effect. A random split understated the error on every task tested (@sec:res-protocol), by a margin larger than most differences between models in this study. This is the protocol of the authors' preliminary study. None of the pilot agents used it: all eight split their data in time order, although their prompts had announced a leakage check. The contribution of the framework here is to make the time-ordered protocol and the strongest baseline the default for whoever uses it, including less careful users and agents.
+
+Baselines and gates had a large effect on what gets deployed. Across 92 tasks the strongest rule without machine learning was often hard to beat (@sec:res-targets): the framework kept the baseline in 20 tasks, and 41 models failed the promotion gates. A pipeline that always reports its best model would have deployed all of them. For an operator, a forecast that is no better than the value an hour earlier adds maintenance without adding value.
+
+Fault handling had a small but consistent effect. With planted faults, the framework's standard handling made the result on faulty data match the result on clean data, whereas a quick script was 1.6–1.9 ppm worse in MAE and three to five times less stable in RMSE between seeds (@sec:res-faults). The detectors also missed faults: a stuck meter at its idle floor in half of the seeds, and a dead meter that only a check across related sensors could reveal.
+
+For capable agents, the framework had no measurable effect on accuracy. Agents that had been told their work would be checked for leakage built leak-free models of similar accuracy with or without the framework (@sec:res-pilot), with no consistent difference in either direction. They found as many planted faults and wrote their own causality tests, and the framework arm cost more tokens, tool calls and time.
+
+Together, these results place the measured value of the framework in four places: making the time-ordered protocol and the strongest baseline the default, rather than something that depends on a careful prompt; making work comparable, since the eight pilot agents produced eight different pipelines with eight different evaluation designs that an operator would have to audit one by one, whereas the framework gives every model the same record, baselines, gates and monitoring; supporting the lifecycle after the first model; and recording decisions so that they can be re-executed. Whether the defaults matter more for weaker or unprimed agents is the main open question, and the pilot was not designed to answer it.
+
+## Lessons for the model lifecycle
+
+Monitoring with gated retraining clearly beat a model left alone (@sec:res-lifecycle). For district heating it only matched persistence on the mean and lost to it in five of eight months, and simple monthly retraining performed better on both tasks. Three lessons follow.
+
+First, a drift check must compare the model with a baseline, not only with the model's own past error. In summer the district-heating load barely changes, so persistence was nearly perfect and every model looked poor next to it, yet the check in the evaluated version compared only with the test-time error and never recommended falling back to persistence. The fallback rule added afterwards would have helped for district heating and hurt slightly for CO~2~ in this single trajectory, which is why it is a recommendation to the operator rather than an automatic switch.
+
+Second, retraining should be scheduled, not only triggered by an alarm. The drift alarm compared the recent error with the test-time error using a tolerance of 1.5. Over the summer, the district-heating model lost skill slowly and never crossed that threshold, so it was not retrained from June to October, while a model retrained monthly kept adapting. The retraining pipeline of the framework can run on any schedule, and the evidence here favors running it monthly, with the drift check as a second line of defense.
+
+Third, the value of the gates was not tested. Monthly retraining without gates performed well because the data were clean enough that retraining rarely made things worse. The gates exist for the months in which a fault or an unusual period would otherwise be trained into production, and two clean trajectories over eight months do not contain enough such months to measure that benefit.
+
+## Judgment remains with the agent
+
+The checks directed judgment rather than replacing it. Each of the following judgment calls was prompted by a warning and settled with evidence that is now in the record: a CO~2~ sensor floor, change-of-value logging recognized from the share of unchanged steps, outdoor humidity saturating on tropical nights, and gaps in the camera counts. A fixed pipeline would have had two poor options: masking those stretches and losing most nights of CO~2~ data, or ignoring stuck sensors and training on a weather station that repeated one value for 37 h.
+
+The dead chilled-water meter shows the limit of this division of labor. The case-study agent, following the skill, did not look for contradictions between related points, whereas all four independent pilot agents that worked on that room found the fault, two with the framework and two without. One possible explanation is that a check which reports no problem makes an agent less curious, but the pilot cannot show this. The skill now asks the agent to check related points against each other, and checks across related sensors are the natural next guardrail.
+
+## Implications for building energy operation
+
+The error gaps measured here translate directly into operational risk. A random split understated the RMSE by a median of 27% on the same data (@sec:res-protocol). A model predictive controller whose constraint margins are sized on such an error estimate would hold comfort or demand constraints tighter than the evidence supports; a demand-response bid based on an hour-ahead load forecast would carry more confidence than the forecast deserves; and a measurement-and-verification baseline could appear to meet Guideline 14 when it does not. The prediction intervals were too narrow wherever the test period differed from the calibration period; for district heating, intervals calibrated on October to mid-November covered only about a quarter of the values from mid-November to December, when the heating load was larger and more variable. Intervals of this kind should be recalibrated as part of monitoring before they are used to set control margins or flexibility offers.
+
+The gates also matter for portfolio-scale deployment. In the BDG2 portfolio, one configuration produced a deployable day-ahead forecast for 11 of 20 buildings and recommended the simple rule for the others, in about a minute per building. For an operator of many buildings, a workflow that declines to deploy a model where it adds nothing is as valuable as one that deploys a model where it does.
+
+## Threats to validity {#sec:validity}
+
+Internal validity. The same agent built the framework and ran the case studies, so the framework is not an independent tool tested by a neutral user. Several detectors were revised on ROBOD and Aalborg data, so the data checks are partly in-sample on those datasets, and the detection rates of the fault-injection experiment are optimistic for the same reason; BDG2 is closer to held-out data but not strictly so. The case-study agent missed a real fault that independent agents caught, and the affected tasks are reported before and after the correction. The unit fix in E3 was coded by the authors, who knew what had been planted, but the same fix was given to the unguarded arm and made no difference.
+
+Construct validity. Skill is defined on RMSE, and the promotion threshold of 0.05 depends on that choice. Fault detection is counted per column and type, not per located sample. The pilot prompts announced a leakage check and asked for rigor, and only the framework arm was asked for a usability report, so its cost figures include that extra reporting; the framework arm also used an earlier package version than the case studies. The Guideline 14 criteria were written for measurement and verification and are used here as a familiar reference for forecasts, not as a claim of compliance.
+
+Statistical conclusion validity. Each task of E1 was run once and scored on one test window; the Diebold–Mariano tests and the backtest address this only in part, and where test and backtest disagreed in sign the gates followed the test window. The pilot has one run per cell, two tasks and two models of one family, the same family as the agent that built the framework. The lifecycle experiment is one trajectory for each of two tasks.
+
+External validity. The three datasets are public, documented and partly curated by their authors, whereas commercial BAS exports are messier. The records are short: ROBOD covers 29–47 weekdays per room and the Aalborg data ten months. No weather forecasts were available, so day-ahead tasks used measured weather up to the forecast time only. The models and hyperparameter searches were deliberately ordinary; stronger models, including probabilistic, deep and foundation models [@emami2023], might beat the baselines more often.

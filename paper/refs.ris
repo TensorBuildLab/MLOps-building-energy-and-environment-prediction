@@ -1,0 +1,713 @@
+TY  - JOUR
+ID  - amasyali2018
+AU  - Amasyali, K.
+AU  - El-Gohary, N.M.
+PY  - 2018
+TI  - A review of data-driven building energy consumption prediction studies
+T2  - Renewable and Sustainable Energy Reviews
+J2  - Renew Sustain Energy Rev
+VL  - 81
+IS  - Part 1
+SP  - 1192
+EP  - 1205
+DO  - 10.1016/j.rser.2017.04.095
+ER  - 
+
+TY  - STAND
+ID  - ashrae2014
+AU  - ASHRAE
+PY  - 2014
+TI  - ASHRAE Guideline 14-2014: Measurement of Energy, Demand, and Water Savings
+T2  - ASHRAE, Atlanta, GA
+ER  - 
+
+TY  - CPAPER
+ID  - balaji2016
+AU  - Balaji, B.
+AU  - Bhattacharya, A.
+AU  - Fierro, G.
+AU  - Gao, J.
+AU  - Gluck, J.
+AU  - Hong, D.
+AU  - Johansen, A.
+AU  - Koh, J.
+AU  - Ploennigs, J.
+AU  - Agarwal, Y.
+AU  - Berges, M.
+AU  - Culler, D.
+AU  - Gupta, R.
+AU  - Kjærgaard, M.B.
+AU  - Srivastava, M.
+AU  - Whitehouse, K.
+PY  - 2016
+TI  - Brick: Towards a unified metadata schema for buildings
+T2  - Proceedings of the 3rd ACM International Conference on Systems for Energy-Efficient Built Environments (BuildSys '16)
+SP  - 41
+EP  - 50
+DO  - 10.1145/2993422.2993577
+ER  - 
+
+TY  - CPAPER
+ID  - bantilan2020
+AU  - Bantilan, N.
+PY  - 2020
+TI  - pandera: Statistical data validation of pandas dataframes
+T2  - Proceedings of the 19th Python in Science Conference (SciPy 2020)
+SP  - 116
+EP  - 124
+DO  - 10.25080/Majora-342d178e-010
+ER  - 
+
+TY  - JOUR
+ID  - bergmeir2012
+AU  - Bergmeir, C.
+AU  - Benítez, J.M.
+PY  - 2012
+TI  - On the use of cross-validation for time series predictor evaluation
+T2  - Information Sciences
+J2  - Inf Sci
+VL  - 191
+SP  - 192
+EP  - 213
+DO  - 10.1016/j.ins.2011.12.028
+ER  - 
+
+TY  - JOUR
+ID  - bergmeir2018
+AU  - Bergmeir, C.
+AU  - Hyndman, R.J.
+AU  - Koo, B.
+PY  - 2018
+TI  - A note on the validity of cross-validation for evaluating autoregressive time series prediction
+T2  - Computational Statistics & Data Analysis
+J2  - Comput Stat Data Anal
+VL  - 120
+SP  - 70
+EP  - 83
+DO  - 10.1016/j.csda.2017.11.003
+ER  - 
+
+TY  - CPAPER
+ID  - breck2017
+AU  - Breck, E.
+AU  - Cai, S.
+AU  - Nielsen, E.
+AU  - Salib, M.
+AU  - Sculley, D.
+PY  - 2017
+TI  - The ML test score: A rubric for ML production readiness and technical debt reduction
+T2  - 2017 IEEE International Conference on Big Data
+SP  - 1123
+EP  - 1132
+DO  - 10.1109/BigData.2017.8258038
+ER  - 
+
+TY  - CPAPER
+ID  - breck2019
+AU  - Breck, E.
+AU  - Polyzotis, N.
+AU  - Roy, S.
+AU  - Whang, S.E.
+AU  - Zinkevich, M.
+PY  - 2019
+TI  - Data validation for machine learning
+T2  - Proceedings of Machine Learning and Systems 1 (SysML 2019)
+SP  - 334
+EP  - 347
+ER  - 
+
+TY  - JOUR
+ID  - brier1950
+AU  - Brier, G.W.
+PY  - 1950
+TI  - Verification of forecasts expressed in terms of probability
+T2  - Monthly Weather Review
+J2  - Mon Weather Rev
+VL  - 78
+IS  - 1
+SP  - 1
+EP  - 3
+DO  - 10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO
+ER  - 
+
+TY  - JOUR
+ID  - candanedo2016
+AU  - Candanedo, L.M.
+AU  - Feldheim, V.
+PY  - 2016
+TI  - Accurate occupancy detection of an office room from light, temperature, humidity and CO2 measurements using statistical learning models
+T2  - Energy and Buildings
+J2  - Energy Build
+VL  - 112
+SP  - 28
+EP  - 39
+DO  - 10.1016/j.enbuild.2015.11.071
+ER  - 
+
+TY  - CPAPER
+ID  - chan2025
+AU  - Chan, J.S.
+AU  - Chowdhury, N.
+AU  - Jaffe, O.
+AU  - Aung, J.
+AU  - Sherburn, D.
+AU  - Mays, E.
+AU  - Starace, G.
+AU  - Liu, K.
+AU  - Maksin, L.
+AU  - Patwardhan, T.
+AU  - Madry, A.
+AU  - Weng, L.
+PY  - 2025
+TI  - MLE-bench: Evaluating machine learning agents on machine learning engineering
+T2  - International Conference on Learning Representations (ICLR 2025)
+SP  - 50466
+EP  - 50494
+ER  - 
+
+TY  - JOUR
+ID  - diebold1995
+AU  - Diebold, F.X.
+AU  - Mariano, R.S.
+PY  - 1995
+TI  - Comparing predictive accuracy
+T2  - Journal of Business & Economic Statistics
+J2  - J Bus Econ Stat
+VL  - 13
+IS  - 3
+SP  - 253
+EP  - 263
+DO  - 10.1080/07350015.1995.10524599
+ER  - 
+
+TY  - CPAPER
+ID  - emami2023
+AU  - Emami, P.
+AU  - Sahu, A.
+AU  - Graf, P.
+PY  - 2023
+TI  - BuildingsBench: A large-scale dataset of 900K buildings and benchmark for short-term load forecasting
+T2  - Advances in Neural Information Processing Systems 36, Datasets and Benchmarks Track
+SP  - 19823
+EP  - 19857
+DO  - 10.52202/075280-0871
+ER  - 
+
+TY  - COMP
+ID  - evidently2026
+AU  - Evidently AI
+PY  - 2026
+TI  - Evidently: open-source ML and LLM evaluation and observability framework (software, Apache-2.0)
+UR  - https://github.com/evidentlyai/evidently
+Y2  - 29 October 2026
+ER  - 
+
+TY  - JOUR
+ID  - fan2021
+AU  - Fan, C.
+AU  - Chen, M.
+AU  - Wang, X.
+AU  - Wang, J.
+AU  - Huang, B.
+PY  - 2021
+TI  - A review on data preprocessing techniques toward efficient and reliable knowledge discovery from building operational data
+T2  - Frontiers in Energy Research
+J2  - Front Energy Res
+VL  - 9
+SP  - 652801
+DO  - 10.3389/fenrg.2021.652801
+ER  - 
+
+TY  - COMP
+ID  - gong2026
+AU  - Gong, A.
+AU  - Campbell, J.
+PY  - 2026
+TI  - Great Expectations (software)
+T2  - Zenodo
+DO  - 10.5281/zenodo.5683574
+Y2  - 29 October 2026
+ER  - 
+
+TY  - CPAPER
+ID  - guo2024
+AU  - Guo, S.
+AU  - Deng, C.
+AU  - Wen, Y.
+AU  - Chen, H.
+AU  - Chang, Y.
+AU  - Wang, J.
+PY  - 2024
+TI  - DS-Agent: Automated data science by empowering large language models with case-based reasoning
+T2  - Proceedings of the 41st International Conference on Machine Learning (ICML 2024), PMLR 235
+SP  - 16813
+EP  - 16848
+ER  - 
+
+TY  - JOUR
+ID  - herzen2022
+AU  - Herzen, J.
+AU  - Lässig, F.
+AU  - Piazzetta, S.G.
+AU  - Neuer, T.
+AU  - Tafti, L.
+AU  - Raille, G.
+AU  - Van Pottelbergh, T.
+AU  - Pasieka, M.
+AU  - Skrodzki, A.
+AU  - Huguenin, N.
+PY  - 2022
+TI  - Darts: User-friendly modern machine learning for time series
+T2  - Journal of Machine Learning Research
+J2  - J Mach Learn Res
+VL  - 23
+IS  - 124
+SP  - 1
+EP  - 6
+UR  - https://jmlr.org/papers/v23/21-1177.html
+ER  - 
+
+TY  - CPAPER
+ID  - huang2024
+AU  - Huang, Q.
+AU  - Vora, J.
+AU  - Liang, P.
+AU  - Leskovec, J.
+PY  - 2024
+TI  - MLAgentBench: Evaluating language agents on machine learning experimentation
+T2  - Proceedings of the 41st International Conference on Machine Learning (ICML 2024), PMLR 235
+SP  - 20271
+EP  - 20309
+ER  - 
+
+TY  - RPRT
+ID  - iea2023
+AU  - IEA
+PY  - 2023
+TI  - Tracking Clean Energy Progress 2023
+T2  - International Energy Agency, Paris
+UR  - https://www.iea.org/reports/tracking-clean-energy-progress-2023
+ER  - 
+
+TY  - GEN
+ID  - jiang2026
+AU  - Jiang, Z.
+AU  - Xu, W.
+AU  - Dong, B.
+PY  - 2026
+TI  - OptAgent: an Agentic AI framework for Intelligent Building Operations
+T2  - arXiv preprint arXiv:2601.20005
+DO  - 10.48550/arXiv.2601.20005
+ER  - 
+
+TY  - JOUR
+ID  - kallio2021
+AU  - Kallio, J.
+AU  - Tervonen, J.
+AU  - Räsänen, P.
+AU  - Mäkynen, R.
+AU  - Koivusaari, J.
+AU  - Peltola, J.
+PY  - 2021
+TI  - Forecasting office indoor CO2 concentration using machine learning with a one-year dataset
+T2  - Building and Environment
+J2  - Build Environ
+VL  - 187
+SP  - 107409
+DO  - 10.1016/j.buildenv.2020.107409
+ER  - 
+
+TY  - JOUR
+ID  - kapoor2023
+AU  - Kapoor, S.
+AU  - Narayanan, A.
+PY  - 2023
+TI  - Leakage and the reproducibility crisis in machine-learning-based science
+T2  - Patterns
+J2  - Patterns
+VL  - 4
+IS  - 9
+SP  - 100804
+DO  - 10.1016/j.patter.2023.100804
+ER  - 
+
+TY  - GEN
+ID  - khadka2024
+AU  - Khadka, S.
+AU  - Zhang, L.
+PY  - 2024
+TI  - Scaling data-driven building energy modelling using large language models
+T2  - arXiv preprint arXiv:2407.03469
+DO  - 10.48550/arXiv.2407.03469
+ER  - 
+
+TY  - JOUR
+ID  - kim2018
+AU  - Kim, W.
+AU  - Katipamula, S.
+PY  - 2018
+TI  - A review of fault detection and diagnostics methods for building systems
+T2  - Science and Technology for the Built Environment
+J2  - Sci Technol Built Environ
+VL  - 24
+IS  - 1
+SP  - 3
+EP  - 21
+DO  - 10.1080/23744731.2017.1318008
+ER  - 
+
+TY  - JOUR
+ID  - kreuzberger2023
+AU  - Kreuzberger, D.
+AU  - Kühl, N.
+AU  - Hirschl, S.
+PY  - 2023
+TI  - Machine Learning Operations (MLOps): Overview, definition, and architecture
+T2  - IEEE Access
+J2  - IEEE Access
+VL  - 11
+SP  - 31866
+EP  - 31879
+DO  - 10.1109/ACCESS.2023.3262138
+ER  - 
+
+TY  - COMP
+ID  - kuprieiev2026
+AU  - Kuprieiev, R.
+PY  - 2026
+TI  - DVC: Data Version Control (software)
+T2  - Zenodo
+DO  - 10.5281/zenodo.3677553
+Y2  - 29 October 2026
+ER  - 
+
+TY  - JOUR
+ID  - luo2022
+AU  - Luo, N.
+AU  - Wang, Z.
+AU  - Blum, D.
+AU  - Weyandt, C.
+AU  - Bourassa, N.
+AU  - Piette, M.A.
+AU  - Hong, T.
+PY  - 2022
+TI  - A three-year dataset supporting research on building energy management and occupancy analytics
+T2  - Scientific Data
+J2  - Sci Data
+VL  - 9
+SP  - 156
+DO  - 10.1038/s41597-022-01257-x
+ER  - 
+
+TY  - GEN
+ID  - loning2019
+AU  - Löning, M.
+AU  - Bagnall, A.
+AU  - Ganesh, S.
+AU  - Kazakov, V.
+AU  - Lines, J.
+AU  - Király, F.J.
+PY  - 2019
+TI  - sktime: A unified interface for machine learning with time series
+T2  - arXiv preprint arXiv:1909.07872
+UR  - https://arxiv.org/abs/1909.07872
+ER  - 
+
+TY  - JOUR
+ID  - maddalena2020
+AU  - Maddalena, E.T.
+AU  - Lian, Y.
+AU  - Jones, C.N.
+PY  - 2020
+TI  - Data-driven methods for building control — A review and promising future directions
+T2  - Control Engineering Practice
+J2  - Control Eng Pract
+VL  - 95
+SP  - 104211
+DO  - 10.1016/j.conengprac.2019.104211
+ER  - 
+
+TY  - JOUR
+ID  - melgaard2024
+AU  - Melgaard, S.P.
+AU  - Johra, H.
+AU  - Nyborg, V.
+AU  - Marszal-Pomianowska, A.
+AU  - Jensen, R.L.
+AU  - Kantas, C.
+AU  - Larsen, O.K.
+AU  - Hu, Y.
+AU  - Frandsen, K.M.
+AU  - Larsen, T.S.
+AU  - Svidt, K.
+AU  - Andersen, K.H.
+AU  - Leiria, D.
+AU  - Schaffer, M.
+AU  - Frandsen, M.
+AU  - Veit, M.
+AU  - Ussing, L.F.
+AU  - Lindhard, S.M.
+AU  - Pomianowski, M.Z.
+AU  - Rohde, L.
+AU  - Hansen, A.R.
+AU  - Heiselberg, P.K.
+PY  - 2024
+TI  - Detailed operational building data for six office rooms in Denmark: Occupancy, indoor environment, heating, ventilation, lighting and room control monitoring with sub-hourly temporal resolution
+T2  - Data in Brief
+J2  - Data Brief
+VL  - 54
+SP  - 110326
+DO  - 10.1016/j.dib.2024.110326
+ER  - 
+
+TY  - JOUR
+ID  - miller2020
+AU  - Miller, C.
+AU  - Kathirgamanathan, A.
+AU  - Picchetti, B.
+AU  - Arjunan, P.
+AU  - Park, J.Y.
+AU  - Nagy, Z.
+AU  - Raftery, P.
+AU  - Hobson, B.W.
+AU  - Shi, Z.
+AU  - Meggers, F.
+PY  - 2020
+TI  - The Building Data Genome Project 2, energy meter data from the ASHRAE Great Energy Predictor III competition
+T2  - Scientific Data
+J2  - Sci Data
+VL  - 7
+SP  - 368
+DO  - 10.1038/s41597-020-00712-x
+ER  - 
+
+TY  - CPAPER
+ID  - mitchell2019
+AU  - Mitchell, M.
+AU  - Wu, S.
+AU  - Zaldivar, A.
+AU  - Barnes, P.
+AU  - Vasserman, L.
+AU  - Hutchinson, B.
+AU  - Spitzer, E.
+AU  - Raji, I.D.
+AU  - Gebru, T.
+PY  - 2019
+TI  - Model cards for model reporting
+T2  - Proceedings of the Conference on Fairness, Accountability, and Transparency (FAT* '19)
+SP  - 220
+EP  - 229
+DO  - 10.1145/3287560.3287596
+ER  - 
+
+TY  - JOUR
+ID  - schelter2018
+AU  - Schelter, S.
+AU  - Lange, D.
+AU  - Schmidt, P.
+AU  - Celikel, M.
+AU  - Biessmann, F.
+AU  - Grafberger, A.
+PY  - 2018
+TI  - Automating large-scale data quality verification
+T2  - Proceedings of the VLDB Endowment
+J2  - Proc VLDB Endow
+VL  - 11
+IS  - 12
+SP  - 1781
+EP  - 1794
+DO  - 10.14778/3229863.3229867
+ER  - 
+
+TY  - CPAPER
+ID  - sculley2015
+AU  - Sculley, D.
+AU  - Holt, G.
+AU  - Golovin, D.
+AU  - Davydov, E.
+AU  - Phillips, T.
+AU  - Ebner, D.
+AU  - Chaudhary, V.
+AU  - Young, M.
+AU  - Crespo, J.-F.
+AU  - Dennison, D.
+PY  - 2015
+TI  - Hidden technical debt in machine learning systems
+T2  - Advances in Neural Information Processing Systems 28 (NIPS 2015)
+SP  - 2503
+EP  - 2511
+ER  - 
+
+TY  - CPAPER
+ID  - shchur2023
+AU  - Shchur, O.
+AU  - Turkmen, A.C.
+AU  - Erickson, N.
+AU  - Shen, H.
+AU  - Shirkov, A.
+AU  - Hu, T.
+AU  - Wang, B.
+PY  - 2023
+TI  - AutoGluon–TimeSeries: AutoML for probabilistic time series forecasting
+T2  - Proceedings of the Second International Conference on Automated Machine Learning (AutoML 2023), PMLR 224, 9/1–21
+ER  - 
+
+TY  - JOUR
+ID  - tekler2022
+AU  - Tekler, Z.D.
+AU  - Ono, E.
+AU  - Peng, Y.
+AU  - Zhan, S.
+AU  - Lasternas, B.
+AU  - Chong, A.
+PY  - 2022
+TI  - ROBOD, room-level occupancy and building operation dataset
+T2  - Building Simulation
+J2  - Build Simul
+VL  - 15
+IS  - 12
+SP  - 2127
+EP  - 2137
+DO  - 10.1007/s12273-022-0925-9
+ER  - 
+
+TY  - JOUR
+ID  - wilson1927
+AU  - Wilson, E.B.
+PY  - 1927
+TI  - Probable inference, the law of succession, and statistical inference
+T2  - Journal of the American Statistical Association
+J2  - J Am Stat Assoc
+VL  - 22
+IS  - 158
+SP  - 209
+EP  - 212
+DO  - 10.1080/01621459.1927.10502953
+ER  - 
+
+TY  - JOUR
+ID  - xiao2024
+AU  - Xiao, T.
+AU  - Xu, P.
+PY  - 2024
+TI  - Exploring automated energy optimization with unstructured building data: A multi-agent based framework leveraging large language models
+T2  - Energy and Buildings
+J2  - Energy Build
+VL  - 322
+SP  - 114691
+DO  - 10.1016/j.enbuild.2024.114691
+ER  - 
+
+TY  - CPAPER
+ID  - yao2023
+AU  - Yao, S.
+AU  - Zhao, J.
+AU  - Yu, D.
+AU  - Du, N.
+AU  - Shafran, I.
+AU  - Narasimhan, K.
+AU  - Cao, Y.
+PY  - 2023
+TI  - ReAct: Synergizing reasoning and acting in language models
+T2  - International Conference on Learning Representations (ICLR 2023)
+ER  - 
+
+TY  - JOUR
+ID  - zaharia2018
+AU  - Zaharia, M.
+AU  - Chen, A.
+AU  - Davidson, A.
+AU  - Ghodsi, A.
+AU  - Hong, S.A.
+AU  - Konwinski, A.
+AU  - Murching, S.
+AU  - Nykodym, T.
+AU  - Ogilvie, P.
+AU  - Parkhe, M.
+AU  - Xie, F.
+AU  - Zumar, C.
+PY  - 2018
+TI  - Accelerating the machine learning lifecycle with MLflow
+T2  - IEEE Data Engineering Bulletin
+J2  - IEEE Data Eng Bull
+VL  - 41
+IS  - 4
+SP  - 39
+EP  - 45
+UR  - http://sites.computer.org/debull/A18dec/p39.pdf
+ER  - 
+
+TY  - ELEC
+ID  - zhang2025a
+AU  - Zhang, B.
+AU  - Lazuka, K.
+AU  - Murag, M.
+PY  - 2025
+TI  - Equipping agents for the real world with Agent Skills
+T2  - Anthropic Engineering Blog
+UR  - https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
+Y2  - 28 October 2026
+ER  - 
+
+TY  - JOUR
+ID  - zhang2024a
+AU  - Zhang, C.
+AU  - Lu, J.
+AU  - Huang, J.
+AU  - Zhao, Y.
+PY  - 2024
+TI  - End-to-end data-driven modeling framework for automated and trustworthy short-term building energy load forecasting
+T2  - Building Simulation
+J2  - Build Simul
+VL  - 17
+IS  - 8
+SP  - 1419
+EP  - 1437
+DO  - 10.1007/s12273-024-1149-y
+ER  - 
+
+TY  - JOUR
+ID  - zhang2024b
+AU  - Zhang, C.
+AU  - Lu, J.
+AU  - Zhao, Y.
+PY  - 2024
+TI  - Generative pre-trained transformers (GPT)-based automated data mining for building energy management: Advantages, limitations and the future
+T2  - Energy and Built Environment
+J2  - Energy Built Environ
+VL  - 5
+IS  - 1
+SP  - 143
+EP  - 169
+DO  - 10.1016/j.enbenv.2023.06.005
+ER  - 
+
+TY  - JOUR
+ID  - zhang2023
+AU  - Zhang, C.
+AU  - Tian, X.
+AU  - Zhao, Y.
+AU  - Lu, J.
+PY  - 2023
+TI  - Automated machine learning-based building energy load prediction method
+T2  - Journal of Building Engineering
+J2  - J Build Eng
+VL  - 80
+SP  - 108071
+DO  - 10.1016/j.jobe.2023.108071
+ER  - 
+
+TY  - JOUR
+ID  - zhang2025b
+AU  - Zhang, C.
+AU  - Zhang, J.
+AU  - Zhao, Y.
+AU  - Lu, J.
+PY  - 2025
+TI  - Automated data-driven building energy load prediction method based on generative pre-trained transformers (GPT)
+T2  - Energy
+J2  - Energy
+VL  - 318
+SP  - 134824
+DO  - 10.1016/j.energy.2025.134824
+ER  - 

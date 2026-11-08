@@ -1,83 +1,24 @@
-## 1. Introduction
+# Introduction {#sec:intro}
 
-Buildings account for about 30% of global final energy use [IEA 2023], and
-data-driven prediction sits behind many of the ways that use is managed in
-operation:
-- model predictive control needs load and temperature forecasts;
-- demand response needs hour-ahead power forecasts;
-- fault detection needs expected values to compare against;
-- indoor-environment management needs to know where CO2 or temperature is heading.
+The operation of buildings accounts for about 30% of global final energy consumption [@iea2023], and data-driven prediction underpins many of the ways in which that consumption is managed. Model predictive control needs forecasts of loads and zone temperatures, demand response needs hour-ahead forecasts of electric power, fault detection compares measurements with expected values, measurement and verification compares consumption with a baseline model, and ventilation control benefits from knowing where CO~2~ concentration and occupancy are heading. Machine-learning models for these tasks are well studied [@amasyali2018], but they are rarely applied in practice [@zhang2024b]. Each building needs its own model, and building one requires skilled effort on data that differ from building to building: point names such as *RM204_ZN_T* must be decoded, units are mixed, and exports contain text in numeric columns, placeholder values, stuck sensors and gaps in vendor-specific formats.
 
-Machine-learning models for these tasks are well studied [Amasyali and
-El-Gohary 2018], but they are rarely applied in practice [Zhang et al. 2024b].
-Each building needs its own model, and building one takes skilled effort on
-data that are different every time. Point names such as `RM204_ZN_T` or `AI-3.PV`
-must be decoded. Units are mixed. Exports contain text in number columns,
-placeholder values, stuck sensors and gaps, in formats that vary by vendor.
+The authors' preliminary study [@khadka2024] asked whether large language models (LLMs) could remove this bottleneck by writing the modeling code. A prompt template that followed the steps of a machine-learning operations (MLOps) lifecycle let GPT-4 produce runnable modeling code for a simulated small office in 34 of 35 attempts. Three problems limit what that result means. First, code that runs is not the same as a model that is right. Second, the generated pipelines split the time series at random and selected features on the full dataset, both of which can let information from the test period leak into training [@kapoor2023]. Third, the study used one simulated building and stopped before deployment.
 
-Our preliminary study [Khadka and Zhang 2024] asked whether large language
-models (LLMs) could remove that bottleneck by writing the modeling code. A
-prompt template following the steps of a machine-learning operations (MLOps)
-lifecycle let GPT-4 produce runnable code for a simulated small office in 34 of
-35 attempts. Three problems limit what that result means:
-- code that runs is not the same as a model that is right;
-- the generated pipelines split the time series at random and selected features
-  on the full dataset, both of which can let test information leak into
-  training [Kapoor and Narayanan 2023];
-- the study used one simulated building and stopped before deployment.
+LLM agents can now write and execute analysis code autonomously, so producing a modeling script is no longer the difficult step. The open question is under what conditions such a model can be relied on in the operation of a real building, and what has to surround the agent's code to make it reliable. This paper studies one answer, a division of labor between an agent and a domain package. The agent reads whatever export it is given, works out what the points mean and makes the judgment calls that no fixed pipeline anticipates. The package applies the same checks every time: every declared column is checked against physical plausibility, inputs are constructed so that they cannot reach past the forecast time, every model is evaluated in time order against the strongest simple baseline, promotion to production is gated, deployed models are monitored and retrained, and every decision is recorded. These checks are referred to as guardrails, in the software-engineering sense of checks that every run of a workflow passes through, not in the sense of filters on an LLM's output.
 
-LLM agents have since become able to write and run analysis code on their own,
-so generating a modeling script is no longer the hard part. The open question
-is when such a model can be relied on in operation, and what has to surround
-the agent's code for that. This paper studies one answer, a division of labour:
-- **The agent** reads whatever export it is given, works out what the points
-  mean, and makes the judgment calls that no fixed pipeline anticipates.
-- **A domain package** applies checks that are the same every time:
-  - every declared column is checked against physical plausibility;
-  - inputs are built so that they cannot reach past the forecast time;
-  - every model is evaluated in time order against the strongest simple
-    baseline;
-  - promotion to production is gated;
-  - deployed models are monitored and retrained;
-  - every decision is recorded.
+Five research questions are addressed, each by one experiment:
 
-We call these checks guardrails, in the software-engineering sense of checks
-that a workflow passes through, not in the sense of LLM output filtering. We
-ask five questions, one per experiment:
+1. RQ1: Can one agent-plus-guardrails workflow produce defensible models across the prediction targets that matter in building operation (energy, thermal load, temperature, CO~2~, humidity, particulate matter and occupancy) and across many buildings, and how often does machine learning beat the strongest simple rule?
+2. RQ2: How much does the evaluation protocol of the preliminary study, a random split, change the reported error on real building data?
+3. RQ3: Which data faults do the checks detect on real data, and what does automatic handling gain compared with a quick script given the same fix?
+4. RQ4: Over months of operation, does monitoring with gated retraining outperform a static model, persistence and simple scheduled retraining?
+5. RQ5: Does the framework change what independent LLM agents deliver?
 
-- **RQ1.** Can one agent-plus-guardrails workflow produce defensible models
-  across the targets that matter in buildings (energy, thermal load,
-  temperature, CO2, humidity, particulates, occupancy) and across many
-  buildings? How often does machine learning beat the strongest simple rule?
-- **RQ2.** How much does the evaluation protocol of the 2024 study (a random
-  split) change the reported error on real building data?
-- **RQ3.** Which data faults do the checks detect on real data, and what does
-  automatic handling buy compared with a quick script given the same fix?
-- **RQ4.** Over months of operation, does monitoring with gated retraining
-  beat a static model, persistence, and naive scheduled retraining?
-- **RQ5.** Does the framework change what independent LLM agents deliver?
+The contributions of this paper are as follows:
 
-The contributions are:
-1. **A framework** for building prediction that divides work between an agent
-   and domain guardrails, covering the MLOps lifecycle from data validation to
-   monitoring and retraining. It is mapped to the nine principles of
-   Kreuzberger et al. [2023]. Its building-specific parts are:
-   - physical-quantity declarations with unit inference as the interface
-     between agent and package;
-   - fault semantics of building automation systems (BAS): change-of-value
-     logging, equipment idling, sensor floors;
-   - gates based on the strongest no-ML baseline and ASHRAE Guideline 14.
-2. **An open-source implementation**, `bemlops`, with an Agent Skill that
-   teaches LLM agents the workflow. It handles any numeric or yes/no target.
-3. **An evaluation on three public real-building datasets**: 72 tasks in 11
-   rooms and their building systems, plus a 20-building portfolio, answering
-   RQ1–RQ4.
-4. **A formative pilot with eight independent agent runs**, answering RQ5. It
-   found no accuracy, leakage or fault-finding advantage from the framework for
-   capable agents told to be rigorous, at a higher cost in tokens and time. The
-   framework's measured value therefore lies elsewhere: in default rigour, in
-   comparable and maintainable records, and in the lifecycle. The pilot agents
-   also exposed defects that were then fixed.
+1. A framework for building energy and indoor environment prediction that divides the work between an LLM agent and domain guardrails and covers the MLOps lifecycle from data validation to monitoring and retraining. Its building-specific parts are physical-quantity declarations with unit inference as the interface between agent and package, fault semantics of building automation systems (BAS) such as change-of-value logging, idle equipment and sensor floors, and promotion gates based on the strongest baseline without machine learning and on ASHRAE Guideline 14.
+2. An open-source implementation, bemlops, with an Agent Skill that teaches LLM agents the workflow and handles any numeric or binary target.
+3. An evaluation on three public datasets of real buildings, comprising 72 tasks in 11 rooms and their building systems plus a portfolio of 20 buildings, which answers RQ1–RQ4.
+4. A formative pilot study with eight independent agent runs, which answers RQ5. It found no advantage of the framework in accuracy, leakage or fault finding for capable agents that had been told to be rigorous, at a higher cost in tokens and time. The measured value of the framework therefore lies elsewhere: in rigorous defaults, in comparable and maintainable records, and in the lifecycle after the first model.
 
-All code, configurations, run records and pilot deliverables are public
-(https://github.com/TensorBuildLab/MLOps-building-energy-and-environment-prediction).
+The remainder of the paper is organized as follows. @sec:related reviews related work, @sec:framework describes the framework and its implementation, and @sec:design describes the datasets, tasks and experiments. @sec:results reports the results, @sec:discussion discusses them, and @sec:conclusions answers the research questions. All code, configurations, run records and pilot deliverables are public (see the Data availability statement).

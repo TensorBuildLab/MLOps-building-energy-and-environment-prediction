@@ -1,38 +1,38 @@
-# Where domain guardrails matter for LLM-agent-built prediction models in buildings: an open MLOps framework evaluated on real data
+---
+title: Domain guardrails for agent-built building energy and indoor environment prediction: an MLOps framework evaluated on real buildings
+author: Liang Zhang | 1 | corresponding
+affiliation: 1 | Department of Civil and Architectural Engineering and Mechanics, The University of Arizona, Tucson, AZ 85721, USA
+email: liangzhang1@arizona.edu
+keywords: building energy prediction; machine learning operations; large language model agents; indoor environmental quality; sensor data quality; time-series validation
+bibliography: ../refs.ris
+endnote-style: Numbered
+---
 
-*Draft manuscript, version 2 of the work first reported in arXiv:2407.03469. Author list and affiliations to be confirmed by the authors.*
+# Highlights {-}
 
-**Keywords:** building energy; indoor environmental quality; occupancy; machine learning operations (MLOps); large language model agents; data quality; time-series evaluation
+- Language-model agents read messy building data; a domain package applies checks
+- Across 92 real-building tasks, models beat the best simple rule in about half
+- Random splits understated prediction error by a median of 27% on the same data
+- Scheduled retraining outperformed drift-triggered retraining over eight months
+- Agents told to be rigorous built similar models with or without the framework
 
-## Highlights
+# Abstract {-}
 
-- An LLM agent reads messy building data; a domain package applies fixed checks.
-- On 92 real-building tasks, ML beat the strongest simple rule in about half.
-- A random split understated prediction error by a median 27% on the same rows.
-- Monitoring beat a static model, but scheduled retraining did better still.
-- In a small pilot, agents told to be rigorous did as well without the framework.
+Large language model (LLM) agents can now write code for building energy and indoor environment prediction models, but their reliability in operation depends on what surrounds that code. This paper presents bemlops, an open-source framework in which an agent supplies building-specific judgment (reading exports, decoding point names, declaring quantities and units) while a domain package applies the same checks to every model: physical plausibility, causal cleaning, inputs that cannot reach past the forecast time, time-ordered evaluation against the strongest no-machine-learning baseline, promotion gates, monitoring and retraining. The framework was evaluated on 92 energy, indoor-environment and occupancy prediction tasks in three public datasets of real buildings, and in a pilot with eight independent agent runs. Ordinary models beat the strongest simple rule significantly in 52% of the tasks, and 45% failed the promotion gates. A random split, the protocol of the authors' earlier study, understated the prediction error by a median of 27%. With faults planted in one CO~2~ task, the framework reproduced the clean-data accuracy, whereas a quick script was 9% worse in mean absolute error but not in root mean square error. Over eight months, gated retraining reduced the error of a static model by 10–33%, but monthly retraining performed better, and for district heating the gated model only matched persistence. Agents told to be rigorous built models of similar accuracy with or without the framework. The value of the guardrails lies in making rigorous evaluation the default, in comparable records and in supporting the model lifecycle.
 
-## Abstract
+# Nomenclature {-}
 
-Large language model (LLM) agents can now write code for building
-prediction models; their reliability depends on what surrounds that code. We
-present bemlops, an open-source framework in which an agent supplies
-building-specific judgment (reading exports, decoding point names, declaring
-quantities and units) and a domain package applies the same checks every
-time: physical plausibility, causal cleaning, inputs that cannot reach past
-the forecast time, time-ordered evaluation against the strongest no-ML
-baseline, promotion gates, monitoring and retraining. We evaluated it on 92
-energy, indoor-environment and occupancy tasks in three public real-building
-datasets, and in a pilot with eight separate agent runs. Ordinary models
-beat the strongest simple rule significantly in 52% of tasks, and 45% failed
-the promotion gates. A random split, the protocol of our 2024 study,
-understated error by a median of 27% on the same rows. With faults planted in
-one CO2 task, the framework reproduced clean-data accuracy, whereas a quick
-script was 9% worse in mean absolute error, though not in RMSE. Over eight
-months, monitoring with gated retraining cut error by 10–33% against a static
-model, but monthly retraining did better and persistence matched it for
-district heating. In the pilot, agents told to be rigorous built leak-free
-models of similar accuracy with or without the framework, at higher cost with
-it, and found a dead meter our own agent had missed. The framework's value
-lies in making rigorous evaluation the default, in comparable records and in
-the lifecycle, not in out-modeling a capable agent.
+| | | | |
+|---|---|---|---|
+| *Symbols* | | | |
+| $e_t$ | prediction error at time $t$ | $h$ | forecast horizon (time steps) |
+| $n$ | number of test observations | $q_{0.9}$ | 90th percentile of absolute validation errors |
+| $S$ | skill against the reference baseline (–) | $y_t$, $\hat{y}_t$ | measured and predicted value |
+| $\bar{y}$ | mean of the measured values | $d_t$ | loss differential (model minus baseline) |
+| *Abbreviations* | | | |
+| AHU | air-handling unit | BAS | building automation system |
+| BDG2 | Building Data Genome Project 2 | CV(RMSE) | coefficient of variation of the RMSE |
+| DM | Diebold–Mariano test | IQR | interquartile range |
+| LLM | large language model | MAE | mean absolute error |
+| MLOps | machine learning operations | NMBE | normalized mean bias error |
+| PM2.5 | particulate matter below 2.5 µm | RMSE | root mean square error |

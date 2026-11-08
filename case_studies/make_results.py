@@ -22,7 +22,7 @@ TABLES, FIGS = PAPER / "tables", PAPER / "figures"
 # Reference categorical palette (first three slots validate for all pairs under colour-vision deficiency).
 COLORS = {"ROBOD": "#2a78d6", "Aalborg": "#eb6834", "BDG2": "#1baf7a"}
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
-plt.rcParams.update({"font.size": 9, "axes.edgecolor": INK2, "axes.labelcolor": INK, "xtick.color": INK2,
+plt.rcParams.update({"font.family": "Arial", "font.size": 9, "savefig.dpi": 600, "axes.edgecolor": INK2, "axes.labelcolor": INK, "xtick.color": INK2,
                      "ytick.color": INK2, "axes.spines.top": False, "axes.spines.right": False,
                      "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6, "figure.dpi": 150})
 
@@ -182,7 +182,8 @@ def fig_skill(df: pd.DataFrame) -> None:
     ax.grid(axis="y", visible=False)
     ax.legend(loc="lower right", frameon=False)
     fig.tight_layout()
-    fig.savefig(FIGS / "skill_by_target.png", dpi=200)
+    fig.savefig(FIGS / "skill_by_target.png")
+    fig.savefig(FIGS / "skill_by_target.pdf")
     plt.close(fig)
 
 
@@ -239,7 +240,8 @@ def fig_protocol(p: pd.DataFrame) -> None:
     ax.set_ylabel("R² with shuffled cross-validation")
     ax.legend(loc="upper left", frameon=False)
     fig.tight_layout()
-    fig.savefig(FIGS / "protocol_r2.png", dpi=200)
+    fig.savefig(FIGS / "protocol_r2.png")
+    fig.savefig(FIGS / "protocol_r2.pdf")
     plt.close(fig)
 
 
@@ -337,7 +339,8 @@ def lifecycle():
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=4, frameon=False, fontsize=8)
     fig.tight_layout(rect=(0, 0.09, 1, 1))
-    fig.savefig(FIGS / "lifecycle_rmse.png", dpi=200)
+    fig.savefig(FIGS / "lifecycle_rmse.png")
+    fig.savefig(FIGS / "lifecycle_rmse.pdf")
     plt.close(fig)
     t = lc[["task", "month", "production_version", "static_rmse", "naive_rmse", "production_rmse",
             "persistence_rmse", "fallback_rmse", "drift_ratio", "retrain_recommended", "promoted"]].copy()
@@ -380,7 +383,8 @@ def bdg2(df: pd.DataFrame):
     ax.set_ylabel("buildings")
     ax.grid(axis="x", visible=False)
     fig.tight_layout()
-    fig.savefig(FIGS / "bdg2_cvrmse.png", dpi=200)
+    fig.savefig(FIGS / "bdg2_cvrmse.png")
+    fig.savefig(FIGS / "bdg2_cvrmse.pdf")
     plt.close(fig)
     t = pd.DataFrame([{
         "Buildings": len(d), "Sites": d["site"].nunique(), "Fitted": len(fit),

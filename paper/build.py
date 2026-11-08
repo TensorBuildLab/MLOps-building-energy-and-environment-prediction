@@ -1,36 +1,65 @@
-"""Assemble paper/manuscript.md from the section files, the generated tables and the reference list.
+"""Assemble the manuscript and the supplementary material, then build the Word files.
 
-    python paper/build.py
+    python paper/build.py            # Markdown only: paper/build/paper.md, paper/build/supplementary.md
+    python paper/build.py --docx     # also Word files, with md2docx from the manuscript-template skill
 
-A line `<!-- table: NAME -->` in a section is replaced by paper/tables/NAME.md.
+Sections live in paper/sections/ (main text) and paper/supplementary/ (supplementary material). A line
+`<!-- table: NAME -->` directly under a `Table:` caption is replaced by paper/tables/NAME.md, so every
+number in a table comes from the generated results.
 """
 
 from __future__ import annotations
 
+import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ORDER = ["00_front", "01_introduction", "02_related_work", "03_framework", "04_implementation",
-         "05_case_studies", "06a_protocol", "06b_targets", "06c_faults", "06d_lifecycle", "06e_pilot",
-         "07_discussion", "08_conclusion", "references", "09_appendix"]
+OUT = HERE / "build"
+MD2DOCX = Path(os.environ.get("MD2DOCX", Path.home() / ".claude/skills/manuscript-template/scripts/md2docx.py"))
+
+
+def expand_tables(text: str) -> str:
+    def table(m):
+        f = HERE / "tables" / f"{m.group(1)}.md"
+        if not f.exists():
+            raise SystemExit(f"missing generated table: {f}")
+        return f.read_text(encoding="utf-8").strip()
+    return re.sub(r"<!-- table: (\w+) -->", table, text)
+
+
+def assemble(folder: Path, name: str) -> Path:
+    parts = [expand_tables(f.read_text(encoding="utf-8")).strip() for f in sorted(folder.glob("*.md"))]
+    OUT.mkdir(exist_ok=True)
+    out = OUT / name
+    out.write_text("\n\n".join(parts) + "\n", encoding="utf-8")
+    body = re.sub(r"^---.*?---", "", out.read_text(encoding="utf-8"), flags=re.S)
+    body = body.split("# References {-}")[0]
+    words = len(re.sub(r"^\|.*\|$", "", body, flags=re.M).split())
+    print(f"Wrote {out.relative_to(HERE.parent)} ({words} words outside tables, before the references)")
+    return out
+
+
+def docx(md: Path) -> None:
+    target = md.with_suffix(".docx")
+    r = subprocess.run([sys.executable, str(MD2DOCX), str(md), "-o", str(target)], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    print(r.stdout.strip())
+    if r.stderr.strip():
+        print(r.stderr.strip())
+    if r.returncode:
+        raise SystemExit(f"md2docx failed for {md.name}")
 
 
 def main() -> None:
-    parts = []
-    for name in ORDER:
-        f = HERE / "references.md" if name == "references" else HERE / "sections" / f"{name}.md"
-        if f.exists():
-            text = f.read_text(encoding="utf-8")
-            text = re.sub(r"<!-- table: (\w+) -->",
-                          lambda m: (HERE / "tables" / f"{m.group(1)}.md").read_text(encoding="utf-8")
-                          if (HERE / "tables" / f"{m.group(1)}.md").exists() else f"*[table {m.group(1)} missing]*",
-                          text)
-            parts.append(text.strip())
-    out = "\n\n".join(parts) + "\n"
-    (HERE / "manuscript.md").write_text(out, encoding="utf-8")
-    words = len(re.sub(r"\|.*\|", "", out).split())
-    print(f"Wrote paper/manuscript.md ({words} words outside tables)")
+    paper = assemble(HERE / "sections", "paper.md")
+    supp = assemble(HERE / "supplementary", "supplementary.md") if (HERE / "supplementary").exists() else None
+    if "--docx" in sys.argv:
+        docx(paper)
+        if supp:
+            docx(supp)
 
 
 if __name__ == "__main__":
