@@ -8,7 +8,7 @@ The framework was revised in four rounds: a first version was run on the ROBOD a
 |---|---|---|
 | Real data (ROBOD) | Stuck-sensor runs and spikes were counted across gaps in the data (weekends missing) | Runs and spike windows never span a gap |
 | Real data (ROBOD, Aalborg) | Solar, illuminance, PM2.5 and supply-air temperature were flagged for spikes that are real | Spike checks disabled for those quantities |
-| Real data (ROBOD, Aalborg) | No way to state that a sensor's flat stretches are normal (CO2 floor at 400 ppm, change-of-value logging) | *flat_ok* declaration; the stuck warning recognises change-of-value logging from the share of unchanged steps |
+| Real data (ROBOD, Aalborg) | No way to state that a sensor's flat stretches are normal (CO2 floor at 400 ppm, change-of-value logging) | *flat_ok* declaration; the stuck warning recognizes change-of-value logging from the share of unchanged steps |
 | Real data | Day-of-year inputs were added with less than a year of history | Seasonal inputs only with a full year |
 | Code review | Saving a run failed when the training period crossed a daylight-saving change | Fixed; test with Europe/Copenhagen data |
 | Code review | Interval totals (energy) were too small when readings were missing, filling missing targets with zeros | Incomplete intervals become missing |

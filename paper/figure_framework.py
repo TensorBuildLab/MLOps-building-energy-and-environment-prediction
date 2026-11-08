@@ -15,7 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch  # noqa: E402
 
-plt.rcParams.update({"font.family": "Arial"})
+plt.rcParams.update({"font.family": "Arial", "pdf.fonttype": 42})
 
 OUT = Path(__file__).resolve().parent / "figures" / "framework.png"
 INK, INK2 = "#0b0b0b", "#52514e"
@@ -37,7 +37,7 @@ AGENT_TASKS = [
     (4, 4, "Explain;\napproval\nis logged"),
     (5, 6, "Act on alerts:\nfix the sensor\nor retrain"),
 ]
-TITLE, BODY, AGENT_TXT, SMALL = 7, 6, 6.5, 5.5
+TITLE, BODY, AGENT_TXT, SMALL = 8, 7, 7, 7  # >= 7 pt at printed size (Elsevier: no disproportionately small text)
 
 
 def box(ax, x, y, w, h, fc, ec, lw=0.8):
@@ -67,8 +67,8 @@ def main() -> None:
     ax.text(0.08, 2.87, "LLM agent\n(judgment)", ha="left", va="center", fontsize=TITLE, color=AGENT, weight="bold")
     ax.text(0.08, 1.37, "bemlops\n(same checks\nfor every\nmodel)", ha="left", va="center", fontsize=TITLE,
             color=PACKAGE, weight="bold")
-    ax.text(0.08, 2.15, "↓ declarations, decisions", ha="left", va="center", fontsize=SMALL, color=AGENT)
-    ax.text(0.08, 2.03, "↑ issues, results, alerts", ha="left", va="center", fontsize=SMALL, color=INK2)
+    ax.text(0.08, 2.40, "↓ declarations,\n   decisions", ha="left", va="center", fontsize=SMALL, color=AGENT)
+    ax.text(0.08, 1.95, "↑ issues, results,\n   alerts", ha="left", va="center", fontsize=SMALL, color=INK2)
 
     # Package pipeline
     y0, bh = 0.78, 1.20
@@ -98,7 +98,7 @@ def main() -> None:
             "Run record: declarations, notes, accepted issues, data fingerprints, settings, metrics, gates, "
             "code version → report, model card, registry", ha="center", va="center", fontsize=SMALL, color=INK)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT, dpi=600)
+    fig.savefig(OUT, dpi=1100)  # line art: >= 1000 dpi and >= 7480 px at full width
     fig.savefig(OUT.with_suffix(".pdf"))
     plt.close(fig)
     print(f"Wrote {OUT} ({W:.2f} x {H:.2f} in)")

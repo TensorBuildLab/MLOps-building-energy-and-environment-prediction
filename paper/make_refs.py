@@ -38,7 +38,35 @@ J2 = {
     "Proceedings of the VLDB Endowment": "Proc VLDB Endow",
     "IEEE Data Engineering Bulletin": "IEEE Data Eng Bull",
     "Journal of Machine Learning Research": "J Mach Learn Res",
+    "Applied Energy": "Appl Energy",
+    "HVAC&R Research": "HVAC&R Res",
+    "IEEE Transactions on Smart Grid": "IEEE Trans Smart Grid",
+    "IEEE Open Access Journal of Power and Energy": "IEEE Open Access J Power Energy",
+    "Journal of Physics: Conference Series": "J Phys Conf Ser",
+    "Annual Reviews in Control": "Annu Rev Control",
+    "International Journal of Forecasting": "Int J Forecast",
+    "Ecography": "Ecography",
+    "The Review of Economic Studies": "Rev Econ Stud",
+    "Journal of the Royal Statistical Society Series B: Statistical Methodology": "J R Stat Soc Series B Stat Methodol",
+    "Machine Learning": "Mach Learn",
 }
+
+
+def one_journal_style(rec: str) -> str:
+    """Give every journal record the same LTWA abbreviation (no periods), whatever its source.
+
+    Records from Crossref carry the publisher's own short title (sometimes the full name, sometimes with
+    periods); the guide asks for one consistent style. A journal missing from J2 stops the build."""
+    lines = rec.splitlines()
+    if not any(l.startswith("TY  - JOUR") for l in lines):
+        return rec
+    t2 = next((l[6:].strip() for l in lines if l.startswith("T2  - ")), "")
+    if t2 not in J2:
+        raise SystemExit(f"add an LTWA abbreviation for journal {t2!r} to J2 in make_refs.py")
+    lines = [l for l in lines if not l.startswith("J2  - ")]
+    k = next(i for i, l in enumerate(lines) if l.startswith("T2  - "))
+    lines.insert(k + 1, f"J2  - {J2[t2]}")
+    return "\n".join(lines)
 
 
 def fold(s: str) -> str:
@@ -135,7 +163,8 @@ def main() -> None:
     # each checked on its publisher or repository page).
     extra = [(HERE / f).read_text(encoding="utf-8").strip() for f in ("refs_extra.ris", "refs_extra_manual.ris")
              if (HERE / f).exists()]
-    (HERE / "refs.ris").write_text("\n\n".join(out + extra) + "\n", encoding="utf-8")
+    recs = [r.strip() for block in out + extra for r in block.split("\n\n") if r.strip()]
+    (HERE / "refs.ris").write_text("\n\n".join(one_journal_style(r) for r in recs) + "\n", encoding="utf-8")
     print(f"Wrote paper/refs.ris: {len(out)} references from references.md + {len(extra)} extra file(s)")
 
 

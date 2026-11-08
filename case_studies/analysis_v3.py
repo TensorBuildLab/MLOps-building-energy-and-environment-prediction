@@ -186,7 +186,7 @@ def table_e1(df: pd.DataFrame) -> pd.DataFrame:
             "Skill, median (IQR)": f"{num(d['skill'].median())} ({num(d['skill'].quantile(.25))} to {num(d['skill'].quantile(.75))})",
             "Baseline kept": int(kept.sum()),
             "Better than baseline (DM), % (95% CI)": fmt_ci(cluster_ci(d["better"], d["cluster"])),
-            "ML model refused by gates": f"{int((~kept & ~d['gates_passed']).sum())}/{int((~kept).sum())}",
+            "Machine-learning model refused by gates": f"{int((~kept & ~d['gates_passed']).sum())}/{int((~kept).sum())}",
         })
         key(f"e1_{name}_tasks", len(d))
         key(f"e1_{name}_better_dm_pct", round(100 * d["better"].mean(), 1), "%", "dm_tests")
@@ -267,7 +267,7 @@ def fig_skill(df: pd.DataFrame) -> None:
                                      .replace("CO2", "CO$_2$") for c in cats])
     ax.invert_yaxis()
     ax.set_xlim(-0.55, 1.0)
-    ax.set_xlabel("Test skill vs strongest no-ML baseline (filled: DM p < 0.05; triangles: below −0.5)")
+    ax.set_xlabel("Test skill against the strongest baseline without machine learning")
     ax.grid(axis="y", visible=False)
     ax.legend(loc="lower right", frameon=False, fontsize=8)
     fig.tight_layout()
@@ -379,7 +379,7 @@ def protocol_tables():
     lo = min(0.0, float(np.nanmin(p[["r2_blocked_cv", "r2_shuffled_cv"]].to_numpy())))
     ax.plot([lo, 1], [lo, 1], color=INK2, lw=1, ls="--")
     ax.set_xlabel("R² with blocked cross-validation"); ax.set_ylabel("R² with shuffled cross-validation")
-    ax.legend(loc="upper left", frameon=False, fontsize=8)
+    ax.legend(loc="lower right", frameon=False, fontsize=8)  # every point lies above the diagonal
     fig.tight_layout()
     for ext in ("png", "pdf"):
         fig.savefig(FIGS / f"protocol_r2.{ext}")
@@ -405,7 +405,7 @@ def mv_tables():
         for arm, label in (("towt", "TOWT regression"), ("fw", "Framework (estimation mode)")):
             nase = d[f"{arm}_nase"].abs()
             rows.append({"Buildings": f"{name} ({len(d)})", "Baseline model": label,
-                         "|Pseudo-savings error|, median (IQR)": f"{100 * nase.median():.1f}% ({100 * nase.quantile(.25):.1f}–{100 * nase.quantile(.75):.1f}%)",
+                         "Absolute pseudo-savings error, median (IQR)": f"{100 * nase.median():.1f}% ({100 * nase.quantile(.25):.1f}–{100 * nase.quantile(.75):.1f}%)",
                          "Within ±5%": f"{int((nase <= 0.05).sum())}/{len(d)}",
                          "CV(RMSE) 2017, median": f"{d[f'{arm}_cvrmse'].median():.1f}%",
                          "Meets 30%/±10% in 2017": f"{int(((d[f'{arm}_cvrmse'] <= 30) & (d[f'{arm}_nmbe'].abs() <= 10)).sum())}/{len(d)}"})
@@ -447,11 +447,10 @@ def mv_tables():
         key(f"mv_{est}_ratio_median", round(float(ratio.median()), 3))
         key(f"mv_{est}_false_pass", int((says_ok & ~real_ok).sum()))
     write("v3_mv_protocol", pd.DataFrame(rows))
-    # figure
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.1))
-    ax = axes[0]
+    # figures: one graph per file (Elsevier artwork rule), savings error and estimated vs realized error
+    fig, ax = plt.subplots(figsize=(5.6, 2.6))
     data = [100 * m["towt_nase"], 100 * m["fw_nase"]]
-    ax.boxplot(data, vert=False, widths=0.5, showfliers=False, medianprops={"color": INK})
+    ax.boxplot(data, orientation="horizontal", widths=0.5, showfliers=False, medianprops={"color": INK})
     nr = m["nonroutine_flag"].astype(bool).to_numpy()
     for i, (d, c) in enumerate(zip(data, (INK2, COLORS["BDG2"])), start=1):
         y = i + RNG.uniform(-0.18, 0.18, len(d))
@@ -459,22 +458,26 @@ def mv_tables():
         ax.scatter(x[~nr], y[~nr], s=6, color=c, alpha=0.6, zorder=3)
         ax.scatter(x[nr], y[nr], s=9, facecolor="white", edgecolor=c, linewidth=0.7, zorder=3,
                    label="flagged non-routine change" if i == 2 else None)
-    ax.legend(frameon=False, fontsize=7, loc="upper left")
+    ax.legend(frameon=False, fontsize=8, loc="lower left", bbox_to_anchor=(0, 1.0), borderaxespad=0.2)
     ax.axvline(0, color=INK2, lw=0.8)
     ax.set_yticks([1, 2], ["TOWT", "Framework"]); ax.set_xlim(-40, 40)
     ax.set_xlabel("2017 pseudo-savings error, % (values clipped at ±40)")
-    ax.set_title("(a) Annual savings error, no measure installed", fontsize=8, loc="left")
-    ax = axes[1]
-    for est, label, c in (("towt_shuffled", "shuffled CV", COLORS["Aalborg"]), ("towt_blocked", "blocked CV", COLORS["ROBOD"]),
-                          ("towt_timeordered", "time-ordered", COLORS["BDG2"])):
-        ax.scatter(real.clip(upper=100), m[f"{est}_cvrmse"].clip(upper=100), s=6, color=c, alpha=0.7, label=label)
-    ax.plot([0, 100], [0, 100], color=INK2, lw=0.8, ls="--")
-    ax.set_xlabel("Realized 2017 CV(RMSE), %"); ax.set_ylabel("Estimated from 2016, %")
-    ax.set_title("(b) Error estimated from the baseline year", fontsize=8, loc="left")
-    ax.legend(frameon=False, fontsize=7, loc="upper left")
     fig.tight_layout()
     for ext in ("png", "pdf"):
-        fig.savefig(FIGS / f"mv.{ext}")
+        fig.savefig(FIGS / f"mv_savings.{ext}")
+    plt.close(fig)
+    fig, ax = plt.subplots(figsize=(4.6, 4.2))
+    for est, label, c in (("towt_shuffled", "shuffled cross-validation", COLORS["Aalborg"]),
+                          ("towt_blocked", "blocked cross-validation", COLORS["ROBOD"]),
+                          ("towt_timeordered", "time-ordered split", COLORS["BDG2"])):
+        ax.scatter(real.clip(upper=100), m[f"{est}_cvrmse"].clip(upper=100), s=6, color=c, alpha=0.7, label=label)
+    ax.plot([0, 100], [0, 100], color=INK2, lw=0.8, ls="--")
+    ax.set_xlabel("Realized 2017 CV(RMSE), %"); ax.set_ylabel("CV(RMSE) estimated from 2016, %")
+    ax.set_ylim(-3, 132); ax.set_yticks(range(0, 101, 20))  # headroom above the clipped values for the legend
+    ax.legend(frameon=False, fontsize=8, loc="upper left", title="Estimate from", title_fontsize=8, alignment="left")
+    fig.tight_layout()
+    for ext in ("png", "pdf"):
+        fig.savefig(FIGS / f"mv_estimate.{ext}")
     plt.close(fig)
 
 
@@ -762,7 +765,8 @@ def fault_tables(tests: pd.DataFrame, df: pd.DataFrame):
 
 # ----- main --------------------------------------------------------------------------------------
 def main() -> None:
-    plt.rcParams.update({"font.family": "Arial", "font.size": 9, "savefig.dpi": 600})
+    # 1100 dpi keeps full-width charts above the 7480 px Elsevier asks for bitmap line art; TrueType fonts in PDFs
+    plt.rcParams.update({"font.family": "Arial", "font.size": 9, "savefig.dpi": 1100, "pdf.fonttype": 42})
     TABLES.mkdir(exist_ok=True); FIGS.mkdir(exist_ok=True); R3.mkdir(exist_ok=True)
     df = load_tasks()
     tests = per_task_tests(df)

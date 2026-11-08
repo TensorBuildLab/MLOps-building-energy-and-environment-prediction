@@ -24,4 +24,71 @@ PY  - 2026
 TI  - RMV2.0: an open-source tool for M&V 2.0 baseline modeling and savings estimation
 UR  - https://github.com/LBNL-ETA/RMV2.0
 Y2  - 7 November 2026
-ER  - 
+ER  -
+
+TY  - DATA
+ID  - bdg2data2020
+AU  - Miller, Clayton
+AU  - Kathirgamanathan, Anjukan
+AU  - Picchetti, Bianca
+AU  - Arjunan, Pandarasamy
+AU  - Park, June Young
+AU  - Nagy, Zoltan
+AU  - Raftery, Paul
+AU  - Hobson, Brodie W.
+AU  - Shi, Zixiao
+AU  - Meggers, Forrest
+PY  - 2020
+TI  - buds-lab/building-data-genome-project-2 [dataset]
+PB  - Zenodo
+C2  - 1.0
+DO  - 10.5281/zenodo.3887306
+UR  - https://doi.org/10.5281/zenodo.3887306
+ER  -
+
+TY  - DATA
+ID  - robod2022data
+AU  - Tekler, Zeynep Duygu
+AU  - Ono, Eikichi
+AU  - Peng, Yuzhen
+AU  - Zhan, Sicheng
+AU  - Lasternas, Bertrand
+AU  - Chong, Adrian
+PY  - 2022
+TI  - ROBOD, Room-level Occupancy and Building Operation Dataset [dataset]
+PB  - figshare
+DO  - 10.6084/m9.figshare.19234530
+UR  - https://doi.org/10.6084/m9.figshare.19234530
+ER  -
+
+TY  - DATA
+ID  - aalborg2024data
+AU  - Melgaard, Simon Pommerencke
+AU  - Johra, Hicham
+AU  - Nyborg, Victor Ørsøe
+AU  - Marszal-Pomianowska, Anna
+AU  - Jensen, Rasmus Lund
+AU  - Kantas, Christos
+AU  - Larsen, Olena Kalyanova
+AU  - Hu, Yue
+AU  - Frandsen, Kirstine Meyer
+AU  - Larsen, Tine Steen
+AU  - Svidt, Kjeld
+AU  - Andersen, Kamilla Heimar
+AU  - Leiria, Daniel
+AU  - Schaffer, Markus
+AU  - Frandsen, Martin
+AU  - Veit, Martin
+AU  - Ussing, Lene Faber
+AU  - Lindhard, Søren Munch
+AU  - Pomianowski, Michael Zbigniew
+AU  - Rohde, Lasse
+AU  - Hansen, Anders Rhiger
+AU  - Heiselberg, Per Kvols
+PY  - 2024
+TI  - A Danish high-resolution dataset for six office rooms with occupancy, indoor environment, heating, ventilation, lighting and room control monitoring [dataset]
+PB  - Zenodo
+C2  - 3
+DO  - 10.5281/zenodo.10673763
+UR  - https://doi.org/10.5281/zenodo.10673763
+ER  -

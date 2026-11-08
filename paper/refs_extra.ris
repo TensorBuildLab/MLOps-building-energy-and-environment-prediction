@@ -252,4 +252,50 @@ SP  - 913
 EP  - 929
 DO  - 10.1111/ecog.02881
 UR  - https://doi.org/10.1111/ecog.02881
+ER  -
+
+TY  - JOUR
+ID  - newey1994automatic
+AU  - Newey, W. K.
+AU  - West, K. D.
+TI  - Automatic Lag Selection in Covariance Matrix Estimation
+T2  - The Review of Economic Studies
+J2  - The Review of Economic Studies
+PY  - 1994
+VL  - 61
+IS  - 4
+SP  - 631
+EP  - 653
+DO  - 10.2307/2297912
+UR  - https://doi.org/10.2307/2297912
 ER  - 
+
+TY  - JOUR
+ID  - benjamini1995controlling
+AU  - Benjamini, Yoav
+AU  - Hochberg, Yosef
+TI  - Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing
+T2  - Journal of the Royal Statistical Society Series B: Statistical Methodology
+PY  - 1995
+VL  - 57
+IS  - 1
+SP  - 289
+EP  - 300
+DO  - 10.1111/j.2517-6161.1995.tb02031.x
+UR  - https://doi.org/10.1111/j.2517-6161.1995.tb02031.x
+ER  - 
+
+TY  - JOUR
+ID  - breiman2001random
+AU  - Breiman, Leo
+TI  - Random Forests
+T2  - Machine Learning
+J2  - Machine Learning
+PY  - 2001
+VL  - 45
+IS  - 1
+SP  - 5
+EP  - 32
+DO  - 10.1023/a:1010933404324
+UR  - https://doi.org/10.1023/a:1010933404324
+ER  -

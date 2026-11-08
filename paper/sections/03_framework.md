@@ -30,13 +30,13 @@ Accuracy is reported as skill against the reference, based on the root mean squa
 
 $$ S = 1 - \frac{\mathrm{RMSE}_{\mathrm{model}}}{\mathrm{RMSE}_{\mathrm{ref}}} $$ {#eq:skill}
 
-where RMSE is replaced by the Brier score [@brier1950] for binary targets. A skill of 0.05 on RMSE corresponds to a mean-square-error skill of about 0.10. For energy-like targets, the coefficient of variation of the RMSE, CV(RMSE), and the normalized mean bias error (NMBE) are computed on the test predictions aggregated to hours (hourly totals for energy and hourly means for power), for the model and for its reference baseline, and compared with the hourly limits of ASHRAE Guideline 14-2014 [@ashrae2014], 30% and ±10% (a 2023 edition has since been published). These limits are the guideline's hourly calibration criteria; they are used here as a familiar threshold, with $n-1$ in the denominators corresponding to $p = 1$ in the guideline's $n-p$:
+where RMSE is replaced by the Brier score [@brier1950] for binary targets. A skill of 0.05 on RMSE corresponds to a mean-square-error skill of about 0.10. For energy-like targets, CV(RMSE) and NMBE are computed on the test predictions aggregated to hours (hourly totals for energy and hourly means for power), for the model and for its reference baseline, and compared with the hourly limits of ASHRAE Guideline 14-2014 [@ashrae2014], 30% and ±10% (a 2023 edition has since been published). These limits are the guideline's hourly calibration criteria; they are used here as a familiar threshold, with $n-1$ in the denominators corresponding to $p = 1$ in the guideline's $n-p$:
 
 $$ \mathrm{CV(RMSE)} = \frac{100}{|\bar{y}|} \sqrt{\frac{\sum_{t=1}^{n} e_t^2}{n-1}} \le 30\% $$ {#eq:cvrmse}
 
 $$ \left|\mathrm{NMBE}\right| = \frac{100}{|\bar{y}|} \left| \frac{\sum_{t=1}^{n} e_t}{n-1} \right| \le 10\% $$ {#eq:nmbe}
 
-where $e_t = y_t - \hat{y}_t$. Each run also reports a rolling-origin backtest over three blocks after training, refitting before each block; because it overlaps the validation period, it checks stability rather than testing independently. A 90% prediction interval $\hat{y}_t \pm q_{0.9}$ uses the 90th percentile of the absolute validation errors, in the manner of split conformal prediction; because its width is calibrated once, it does not adapt to changes in operation [@gibbs2021adaptive]. Grouped permutation importance shows which inputs the model relies on.
+where $e_t = y_t - \hat{y}_t$. Each run also reports a rolling-origin backtest over three blocks after training, refitting before each block; because it overlaps the validation period, it checks stability rather than testing independently. A 90% prediction interval $\hat{y}_t \pm q_{0.9}$ uses the 90th percentile of the absolute validation errors, in the manner of split conformal prediction; because its width is calibrated once, it does not adapt to changes in operation [@gibbs2021adaptive]. Grouped permutation importance [@breiman2001random] shows which inputs the model relies on.
 
 ## Promotion gates, monitoring and retraining {#sec:gates}
 
@@ -62,6 +62,6 @@ Table: MLOps principles [@kreuzberger2023] and their implementation in the frame
 
 ## Implementation and agent instructions
 
-bemlops is a Python package (BSD 3-Clause licence) built on pandas and scikit-learn (modules in Supplementary Table S4). A typical session declares the columns, checks and prepares the data, fits the run and registers the model in about a dozen lines of code. The evaluated version has 51 automated tests, including one that perturbs every value after the forecast time and checks that no input changes. Every run record carries the git commit of the case-study code and a fingerprint of the package source.
+bemlops is a Python package (BSD 3-Clause license) built on pandas and scikit-learn (modules in Supplementary Table S4). A typical session declares the columns, checks and prepares the data, fits the run and registers the model in about a dozen lines of code. The evaluated version has 51 automated tests, including one that perturbs every value after the forecast time and checks that no input changes. Every run record carries the git commit of the case-study code and a fingerprint of the package source.
 
 The agent learns the workflow from an Agent Skill [@zhang2025a], a short instruction file loaded on demand, with the workflow steps, seven rules (for example, never split building time series at random, and never change a declaration to silence a check), a playbook for messy data and a reference for decoding BAS point names. It succeeds the prompt template of the preliminary study: instead of prescribing code, it prescribes conduct.

@@ -11,7 +11,7 @@ IS  - Part 1
 SP  - 1192
 EP  - 1205
 DO  - 10.1016/j.rser.2017.04.095
-ER  - 
+ER  -
 
 TY  - STAND
 ID  - ashrae2014
@@ -19,7 +19,7 @@ AU  - ASHRAE
 PY  - 2014
 TI  - ASHRAE Guideline 14-2014: Measurement of Energy, Demand, and Water Savings
 T2  - ASHRAE, Atlanta, GA
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - balaji2016
@@ -45,7 +45,7 @@ T2  - Proceedings of the 3rd ACM International Conference on Systems for Energy-
 SP  - 41
 EP  - 50
 DO  - 10.1145/2993422.2993577
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - bantilan2020
@@ -56,7 +56,7 @@ T2  - Proceedings of the 19th Python in Science Conference (SciPy 2020)
 SP  - 116
 EP  - 124
 DO  - 10.25080/Majora-342d178e-010
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - bergmeir2012
@@ -70,7 +70,7 @@ VL  - 191
 SP  - 192
 EP  - 213
 DO  - 10.1016/j.ins.2011.12.028
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - bergmeir2018
@@ -85,7 +85,7 @@ VL  - 120
 SP  - 70
 EP  - 83
 DO  - 10.1016/j.csda.2017.11.003
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - breck2017
@@ -100,7 +100,7 @@ T2  - 2017 IEEE International Conference on Big Data
 SP  - 1123
 EP  - 1132
 DO  - 10.1109/BigData.2017.8258038
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - breck2019
@@ -114,7 +114,7 @@ TI  - Data validation for machine learning
 T2  - Proceedings of Machine Learning and Systems 1 (SysML 2019)
 SP  - 334
 EP  - 347
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - brier1950
@@ -128,7 +128,7 @@ IS  - 1
 SP  - 1
 EP  - 3
 DO  - 10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - candanedo2016
@@ -142,7 +142,7 @@ VL  - 112
 SP  - 28
 EP  - 39
 DO  - 10.1016/j.enbuild.2015.11.071
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - chan2025
@@ -163,7 +163,7 @@ TI  - MLE-bench: Evaluating machine learning agents on machine learning engineer
 T2  - International Conference on Learning Representations (ICLR 2025)
 SP  - 50466
 EP  - 50494
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - diebold1995
@@ -178,7 +178,7 @@ IS  - 3
 SP  - 253
 EP  - 263
 DO  - 10.1080/07350015.1995.10524599
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - emami2023
@@ -191,7 +191,7 @@ T2  - Advances in Neural Information Processing Systems 36, Datasets and Benchma
 SP  - 19823
 EP  - 19857
 DO  - 10.52202/075280-0871
-ER  - 
+ER  -
 
 TY  - COMP
 ID  - evidently2026
@@ -200,7 +200,7 @@ PY  - 2026
 TI  - Evidently: open-source ML and LLM evaluation and observability framework (software, Apache-2.0)
 UR  - https://github.com/evidentlyai/evidently
 Y2  - 29 October 2026
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - fan2021
@@ -216,7 +216,7 @@ J2  - Front Energy Res
 VL  - 9
 SP  - 652801
 DO  - 10.3389/fenrg.2021.652801
-ER  - 
+ER  -
 
 TY  - COMP
 ID  - gong2026
@@ -227,7 +227,7 @@ TI  - Great Expectations (software)
 T2  - Zenodo
 DO  - 10.5281/zenodo.5683574
 Y2  - 29 October 2026
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - guo2024
@@ -242,7 +242,7 @@ TI  - DS-Agent: Automated data science by empowering large language models with 
 T2  - Proceedings of the 41st International Conference on Machine Learning (ICML 2024), PMLR 235
 SP  - 16813
 EP  - 16848
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - herzen2022
@@ -265,7 +265,7 @@ IS  - 124
 SP  - 1
 EP  - 6
 UR  - https://jmlr.org/papers/v23/21-1177.html
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - huang2024
@@ -278,7 +278,7 @@ TI  - MLAgentBench: Evaluating language agents on machine learning experimentati
 T2  - Proceedings of the 41st International Conference on Machine Learning (ICML 2024), PMLR 235
 SP  - 20271
 EP  - 20309
-ER  - 
+ER  -
 
 TY  - RPRT
 ID  - iea2023
@@ -287,7 +287,7 @@ PY  - 2023
 TI  - Tracking Clean Energy Progress 2023
 T2  - International Energy Agency, Paris
 UR  - https://www.iea.org/reports/tracking-clean-energy-progress-2023
-ER  - 
+ER  -
 
 TY  - GEN
 ID  - jiang2026
@@ -298,7 +298,7 @@ PY  - 2026
 TI  - OptAgent: an Agentic AI framework for Intelligent Building Operations
 T2  - arXiv preprint arXiv:2601.20005
 DO  - 10.48550/arXiv.2601.20005
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - kallio2021
@@ -315,7 +315,7 @@ J2  - Build Environ
 VL  - 187
 SP  - 107409
 DO  - 10.1016/j.buildenv.2020.107409
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - kapoor2023
@@ -329,17 +329,17 @@ VL  - 4
 IS  - 9
 SP  - 100804
 DO  - 10.1016/j.patter.2023.100804
-ER  - 
+ER  -
 
-TY  - GEN
+TY  - CPAPER
 ID  - khadka2024
 AU  - Khadka, S.
 AU  - Zhang, L.
 PY  - 2024
 TI  - Scaling data-driven building energy modelling using large language models
-T2  - arXiv preprint arXiv:2407.03469
-DO  - 10.48550/arXiv.2407.03469
-ER  - 
+T2  - 2024 ASHRAE Annual Conference, Indianapolis, IN, paper IN-24-C-009
+DO  - 10.63044/s24kha09
+ER  -
 
 TY  - JOUR
 ID  - kim2018
@@ -354,7 +354,7 @@ IS  - 1
 SP  - 3
 EP  - 21
 DO  - 10.1080/23744731.2017.1318008
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - kreuzberger2023
@@ -369,7 +369,7 @@ VL  - 11
 SP  - 31866
 EP  - 31879
 DO  - 10.1109/ACCESS.2023.3262138
-ER  - 
+ER  -
 
 TY  - COMP
 ID  - kuprieiev2026
@@ -379,7 +379,7 @@ TI  - DVC: Data Version Control (software)
 T2  - Zenodo
 DO  - 10.5281/zenodo.3677553
 Y2  - 29 October 2026
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - luo2022
@@ -397,7 +397,7 @@ J2  - Sci Data
 VL  - 9
 SP  - 156
 DO  - 10.1038/s41597-022-01257-x
-ER  - 
+ER  -
 
 TY  - GEN
 ID  - loning2019
@@ -410,8 +410,8 @@ AU  - Király, F.J.
 PY  - 2019
 TI  - sktime: A unified interface for machine learning with time series
 T2  - arXiv preprint arXiv:1909.07872
-UR  - https://arxiv.org/abs/1909.07872
-ER  - 
+DO  - 10.48550/arXiv.1909.07872
+ER  -
 
 TY  - JOUR
 ID  - maddalena2020
@@ -425,7 +425,7 @@ J2  - Control Eng Pract
 VL  - 95
 SP  - 104211
 DO  - 10.1016/j.conengprac.2019.104211
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - melgaard2024
@@ -458,7 +458,7 @@ J2  - Data Brief
 VL  - 54
 SP  - 110326
 DO  - 10.1016/j.dib.2024.110326
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - miller2020
@@ -479,7 +479,7 @@ J2  - Sci Data
 VL  - 7
 SP  - 368
 DO  - 10.1038/s41597-020-00712-x
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - mitchell2019
@@ -498,7 +498,7 @@ T2  - Proceedings of the Conference on Fairness, Accountability, and Transparenc
 SP  - 220
 EP  - 229
 DO  - 10.1145/3287560.3287596
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - schelter2018
@@ -517,7 +517,7 @@ IS  - 12
 SP  - 1781
 EP  - 1794
 DO  - 10.14778/3229863.3229867
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - sculley2015
@@ -536,7 +536,7 @@ TI  - Hidden technical debt in machine learning systems
 T2  - Advances in Neural Information Processing Systems 28 (NIPS 2015)
 SP  - 2503
 EP  - 2511
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - shchur2023
@@ -550,7 +550,7 @@ AU  - Wang, B.
 PY  - 2023
 TI  - AutoGluon–TimeSeries: AutoML for probabilistic time series forecasting
 T2  - Proceedings of the Second International Conference on Automated Machine Learning (AutoML 2023), PMLR 224, 9/1–21
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - tekler2022
@@ -569,7 +569,7 @@ IS  - 12
 SP  - 2127
 EP  - 2137
 DO  - 10.1007/s12273-022-0925-9
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - xiao2024
@@ -582,7 +582,7 @@ J2  - Energy Build
 VL  - 322
 SP  - 114691
 DO  - 10.1016/j.enbuild.2024.114691
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - zaharia2018
@@ -607,7 +607,7 @@ IS  - 4
 SP  - 39
 EP  - 45
 UR  - http://sites.computer.org/debull/A18dec/p39.pdf
-ER  - 
+ER  -
 
 TY  - ELEC
 ID  - zhang2025a
@@ -619,7 +619,7 @@ TI  - Equipping agents for the real world with Agent Skills
 T2  - Anthropic Engineering Blog
 UR  - https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
 Y2  - 28 October 2026
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - zhang2024a
@@ -636,7 +636,7 @@ IS  - 8
 SP  - 1419
 EP  - 1437
 DO  - 10.1007/s12273-024-1149-y
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - zhang2024b
@@ -652,7 +652,7 @@ IS  - 1
 SP  - 143
 EP  - 169
 DO  - 10.1016/j.enbenv.2023.06.005
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - zhang2023
@@ -667,7 +667,7 @@ J2  - J Build Eng
 VL  - 80
 SP  - 108071
 DO  - 10.1016/j.jobe.2023.108071
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - zhang2025b
@@ -682,7 +682,7 @@ J2  - Energy
 VL  - 318
 SP  - 134824
 DO  - 10.1016/j.energy.2025.134824
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - granderson2016accuracy
@@ -694,14 +694,14 @@ AU  - Jump, David
 AU  - Fernandes, Samuel
 TI  - Accuracy of automated measurement and verification (M&V) techniques for energy savings in commercial buildings
 T2  - Applied Energy
-J2  - Applied Energy
+J2  - Appl Energy
 PY  - 2016
 VL  - 173
 SP  - 296
 EP  - 308
 DO  - 10.1016/j.apenergy.2016.04.049
 UR  - https://doi.org/10.1016/j.apenergy.2016.04.049
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - reddy2000uncertainty
@@ -709,7 +709,7 @@ AU  - Reddy, T. Agami
 AU  - Claridge, David E.
 TI  - Uncertainty of “Measured” Energy Savings from Statistical Baseline Models
 T2  - HVAC&R Research
-J2  - HVAC&R Research
+J2  - HVAC&R Res
 PY  - 2000
 VL  - 6
 IS  - 1
@@ -717,7 +717,7 @@ SP  - 3
 EP  - 20
 DO  - 10.1080/10789669.2000.10391247
 UR  - https://doi.org/10.1080/10789669.2000.10391247
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - mathieu2011quantifying
@@ -727,7 +727,7 @@ AU  - Kiliccote, Sila
 AU  - Piette, Mary Ann
 TI  - Quantifying Changes in Building Electricity Use, With Application to Demand Response
 T2  - IEEE Transactions on Smart Grid
-J2  - IEEE Trans. Smart Grid
+J2  - IEEE Trans Smart Grid
 PY  - 2011
 VL  - 2
 IS  - 3
@@ -735,7 +735,7 @@ SP  - 507
 EP  - 518
 DO  - 10.1109/tsg.2011.2145010
 UR  - https://doi.org/10.1109/tsg.2011.2145010
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - li2023large
@@ -747,13 +747,13 @@ AU  - Deng, Yang
 AU  - Wang, Dan
 TI  - Large-scale comparison and demonstration of continual learning for adaptive data-driven building energy prediction
 T2  - Applied Energy
-J2  - Applied Energy
+J2  - Appl Energy
 PY  - 2023
 VL  - 347
 SP  - 121481
 DO  - 10.1016/j.apenergy.2023.121481
 UR  - https://doi.org/10.1016/j.apenergy.2023.121481
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - derzsi2025performance
@@ -764,14 +764,14 @@ AU  - Klingebiel, J
 AU  - Müller, D
 TI  - Performance-based drift detection for active machine learning model adaption: A comparative analysis across 35 HVAC devices
 T2  - Journal of Physics: Conference Series
-J2  - J. Phys.: Conf. Ser.
+J2  - J Phys Conf Ser
 PY  - 2025
 VL  - 3140
 IS  - 2
 SP  - 022002
 DO  - 10.1088/1742-6596/3140/2/022002
 UR  - https://doi.org/10.1088/1742-6596/3140/2/022002
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - miller2020ashrae
@@ -788,7 +788,7 @@ AU  - Fontanini, Anthony D.
 AU  - Haberl, Jeff
 TI  - The ASHRAE Great Energy Predictor III competition: Overview and results
 T2  - Science and Technology for the Built Environment
-J2  - Science and Technology for the Built Environment
+J2  - Sci Technol Built Environ
 PY  - 2020
 VL  - 26
 IS  - 10
@@ -796,7 +796,7 @@ SP  - 1427
 EP  - 1447
 DO  - 10.1080/23744731.2020.1795514
 UR  - https://doi.org/10.1080/23744731.2020.1795514
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - granderson2023labeled
@@ -818,7 +818,7 @@ IS  - 1
 SP  - 342
 DO  - 10.1038/s41597-023-02197-w
 UR  - https://doi.org/10.1038/s41597-023-02197-w
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - drgona2020all
@@ -835,14 +835,14 @@ AU  - Vrabie, Draguna L.
 AU  - Helsen, Lieve
 TI  - All you need to know about model predictive control for buildings
 T2  - Annual Reviews in Control
-J2  - Annual Reviews in Control
+J2  - Annu Rev Control
 PY  - 2020
 VL  - 50
 SP  - 190
 EP  - 232
 DO  - 10.1016/j.arcontrol.2020.09.001
 UR  - https://doi.org/10.1016/j.arcontrol.2020.09.001
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - harvey1997testing
@@ -851,7 +851,7 @@ AU  - Leybourne, Stephen
 AU  - Newbold, Paul
 TI  - Testing the equality of prediction mean squared errors
 T2  - International Journal of Forecasting
-J2  - International Journal of Forecasting
+J2  - Int J Forecast
 PY  - 1997
 VL  - 13
 IS  - 2
@@ -859,14 +859,14 @@ SP  - 281
 EP  - 291
 DO  - 10.1016/s0169-2070(96)00719-4
 UR  - https://doi.org/10.1016/s0169-2070(96)00719-4
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - tashman2000out
 AU  - Tashman, Leonard J.
 TI  - Out-of-sample tests of forecasting accuracy: an analysis and review
 T2  - International Journal of Forecasting
-J2  - International Journal of Forecasting
+J2  - Int J Forecast
 PY  - 2000
 VL  - 16
 IS  - 4
@@ -874,7 +874,7 @@ SP  - 437
 EP  - 450
 DO  - 10.1016/s0169-2070(00)00065-0
 UR  - https://doi.org/10.1016/s0169-2070(00)00065-0
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - hong2020energy
@@ -886,14 +886,14 @@ AU  - Yang, Dazhi
 AU  - Zareipour, Hamidreza
 TI  - Energy Forecasting: A Review and Outlook
 T2  - IEEE Open Access Journal of Power and Energy
-J2  - IEEE Open J. Power Energy
+J2  - IEEE Open Access J Power Energy
 PY  - 2020
 VL  - 7
 SP  - 376
 EP  - 388
 DO  - 10.1109/oajpe.2020.3029979
 UR  - https://doi.org/10.1109/oajpe.2020.3029979
-ER  - 
+ER  -
 
 TY  - CPAPER
 ID  - heidrich2022adaptively
@@ -910,7 +910,7 @@ EP  - 470
 PB  - ACM
 DO  - 10.1145/3538637.3539759
 UR  - https://doi.org/10.1145/3538637.3539759
-ER  - 
+ER  -
 
 TY  - JOUR
 ID  - roberts2017crossvalidation
@@ -940,6 +940,53 @@ DO  - 10.1111/ecog.02881
 UR  - https://doi.org/10.1111/ecog.02881
 ER  -
 
+TY  - JOUR
+ID  - newey1994automatic
+AU  - Newey, W. K.
+AU  - West, K. D.
+TI  - Automatic Lag Selection in Covariance Matrix Estimation
+T2  - The Review of Economic Studies
+J2  - Rev Econ Stud
+PY  - 1994
+VL  - 61
+IS  - 4
+SP  - 631
+EP  - 653
+DO  - 10.2307/2297912
+UR  - https://doi.org/10.2307/2297912
+ER  -
+
+TY  - JOUR
+ID  - benjamini1995controlling
+AU  - Benjamini, Yoav
+AU  - Hochberg, Yosef
+TI  - Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing
+T2  - Journal of the Royal Statistical Society Series B: Statistical Methodology
+J2  - J R Stat Soc Series B Stat Methodol
+PY  - 1995
+VL  - 57
+IS  - 1
+SP  - 289
+EP  - 300
+DO  - 10.1111/j.2517-6161.1995.tb02031.x
+UR  - https://doi.org/10.1111/j.2517-6161.1995.tb02031.x
+ER  -
+
+TY  - JOUR
+ID  - breiman2001random
+AU  - Breiman, Leo
+TI  - Random Forests
+T2  - Machine Learning
+J2  - Mach Learn
+PY  - 2001
+VL  - 45
+IS  - 1
+SP  - 5
+EP  - 32
+DO  - 10.1023/a:1010933404324
+UR  - https://doi.org/10.1023/a:1010933404324
+ER  -
+
 TY  - CPAPER
 ID  - gibbs2021adaptive
 AU  - Gibbs, Isaac
@@ -948,7 +995,7 @@ PY  - 2021
 TI  - Adaptive conformal inference under distribution shift
 T2  - Advances in Neural Information Processing Systems 34 (NeurIPS 2021)
 UR  - https://arxiv.org/abs/2106.00170
-ER  - 
+ER  -
 
 TY  - COMP
 ID  - opendsm2026eemeter
@@ -957,7 +1004,7 @@ PY  - 2026
 TI  - OpenDSM eemeter: open-source implementation of the CalTRACK methods for measuring energy savings
 UR  - https://github.com/opendsm/eemeter
 Y2  - 7 November 2026
-ER  - 
+ER  -
 
 TY  - COMP
 ID  - lbnl2026rmv2
@@ -966,4 +1013,71 @@ PY  - 2026
 TI  - RMV2.0: an open-source tool for M&V 2.0 baseline modeling and savings estimation
 UR  - https://github.com/LBNL-ETA/RMV2.0
 Y2  - 7 November 2026
+ER  -
+
+TY  - DATA
+ID  - bdg2data2020
+AU  - Miller, Clayton
+AU  - Kathirgamanathan, Anjukan
+AU  - Picchetti, Bianca
+AU  - Arjunan, Pandarasamy
+AU  - Park, June Young
+AU  - Nagy, Zoltan
+AU  - Raftery, Paul
+AU  - Hobson, Brodie W.
+AU  - Shi, Zixiao
+AU  - Meggers, Forrest
+PY  - 2020
+TI  - buds-lab/building-data-genome-project-2 [dataset]
+PB  - Zenodo
+C2  - 1.0
+DO  - 10.5281/zenodo.3887306
+UR  - https://doi.org/10.5281/zenodo.3887306
+ER  -
+
+TY  - DATA
+ID  - robod2022data
+AU  - Tekler, Zeynep Duygu
+AU  - Ono, Eikichi
+AU  - Peng, Yuzhen
+AU  - Zhan, Sicheng
+AU  - Lasternas, Bertrand
+AU  - Chong, Adrian
+PY  - 2022
+TI  - ROBOD, Room-level Occupancy and Building Operation Dataset [dataset]
+PB  - figshare
+DO  - 10.6084/m9.figshare.19234530
+UR  - https://doi.org/10.6084/m9.figshare.19234530
+ER  -
+
+TY  - DATA
+ID  - aalborg2024data
+AU  - Melgaard, Simon Pommerencke
+AU  - Johra, Hicham
+AU  - Nyborg, Victor Ørsøe
+AU  - Marszal-Pomianowska, Anna
+AU  - Jensen, Rasmus Lund
+AU  - Kantas, Christos
+AU  - Larsen, Olena Kalyanova
+AU  - Hu, Yue
+AU  - Frandsen, Kirstine Meyer
+AU  - Larsen, Tine Steen
+AU  - Svidt, Kjeld
+AU  - Andersen, Kamilla Heimar
+AU  - Leiria, Daniel
+AU  - Schaffer, Markus
+AU  - Frandsen, Martin
+AU  - Veit, Martin
+AU  - Ussing, Lene Faber
+AU  - Lindhard, Søren Munch
+AU  - Pomianowski, Michael Zbigniew
+AU  - Rohde, Lasse
+AU  - Hansen, Anders Rhiger
+AU  - Heiselberg, Per Kvols
+PY  - 2024
+TI  - A Danish high-resolution dataset for six office rooms with occupancy, indoor environment, heating, ventilation, lighting and room control monitoring [dataset]
+PB  - Zenodo
+C2  - 3
+DO  - 10.5281/zenodo.10673763
+UR  - https://doi.org/10.5281/zenodo.10673763
 ER  -
