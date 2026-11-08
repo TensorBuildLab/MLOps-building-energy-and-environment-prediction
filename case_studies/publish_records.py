@@ -1,7 +1,7 @@
 """Copy the run records behind every reported result into the repository (no data, no models).
 
 For each task in case_studies/{robod,aalborg,bdg2}/results/summary.csv, copies run.json, report.md and
-model_card.md from runs/<dataset>/<run>/ to case_studies/<dataset>/records/<run>/. Test predictions,
+model_card.md from runs/v3/<dataset>/<run>/ to case_studies/<dataset>/records/<run>/. Test predictions,
 plots and saved models stay local: they contain or encode the measured data. Records of runs that
 were superseded (the ROBOD chilled-water tasks before the dead-meter mask) go to records/superseded/.
 
@@ -17,7 +17,7 @@ from pathlib import Path
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
-RUNS = HERE.parent / "runs"
+RUNS = HERE.parent / "runs" / "v3"   # the frozen version 0.3.1 runs (ANALYSIS_PLAN_v3.md)
 FILES = ("run.json", "report.md", "model_card.md")
 SEP = r"(?:\\\\|\\|/)+"
 LOCAL_PATH = re.compile(r"(?:[A-Za-z]:|/[a-z])" + SEP + "Users" + SEP + r"[^\\/\"']+" + SEP + r"(?:[^\\/\"']+" + SEP

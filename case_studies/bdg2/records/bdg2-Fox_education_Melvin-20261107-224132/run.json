@@ -1,0 +1,643 @@
+{
+  "run": {
+    "name": "bdg2-Fox_education_Melvin",
+    "created": "20261107-224132",
+    "environment": {
+      "bemlops": "0.3.1",
+      "code_commit": "a89b059",
+      "package_fingerprint": "84f7e16c74ac9fdc",
+      "python": "3.12.10",
+      "numpy": "2.5.4",
+      "pandas": "3.1.0",
+      "scikit-learn": "1.9.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    }
+  },
+  "config": {
+    "config_version": 1,
+    "name": "bdg2-Fox_education_Melvin",
+    "target": "electricity",
+    "task": "regression",
+    "horizon": "24h",
+    "columns": {
+      "electricity": {
+        "name": "electricity",
+        "quantity": "energy",
+        "unit": "kWh",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "airTemperature": {
+        "name": "airTemperature",
+        "quantity": "outdoor_air_temperature",
+        "unit": "degC",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      },
+      "dewTemperature": {
+        "name": "dewTemperature",
+        "quantity": "other",
+        "unit": null,
+        "known_ahead": false,
+        "description": "dew point, degC",
+        "flat_ok": false
+      },
+      "windSpeed": {
+        "name": "windSpeed",
+        "quantity": "wind_speed",
+        "unit": "m/s",
+        "known_ahead": false,
+        "description": "",
+        "flat_ok": false
+      }
+    },
+    "timestamp": null,
+    "timestamp_format": null,
+    "tz": null,
+    "intended_use": "Day-ahead hourly electricity forecast for operations planning.",
+    "holidays": [],
+    "prepare": {
+      "freq": "1h",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "fit": {
+      "models": [
+        "ridge",
+        "gbm",
+        "gbm_change"
+      ],
+      "n_iter": 3,
+      "fractions": [
+        0.7,
+        0.15,
+        0.15
+      ],
+      "random_state": 0,
+      "backtest_blocks": 3,
+      "refit_all": false
+    },
+    "accepted": {},
+    "notes": [
+      "Electricity is hourly kWh per interval in naive local time per site (BDG2 cleaned meters; values the dataset authors judged invalid are already removed, which shows up as missing).",
+      "Weather is the site's station data; it is used only up to the forecast time (no weather forecasts are available, so none is assumed).",
+      "Buildings sampled at random among those with at least 90% of hours present, one per site in turn."
+    ]
+  },
+  "task": {
+    "target": "electricity",
+    "quantity": "energy",
+    "unit": "kWh",
+    "mode": "forecast",
+    "task_type": "regression",
+    "horizon_steps": 24,
+    "step": "0 days 01:00:00",
+    "description": "forecast electricity (energy, kWh) 1 d ahead (24 step(s) of 1 h)"
+  },
+  "data": {
+    "raw_fingerprint": "bd097c92c3b538f7",
+    "prepared_fingerprint": "8736f547cc14f40c",
+    "raw_rows": 17544,
+    "prepared_rows": 17544,
+    "summary": {
+      "rows": 17544,
+      "start": "2016-01-01 00:00:00",
+      "end": "2017-12-31 23:00:00",
+      "step": "1 h",
+      "timezone": "none",
+      "target": "electricity",
+      "declared_columns": 4
+    }
+  },
+  "data_check": {
+    "summary": {
+      "rows": "17544",
+      "start": "2016-01-01 00:00:00",
+      "end": "2017-12-31 23:00:00",
+      "step": "1 h",
+      "timezone": "none",
+      "target": "electricity",
+      "declared_columns": "4"
+    },
+    "issues": [
+      {
+        "id": "index:no_timezone",
+        "severity": "info",
+        "column": null,
+        "message": "Timestamps carry no time zone.",
+        "fix": "Fine if all are local time; check for daylight-saving jumps (Arizona and Hawaii have none).",
+        "evidence": {}
+      },
+      {
+        "id": "stuck:electricity",
+        "severity": "warning",
+        "column": "electricity",
+        "message": "Sensor repeats exactly 56.47 for 10 d 13 h (2016-10-05 07:00:00 to 2016-10-15 20:00:00); 7 such stretch(es), 27 d 23 h in total.",
+        "fix": "prepare() treats these stretches as missing once they are detectable (by default).",
+        "evidence": {
+          "n_runs": "7",
+          "n": "40260",
+          "unchanged_share": "0.04030038981884889"
+        }
+      },
+      {
+        "id": "stuck:airTemperature",
+        "severity": "warning",
+        "column": "airTemperature",
+        "message": "Sensor repeats exactly 10.6 for 9 h (2017-02-18 21:00:00 to 2017-02-19 06:00:00); 6 such stretch(es), 1 d 18 h in total.",
+        "fix": "prepare() treats these stretches as missing once they are detectable (by default).",
+        "evidence": {
+          "n_runs": "6",
+          "n": "2520",
+          "unchanged_share": "0.16127928852402942"
+        }
+      },
+      {
+        "id": "stuck:windSpeed",
+        "severity": "warning",
+        "column": "windSpeed",
+        "message": "Sensor repeats exactly 2.1 for 7 h (2017-08-26 00:00:00 to 2017-08-26 07:00:00); 1 such stretch(es), 7 h in total.",
+        "fix": "prepare() treats these stretches as missing once they are detectable (by default).",
+        "evidence": {
+          "n_runs": "1",
+          "n": "420",
+          "unchanged_share": "0.1865373645179692"
+        }
+      }
+    ]
+  },
+  "unresolved_errors": [],
+  "accepted_issues": {},
+  "notes": [
+    "Electricity is hourly kWh per interval in naive local time per site (BDG2 cleaned meters; values the dataset authors judged invalid are already removed, which shows up as missing).",
+    "Weather is the site's station data; it is used only up to the forecast time (no weather forecasts are available, so none is assumed).",
+    "Buildings sampled at random among those with at least 90% of hours present, one per site in turn."
+  ],
+  "prepare": {
+    "options": {
+      "freq": "1h",
+      "mask_sentinels": true,
+      "mask_out_of_range": true,
+      "mask_stuck": true,
+      "mask_spikes": true,
+      "stuck_hours": 6.0,
+      "fill_limit": "1h"
+    },
+    "log": [
+      {
+        "step": "mask_stuck",
+        "column": "electricity",
+        "detail": "7 stuck stretch(es) set to missing.",
+        "count": 636
+      },
+      {
+        "step": "mask_stuck",
+        "column": "airTemperature",
+        "detail": "6 stuck stretch(es) set to missing.",
+        "count": 12
+      },
+      {
+        "step": "mask_stuck",
+        "column": "windSpeed",
+        "detail": "1 stuck stretch(es) set to missing.",
+        "count": 2
+      },
+      {
+        "step": "resample",
+        "column": null,
+        "detail": "Resampled to a regular 1 h grid (17544 rows).",
+        "count": 17544
+      },
+      {
+        "step": "forward_fill",
+        "column": "airTemperature",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 8
+      },
+      {
+        "step": "forward_fill",
+        "column": "dewTemperature",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 2
+      },
+      {
+        "step": "forward_fill",
+        "column": "windSpeed",
+        "detail": "Filled input gaps up to 1h with the last known value.",
+        "count": 14
+      }
+    ]
+  },
+  "features": [
+    {
+      "name": "electricity__t-24",
+      "source": "electricity",
+      "shift": 24,
+      "kind": "target_lag"
+    },
+    {
+      "name": "electricity__t-25",
+      "source": "electricity",
+      "shift": 25,
+      "kind": "target_lag"
+    },
+    {
+      "name": "electricity__t-26",
+      "source": "electricity",
+      "shift": 26,
+      "kind": "target_lag"
+    },
+    {
+      "name": "electricity__t-27",
+      "source": "electricity",
+      "shift": 27,
+      "kind": "target_lag"
+    },
+    {
+      "name": "electricity__t-168",
+      "source": "electricity",
+      "shift": 168,
+      "kind": "target_lag"
+    },
+    {
+      "name": "electricity__mean_1d",
+      "source": "electricity",
+      "shift": 24,
+      "kind": "target_rolling"
+    },
+    {
+      "name": "airTemperature__t-24",
+      "source": "airTemperature",
+      "shift": 24,
+      "kind": "input_lag"
+    },
+    {
+      "name": "dewTemperature__t-24",
+      "source": "dewTemperature",
+      "shift": 24,
+      "kind": "input_lag"
+    },
+    {
+      "name": "windSpeed__t-24",
+      "source": "windSpeed",
+      "shift": 24,
+      "kind": "input_lag"
+    },
+    {
+      "name": "hour_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "hour_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "dow_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "is_weekend",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "doy_sin",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    },
+    {
+      "name": "doy_cos",
+      "source": "calendar",
+      "shift": 0,
+      "kind": "calendar"
+    }
+  ],
+  "split": {
+    "sizes": {
+      "train": 11766,
+      "val": 2497,
+      "test": 2498
+    },
+    "gap": "1 d",
+    "test_days": 105,
+    "test_completeness": 1.0,
+    "bounds": {
+      "train": [
+        "2016-01-01 00:00:00",
+        "2017-06-01 02:00:00"
+      ],
+      "val": [
+        "2017-06-02 03:00:00",
+        "2017-09-14 03:00:00"
+      ],
+      "test": [
+        "2017-09-15 04:00:00",
+        "2017-12-28 05:00:00"
+      ]
+    }
+  },
+  "validation": [
+    {
+      "model": "gbm_change",
+      "type": "ml",
+      "n": 2497,
+      "rmse": 12.206230315753345,
+      "mae": 8.236516296962149,
+      "r2": 0.8277816857765296,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 21.185018846421453,
+      "nmbe_pct": 2.9215851978069014,
+      "params": {
+        "base__min_samples_leaf": 100,
+        "base__max_leaf_nodes": 15,
+        "base__max_iter": 100,
+        "base__learning_rate": 0.1,
+        "base__l2_regularization": 1.0
+      },
+      "cv_score": 11.610708686145232
+    },
+    {
+      "model": "gbm",
+      "type": "ml",
+      "n": 2497,
+      "rmse": 12.890371044381011,
+      "mae": 8.828700086370201,
+      "r2": 0.8079355219810787,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 22.372407078058888,
+      "nmbe_pct": 2.638205179823044,
+      "params": {
+        "min_samples_leaf": 100,
+        "max_leaf_nodes": 15,
+        "max_iter": 100,
+        "learning_rate": 0.1,
+        "l2_regularization": 1.0
+      },
+      "cv_score": 12.127963865432308
+    },
+    {
+      "model": "ridge",
+      "type": "ml",
+      "n": 2497,
+      "rmse": 13.30328288858786,
+      "mae": 9.78842944634084,
+      "r2": 0.7954338056828111,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 23.089053001914934,
+      "nmbe_pct": 1.64542556512378,
+      "params": {
+        "model__alpha": 19.549524484259873
+      },
+      "cv_score": 16.822257715310634
+    },
+    {
+      "model": "same_time_last_week",
+      "type": "baseline",
+      "n": 2497,
+      "rmse": 15.674973873251353,
+      "mae": 10.168121746095315,
+      "r2": 0.7159924636698219,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 27.205337629375933,
+      "nmbe_pct": 2.539155571979688,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "towt",
+      "type": "baseline",
+      "n": 2497,
+      "rmse": 17.00666400409503,
+      "mae": 11.991310077866942,
+      "r2": 0.6656860673398484,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 29.516606529742866,
+      "nmbe_pct": 0.8444306275158833,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "time_of_week_profile",
+      "type": "baseline",
+      "n": 2497,
+      "rmse": 17.320678717433342,
+      "mae": 12.88571781714414,
+      "r2": 0.653226401444823,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 30.061607520879356,
+      "nmbe_pct": -8.712703505638915,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "time_of_day_profile",
+      "type": "baseline",
+      "n": 2497,
+      "rmse": 17.348222978317082,
+      "mae": 12.799559159036745,
+      "r2": 0.6521226089930177,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 30.109413081714923,
+      "nmbe_pct": -8.748604423010672,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "persistence",
+      "type": "baseline",
+      "n": 2497,
+      "rmse": 23.34894895666306,
+      "mae": 14.055330396475773,
+      "r2": 0.36983992413655975,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 40.52421680530208,
+      "nmbe_pct": 0.5398024114324298,
+      "params": {},
+      "cv_score": null
+    },
+    {
+      "model": "same_time_yesterday",
+      "type": "baseline",
+      "n": 2497,
+      "rmse": 23.34894895666306,
+      "mae": 14.055330396475773,
+      "r2": 0.36983992413655975,
+      "mean_actual": 57.628814577493,
+      "cvrmse_pct": 40.52421680530208,
+      "nmbe_pct": 0.5398024114324298,
+      "params": {},
+      "cv_score": null
+    }
+  ],
+  "chosen_model": {
+    "name": "gbm_change",
+    "params": {
+      "base__min_samples_leaf": 100,
+      "base__max_leaf_nodes": 15,
+      "base__max_iter": 100,
+      "base__learning_rate": 0.1,
+      "base__l2_regularization": 1.0
+    }
+  },
+  "test": {
+    "model": {
+      "n": 2498,
+      "rmse": 12.398369735027991,
+      "mae": 7.664940452257011,
+      "r2": 0.7908524754027557,
+      "mean_actual": 54.71025620496398,
+      "cvrmse_pct": 22.666412113273502,
+      "nmbe_pct": -1.3061536308139385
+    },
+    "baseline": {
+      "name": "same_time_last_week",
+      "n": 2498,
+      "rmse": 18.4784060186801,
+      "mae": 10.053214571657326,
+      "r2": 0.5354284901835059,
+      "mean_actual": 54.71025620496398,
+      "cvrmse_pct": 33.78179349116265,
+      "nmbe_pct": -2.777108610478787
+    },
+    "skill": 0.3290346730938647,
+    "guideline14": {
+      "resolution": "hourly",
+      "cvrmse_pct": 22.666412113273502,
+      "nmbe_pct": -1.3061536308139385,
+      "cvrmse_limit": 30.0,
+      "nmbe_limit": 10.0,
+      "passes": true,
+      "baseline": {
+        "resolution": "hourly",
+        "cvrmse_pct": 33.78179349116265,
+        "nmbe_pct": -2.777108610478787,
+        "cvrmse_limit": 30.0,
+        "nmbe_limit": 10.0,
+        "passes": false
+      },
+      "applies_as_gate": false
+    }
+  },
+  "warnings": [],
+  "leakage_warnings": [],
+  "interval": {
+    "nominal": 0.9,
+    "half_width": 21.288457648199053,
+    "test_coverage": 0.8907125700560449
+  },
+  "drivers": [
+    {
+      "input": "electricity (recent history)",
+      "share": 0.6353436435417227
+    },
+    {
+      "input": "calendar (time of day, weekday)",
+      "share": 0.3646397344336562
+    }
+  ],
+  "backtest": {
+    "blocks": [
+      {
+        "from": "2017-06-01 03:00:00",
+        "to": "2017-08-10 03:00:00",
+        "rows": 1681,
+        "rmse": 13.070959712490046,
+        "baseline_rmse": 16.318087259311323,
+        "skill": 0.19898947071559636
+      },
+      {
+        "from": "2017-08-10 04:00:00",
+        "to": "2017-10-19 04:00:00",
+        "rows": 1681,
+        "rmse": 11.345488531283,
+        "baseline_rmse": 16.364485028738304,
+        "skill": 0.30670054625252496
+      },
+      {
+        "from": "2017-10-19 05:00:00",
+        "to": "2017-12-28 05:00:00",
+        "rows": 1681,
+        "rmse": 12.260824790949137,
+        "baseline_rmse": 18.479970992944214,
+        "skill": 0.33653441362919845
+      }
+    ],
+    "pooled_rmse": 12.24605953457907,
+    "pooled_baseline_rmse": 17.083965874062127,
+    "pooled_skill": 0.28318403204189546
+  },
+  "event_log": [
+    {
+      "time": "2026-11-07T22:41:16",
+      "kind": "note",
+      "detail": "Electricity is hourly kWh per interval in naive local time per site (BDG2 cleaned meters; values the dataset authors judged invalid are already removed, which shows up as missing)."
+    },
+    {
+      "time": "2026-11-07T22:41:16",
+      "kind": "note",
+      "detail": "Weather is the site's station data; it is used only up to the forecast time (no weather forecasts are available, so none is assumed)."
+    },
+    {
+      "time": "2026-11-07T22:41:16",
+      "kind": "note",
+      "detail": "Buildings sampled at random among those with at least 90% of hours present, one per site in turn."
+    },
+    {
+      "time": "2026-11-07T22:41:16",
+      "kind": "check",
+      "detail": "0 errors, 3 warnings"
+    },
+    {
+      "time": "2026-11-07T22:41:16",
+      "kind": "prepare",
+      "detail": "17544 rows on a 1 h grid"
+    },
+    {
+      "time": "2026-11-07T22:41:32",
+      "kind": "fit",
+      "detail": "chosen gbm_change, test rmse 12.4"
+    }
+  ],
+  "gates": {
+    "data_check_resolved": {
+      "passed": true,
+      "detail": "all errors fixed or accepted with reasons"
+    },
+    "beats_baseline": {
+      "passed": true,
+      "detail": "skill 0.329 vs required 0.05"
+    },
+    "guideline14": {
+      "passed": true,
+      "detail": "reported, not gated (forecast): CV(RMSE) 22.7%, NMBE -1.3%"
+    },
+    "no_suspicious_inputs": {
+      "passed": true,
+      "detail": "none"
+    },
+    "enough_test_data": {
+      "passed": true,
+      "detail": "2498 test rows (need 200)"
+    }
+  }
+}

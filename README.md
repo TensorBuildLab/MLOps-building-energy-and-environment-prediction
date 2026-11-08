@@ -149,40 +149,38 @@ paper/              the paper: sections, generated tables and figures, build scr
 This repository continues the preliminary study
 [*Scaling Data-Driven Building Energy Modelling using Large Language Models*](https://arxiv.org/abs/2407.03469)
 (Khadka and Zhang, 2024), which used prompt templates following MLOps steps to
-have an LLM write modeling code for a simulated building. Version 2 of the
-paper, [`paper/manuscript.md`](paper/manuscript.md), evaluates this package on
-real buildings. What we found:
+have an LLM write modeling code for a simulated building. The paper in
+[`paper/`](paper/) evaluates this package on real buildings, following an
+analysis plan committed before the experiments
+([`case_studies/ANALYSIS_PLAN_v3.md`](case_studies/ANALYSIS_PLAN_v3.md)) and run on
+the frozen version 0.3.1. What we found:
 
 | Question | Result |
 |---|---|
-| Does one workflow handle many targets and buildings? | All 92 tasks in three public datasets (ROBOD, Aalborg offices, 20 BDG2 buildings) ran to an evaluated, gated result. Ordinary models beat the strongest no-ML rule significantly in 52% of tasks; elsewhere the framework kept the rule. |
-| How much does a random split mislead? | On the same rows, shuffled cross-validation understated RMSE by a median 27% against blocked cross-validation (22 tasks, every one affected). |
-| Do the data checks help? | Six of eight planted fault types were caught in every seed. With them, accuracy on faulty data matched clean data; a quick script was 9% worse in MAE (not in RMSE). A stuck meter at its idle floor was caught only half the time. |
-| Does monitoring and retraining help? | Over eight months it beat a never-retrained model by 10–33%, but simple monthly retraining did better, and persistence matched it for district heating in summer. Retrain on a schedule; monitor against persistence. |
-| Do capable agents need it? | In a small pilot, independent agents told to be rigorous built equally accurate, leak-free models with or without the package, at higher cost with it. They also found a dead meter our own case study had missed. |
+| Is machine learning worth deploying against strong simple rules? | Day ahead, models beat references that include TOWT and last week's value significantly in 66% of 200 BDG2 buildings (median skill 0.16) and in 62.5% of all 272 tasks; elsewhere the framework kept the rule. |
+| Do models beat TOWT as M&V baselines? | No. Over a reporting year with no measure installed, the framework's models matched TOWT (median absolute annual savings error 5.3% vs 5.2%, 152 buildings). |
+| Does the evaluation protocol change decisions? | Error estimates from shuffled cross-validation accepted 32 M&V baselines that missed the Guideline 14 limits in the reporting year, against 13 for a time-ordered split. On the same rows, shuffled CV understated forward-chaining RMSE in all 62 tasks tested, by a median of 41%. |
+| How should models be retrained? | Over a year in 50 buildings, monthly retraining gave the lowest error; drift-triggered retraining at the default tolerance was 4.8% worse in the median building. 86% of models promoted by the gates realized a skill of at least 0.05 over the next three months. |
+| Do the data checks help? | On cleaned BDG2 meters they flagged a site whose hourly readings are daily totals, but missed months of zero readings at another site. With planted faults, the default handling matched a competent hand-written script in MAE and beat a quick script by 1.9 ppm (9%). |
 
-The package's value is in making rigorous evaluation the default, in
-comparable and re-executable records, and in the lifecycle after the first
-model, rather than in out-modeling a careful agent.
-
-Reproduce: [`case_studies/`](case_studies/README.md) (real buildings, faults,
-lifecycle) and [`benchmarks/pilot/`](benchmarks/pilot/) (independent agents:
-prompts, deliverables, scores).
+A formative usability study with independent agents is in
+[`benchmarks/pilot/`](benchmarks/pilot/) and the paper's Supplementary Material.
+Reproduce everything with [`case_studies/`](case_studies/README.md).
 
 ## Status and roadmap
 
-Version 0.2.0. Working and evaluated: data checks, causal preparation,
-leakage-safe inputs, time-ordered evaluation with three baselines,
-backtests, prediction intervals, input drivers, ASHRAE Guideline 14, model
-registry with promotion gates, live-data validation, drift monitoring,
-champion/challenger retraining, reproduction, the Agent Skill. Added after
-the evaluation and not yet evaluated: drift checks against persistence,
-`refit_all`, four more quantities (see the paper's Appendix A).
+Version 0.3.1, the version evaluated in the paper. Working and evaluated: data
+checks, causal preparation, leakage-safe inputs, time-ordered evaluation
+against persistence, last-day and last-week values, time-of-day and
+time-of-week profiles and TOWT, backtests, prediction intervals, input
+drivers, ASHRAE Guideline 14 (a gate for M&V baselines), model registry with
+promotion gates, live-data validation, drift monitoring against persistence,
+champion/challenger retraining, `refit_all`, reproduction, the Agent Skill.
 
-Planned: checks across related sensors (a meter at zero while its valve is
-open); intervals that depend on the time of day and are recalibrated in
-operation; Brick and Project Haystack metadata import; more model families;
-a multi-run benchmark with weaker and unprimed agents.
+Planned: checks for dead meters and across related sensors (a whole-building
+meter at zero for a week; a chilled-water meter at zero while its valve is
+open); adaptive prediction intervals; Brick and Project Haystack metadata
+import; a multi-run benchmark with primed and unprimed agents.
 
 ## Citation
 

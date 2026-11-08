@@ -61,7 +61,7 @@ def entry_to_ris(e: str):
     authors = authors_of(auth)
     first = re.sub(r"[^a-z]", "", fold(re.split(r"[,\s]", authors[0])[0]))
     key = f"{first}{year}"
-    dois = re.findall(r"https?://doi\.org/(10\.\S+?)(?=[\s,;]|\)\s|\)$|$)", e)
+    dois = re.findall(r"https?://doi\.org/(10\.\S+?)(?=[\s,]|;\s|;$|\)\s|\)$|$)", e)  # ';' may be inside a DOI
     doi = dois[0].rstrip(".") if dois else ""
     urls = [u.rstrip(".,;)") for u in re.findall(r"https?://\S+", e) if "doi.org" not in u]
     tm = re.match(r"(?P<title>.+?[.?!])\s+(?P<tail>(?:In:\s|arXiv:)?[A-Z(].*|arXiv:.*|https?:.*)$", rest)
@@ -130,8 +130,13 @@ def main() -> None:
     dup = {k for k in keys if keys.count(k) > 1}
     if dup:
         raise SystemExit(f"duplicate keys: {dup}")
-    (HERE / "refs.ris").write_text("\n\n".join(out) + "\n", encoding="utf-8")
-    print(f"Wrote paper/refs.ris: {len(out)} references; keys: {', '.join(keys)}")
+    # Entries added in the revision: written from Crossref records (refs_extra.ris, built with the fact-check
+    # skill's build-ris from refs_extra_dois.txt) and, for items without a DOI, by hand (refs_extra_manual.ris;
+    # each checked on its publisher or repository page).
+    extra = [(HERE / f).read_text(encoding="utf-8").strip() for f in ("refs_extra.ris", "refs_extra_manual.ris")
+             if (HERE / f).exists()]
+    (HERE / "refs.ris").write_text("\n\n".join(out + extra) + "\n", encoding="utf-8")
+    print(f"Wrote paper/refs.ris: {len(out)} references from references.md + {len(extra)} extra file(s)")
 
 
 if __name__ == "__main__":

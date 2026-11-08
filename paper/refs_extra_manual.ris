@@ -1,0 +1,27 @@
+TY  - CPAPER
+ID  - gibbs2021adaptive
+AU  - Gibbs, Isaac
+AU  - Candès, Emmanuel
+PY  - 2021
+TI  - Adaptive conformal inference under distribution shift
+T2  - Advances in Neural Information Processing Systems 34 (NeurIPS 2021)
+UR  - https://arxiv.org/abs/2106.00170
+ER  - 
+
+TY  - COMP
+ID  - opendsm2026eemeter
+AU  - OpenDSM contributors
+PY  - 2026
+TI  - OpenDSM eemeter: open-source implementation of the CalTRACK methods for measuring energy savings
+UR  - https://github.com/opendsm/eemeter
+Y2  - 7 November 2026
+ER  - 
+
+TY  - COMP
+ID  - lbnl2026rmv2
+AU  - Lawrence Berkeley National Laboratory
+PY  - 2026
+TI  - RMV2.0: an open-source tool for M&V 2.0 baseline modeling and savings estimation
+UR  - https://github.com/LBNL-ETA/RMV2.0
+Y2  - 7 November 2026
+ER  - 

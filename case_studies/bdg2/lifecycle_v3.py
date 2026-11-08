@@ -137,7 +137,8 @@ def simulate_building(bid: str, raw: pd.DataFrame) -> tuple:
             out.append(champ)
             if m == n - 1 or champ not in models:
                 continue
-            ratio = err(f"m{champ}", m) / models[champ]["test_error"]
+            te = models[champ]["test_error"]
+            ratio = err(f"m{champ}", m) / te if te else float("nan")  # as in bemlops.deploy: no ratio without a test error
             oor = out_of_range(raw, models[champ]["input_ranges"], *bounds[m])
             if not (ratio > tol or oor):
                 continue
@@ -174,9 +175,22 @@ def simulate_building(bid: str, raw: pd.DataFrame) -> tuple:
     g = rows[[r["arm"] for r in rows].index("gated_1.5")]["monthly_rmse"]
     fb = [g[0]] + [pers[m] if g[m - 1] > pers[m - 1] else g[m] for m in range(1, n)]
     rows.append({"building": bid, "arm": "gated_1.5_fallback", "monthly_rmse": fb})
-    # pooled RMSE per arm over 2017
+    # pooled RMSE per arm over 2017: the served forecast of every hour, scored together
+    def pooled(per_month_cols):
+        pred = np.full(len(a), np.nan)
+        for m, col in enumerate(per_month_cols):
+            mask = month_mask(m)
+            pred[mask] = preds[col].to_numpy(float)[mask]
+        live = idx >= MONTHS[0]
+        return rmse(a[live], pred[live])
+
+    cols = {arm: [f"m{k}" for k in ks] for arm, ks in served.items()}
+    cols["persistence"] = ["persistence"] * n
+    cols["gated_1.5_fallback"] = [cols["gated_1.5"][0]] + [
+        "persistence" if g[m - 1] > pers[m - 1] else cols["gated_1.5"][m] for m in range(1, n)]
     for r in rows:
         r["mean_monthly_rmse"] = float(np.nanmean(r["monthly_rmse"]))
+        r["pooled_rmse"] = float(pooled(cols[r["arm"]]))
         r["mean_load"] = float(np.nanmean(a[(idx >= MONTHS[0])]))
 
     # gate audit: each monthly model's decision against its realized skill vs its own reference, next 3 months

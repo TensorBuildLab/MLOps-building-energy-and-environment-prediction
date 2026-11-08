@@ -28,13 +28,13 @@ STAGES = [
     ("Inputs", "shifted by\nthe horizon;\nreach\naudited"),
     ("Evaluate", "time order;\nstrongest\nbaseline;\nbacktest"),
     ("Gate,\nregister", "five gates;\nversions;\nrollback"),
-    ("Serve,\nmonitor", "live checks;\ndrift vs\ntest error"),
+    ("Serve,\nmonitor", "live checks;\ndrift vs test\nerror and\nbaseline"),
     ("Retrain", "champion\nvs\nchallenger"),
 ]
 AGENT_TASKS = [
     (0, 1, "Load any export; decode\npoints; declare quantity\nand unit; fix or accept\neach issue with a reason"),
     (2, 3, "Add inputs and models;\nmark inputs known\nin advance"),
-    (4, 4, "Explain;\na person\napproves"),
+    (4, 4, "Explain;\napproval\nis logged"),
     (5, 6, "Act on alerts:\nfix the sensor\nor retrain"),
 ]
 TITLE, BODY, AGENT_TXT, SMALL = 7, 6, 6.5, 5.5

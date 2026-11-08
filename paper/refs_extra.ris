@@ -1,0 +1,255 @@
+TY  - JOUR
+ID  - granderson2016accuracy
+AU  - Granderson, Jessica
+AU  - Touzani, Samir
+AU  - Custodio, Claudine
+AU  - Sohn, Michael D.
+AU  - Jump, David
+AU  - Fernandes, Samuel
+TI  - Accuracy of automated measurement and verification (M&V) techniques for energy savings in commercial buildings
+T2  - Applied Energy
+J2  - Applied Energy
+PY  - 2016
+VL  - 173
+SP  - 296
+EP  - 308
+DO  - 10.1016/j.apenergy.2016.04.049
+UR  - https://doi.org/10.1016/j.apenergy.2016.04.049
+ER  - 
+
+TY  - JOUR
+ID  - reddy2000uncertainty
+AU  - Reddy, T. Agami
+AU  - Claridge, David E.
+TI  - Uncertainty of “Measured” Energy Savings from Statistical Baseline Models
+T2  - HVAC&R Research
+J2  - HVAC&R Research
+PY  - 2000
+VL  - 6
+IS  - 1
+SP  - 3
+EP  - 20
+DO  - 10.1080/10789669.2000.10391247
+UR  - https://doi.org/10.1080/10789669.2000.10391247
+ER  - 
+
+TY  - JOUR
+ID  - mathieu2011quantifying
+AU  - Mathieu, Johanna L.
+AU  - Price, Phillip N.
+AU  - Kiliccote, Sila
+AU  - Piette, Mary Ann
+TI  - Quantifying Changes in Building Electricity Use, With Application to Demand Response
+T2  - IEEE Transactions on Smart Grid
+J2  - IEEE Trans. Smart Grid
+PY  - 2011
+VL  - 2
+IS  - 3
+SP  - 507
+EP  - 518
+DO  - 10.1109/tsg.2011.2145010
+UR  - https://doi.org/10.1109/tsg.2011.2145010
+ER  - 
+
+TY  - JOUR
+ID  - li2023large
+AU  - Li, Ao
+AU  - Zhang, Chong
+AU  - Xiao, Fu
+AU  - Fan, Cheng
+AU  - Deng, Yang
+AU  - Wang, Dan
+TI  - Large-scale comparison and demonstration of continual learning for adaptive data-driven building energy prediction
+T2  - Applied Energy
+J2  - Applied Energy
+PY  - 2023
+VL  - 347
+SP  - 121481
+DO  - 10.1016/j.apenergy.2023.121481
+UR  - https://doi.org/10.1016/j.apenergy.2023.121481
+ER  - 
+
+TY  - JOUR
+ID  - derzsi2025performance
+AU  - Derzsi, K
+AU  - Stinner, F
+AU  - Patrun, L
+AU  - Klingebiel, J
+AU  - Müller, D
+TI  - Performance-based drift detection for active machine learning model adaption: A comparative analysis across 35 HVAC devices
+T2  - Journal of Physics: Conference Series
+J2  - J. Phys.: Conf. Ser.
+PY  - 2025
+VL  - 3140
+IS  - 2
+SP  - 022002
+DO  - 10.1088/1742-6596/3140/2/022002
+UR  - https://doi.org/10.1088/1742-6596/3140/2/022002
+ER  - 
+
+TY  - JOUR
+ID  - miller2020ashrae
+AU  - Miller, Clayton
+AU  - Arjunan, Pandarasamy
+AU  - Kathirgamanathan, Anjukan
+AU  - Fu, Chun
+AU  - Roth, Jonathan
+AU  - Park, June Young
+AU  - Balbach, Chris
+AU  - Gowri, Krishnan
+AU  - Nagy, Zoltan
+AU  - Fontanini, Anthony D.
+AU  - Haberl, Jeff
+TI  - The ASHRAE Great Energy Predictor III competition: Overview and results
+T2  - Science and Technology for the Built Environment
+J2  - Science and Technology for the Built Environment
+PY  - 2020
+VL  - 26
+IS  - 10
+SP  - 1427
+EP  - 1447
+DO  - 10.1080/23744731.2020.1795514
+UR  - https://doi.org/10.1080/23744731.2020.1795514
+ER  - 
+
+TY  - JOUR
+ID  - granderson2023labeled
+AU  - Granderson, Jessica
+AU  - Lin, Guanjing
+AU  - Chen, Yimin
+AU  - Casillas, Armando
+AU  - Wen, Jin
+AU  - Chen, Zhelun
+AU  - Im, Piljae
+AU  - Huang, Sen
+AU  - Ling, Jiazhen
+TI  - A labeled dataset for building HVAC systems operating in faulted and fault-free states
+T2  - Scientific Data
+J2  - Sci Data
+PY  - 2023
+VL  - 10
+IS  - 1
+SP  - 342
+DO  - 10.1038/s41597-023-02197-w
+UR  - https://doi.org/10.1038/s41597-023-02197-w
+ER  - 
+
+TY  - JOUR
+ID  - drgona2020all
+AU  - Drgoňa, Ján
+AU  - Arroyo, Javier
+AU  - Cupeiro Figueroa, Iago
+AU  - Blum, David
+AU  - Arendt, Krzysztof
+AU  - Kim, Donghun
+AU  - Ollé, Enric Perarnau
+AU  - Oravec, Juraj
+AU  - Wetter, Michael
+AU  - Vrabie, Draguna L.
+AU  - Helsen, Lieve
+TI  - All you need to know about model predictive control for buildings
+T2  - Annual Reviews in Control
+J2  - Annual Reviews in Control
+PY  - 2020
+VL  - 50
+SP  - 190
+EP  - 232
+DO  - 10.1016/j.arcontrol.2020.09.001
+UR  - https://doi.org/10.1016/j.arcontrol.2020.09.001
+ER  - 
+
+TY  - JOUR
+ID  - harvey1997testing
+AU  - Harvey, David
+AU  - Leybourne, Stephen
+AU  - Newbold, Paul
+TI  - Testing the equality of prediction mean squared errors
+T2  - International Journal of Forecasting
+J2  - International Journal of Forecasting
+PY  - 1997
+VL  - 13
+IS  - 2
+SP  - 281
+EP  - 291
+DO  - 10.1016/s0169-2070(96)00719-4
+UR  - https://doi.org/10.1016/s0169-2070(96)00719-4
+ER  - 
+
+TY  - JOUR
+ID  - tashman2000out
+AU  - Tashman, Leonard J.
+TI  - Out-of-sample tests of forecasting accuracy: an analysis and review
+T2  - International Journal of Forecasting
+J2  - International Journal of Forecasting
+PY  - 2000
+VL  - 16
+IS  - 4
+SP  - 437
+EP  - 450
+DO  - 10.1016/s0169-2070(00)00065-0
+UR  - https://doi.org/10.1016/s0169-2070(00)00065-0
+ER  - 
+
+TY  - JOUR
+ID  - hong2020energy
+AU  - Hong, Tao
+AU  - Pinson, Pierre
+AU  - Wang, Yi
+AU  - Weron, Rafal
+AU  - Yang, Dazhi
+AU  - Zareipour, Hamidreza
+TI  - Energy Forecasting: A Review and Outlook
+T2  - IEEE Open Access Journal of Power and Energy
+J2  - IEEE Open J. Power Energy
+PY  - 2020
+VL  - 7
+SP  - 376
+EP  - 388
+DO  - 10.1109/oajpe.2020.3029979
+UR  - https://doi.org/10.1109/oajpe.2020.3029979
+ER  - 
+
+TY  - CPAPER
+ID  - heidrich2022adaptively
+AU  - Heidrich, Benedikt
+AU  - Ludwig, Nicole
+AU  - Turowski, Marian
+AU  - Mikut, Ralf
+AU  - Hagenmeyer, Veit
+TI  - Adaptively coping with concept drifts in energy time series forecasting using profiles
+T2  - Proceedings of the Thirteenth ACM International Conference on Future Energy Systems
+PY  - 2022
+SP  - 459
+EP  - 470
+PB  - ACM
+DO  - 10.1145/3538637.3539759
+UR  - https://doi.org/10.1145/3538637.3539759
+ER  - 
+
+TY  - JOUR
+ID  - roberts2017crossvalidation
+AU  - Roberts, David R.
+AU  - Bahn, Volker
+AU  - Ciuti, Simone
+AU  - Boyce, Mark S.
+AU  - Elith, Jane
+AU  - Guillera‐Arroita, Gurutzeta
+AU  - Hauenstein, Severin
+AU  - Lahoz‐Monfort, José J.
+AU  - Schröder, Boris
+AU  - Thuiller, Wilfried
+AU  - Warton, David I.
+AU  - Wintle, Brendan A.
+AU  - Hartig, Florian
+AU  - Dormann, Carsten F.
+TI  - Cross‐validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure
+T2  - Ecography
+J2  - Ecography
+PY  - 2017
+VL  - 40
+IS  - 8
+SP  - 913
+EP  - 929
+DO  - 10.1111/ecog.02881
+UR  - https://doi.org/10.1111/ecog.02881
+ER  - 
