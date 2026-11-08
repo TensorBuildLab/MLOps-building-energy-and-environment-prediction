@@ -22,3 +22,6 @@ Thumbs.db
 
 # Development worktree
 .wt/
+
+# fact-check working files
+checks/

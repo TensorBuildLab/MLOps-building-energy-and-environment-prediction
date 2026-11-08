@@ -44,8 +44,8 @@ the framework recommended the simple rule.
   hourly criteria: all 3 Aalborg building-level meters, 16 of 20 BDG2
   buildings, but only 4 of 10 ROBOD room meters. The six ROBOD failures are
   room-level chilled-water and plug meters with small, intermittent loads,
-  for which CV(RMSE) is large whatever the model (127–570% in the worst
-  three).
+  for which CV(RMSE) is large whatever the model (218–511% on hourly
+  values in the worst three).
 
 **By dataset.** Aalborg had the highest share of models significantly better
 than the baseline (20 of 27), and ROBOD the lowest (17 of 45). ROBOD's rooms

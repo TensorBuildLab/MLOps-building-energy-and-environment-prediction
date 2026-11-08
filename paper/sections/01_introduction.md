@@ -9,9 +9,9 @@ operation:
 - indoor-environment management needs to know where CO2 or temperature is heading.
 
 Machine-learning models for these tasks are well studied [Amasyali and
-El-Gohary 2018]. They are rarely deployed at scale, because each building needs
-its own model, and building one takes a data scientist days of work on data
-that is different every time. Point names such as `RM204_ZN_T` or `AI-3.PV`
+El-Gohary 2018], but they are rarely applied in practice [Zhang et al. 2024b].
+Each building needs its own model, and building one takes skilled effort on
+data that are different every time. Point names such as `RM204_ZN_T` or `AI-3.PV`
 must be decoded. Units are mixed. Exports contain text in number columns,
 placeholder values, stuck sensors and gaps, in formats that vary by vendor.
 
@@ -23,7 +23,7 @@ lifecycle let GPT-4 produce runnable code for a simulated small office in 34 of
 - code that runs is not the same as a model that is right;
 - the generated pipelines split the time series at random and selected features
   on the full dataset, both of which can let test information leak into
-  training [Bergmeir and Benítez 2012; Kapoor and Narayanan 2023];
+  training [Kapoor and Narayanan 2023];
 - the study used one simulated building and stopped before deployment.
 
 LLM agents have since become able to write and run analysis code on their own,

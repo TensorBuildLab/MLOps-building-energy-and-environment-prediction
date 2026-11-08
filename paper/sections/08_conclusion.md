@@ -26,16 +26,20 @@ eight independent agent runs. The answers to the five research questions are:
   added no measurable optimism.
 - **RQ3 (faults).** The checks detected six of eight planted fault types in
   every seed, spikes in nine seeds of ten and a stuck meter at its idle floor
-  in five. With them, accuracy on faulty data matched clean data. A quick
-  script was 1.6–1.9 ppm worse in MAE, with or without the agent's unit fix,
-  and three to five times less stable between seeds. RMSE did not differ.
+  in five; these rates are partly in-sample, because detectors were revised
+  on the same dataset. On the one CO2 task with planted faults, accuracy with
+  the checks matched clean data. A quick script was 1.6–1.9 ppm worse in MAE,
+  with or without the same unit fix, and three to five times less stable in
+  RMSE between seeds. Mean RMSE did not differ.
 - **RQ4 (lifecycle).** Monitoring with gated retraining beat a static model
-  by 10–33% in mean monthly RMSE. It did not beat persistence for district
-  heating, and simple monthly retraining did better on both tasks. Retraining
+  by 10–33% in mean monthly RMSE. For district heating it only matched
+  persistence on the mean (1.53 vs 1.56 kW) and lost to it in five of eight
+  months, and simple monthly retraining did better on both tasks. Retraining
   should be scheduled, and persistence monitored alongside the model.
-- **RQ5 (independent agents).** Capable agents, told to be rigorous, built
-  equally accurate, leak-free models with or without the framework, and found
-  as many planted faults. The framework arm cost more. All four agents that
+- **RQ5 (independent agents).** In a pilot with one run per cell, capable
+  agents told to be rigorous built leak-free models of similar accuracy with
+  or without the framework, with no consistent difference in either
+  direction, and found as many planted faults. The framework arm cost more. All four agents that
   saw the dead chilled-water meter found it; our own case-study agent, relying
   on the checks, had missed it.
 

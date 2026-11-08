@@ -159,8 +159,11 @@ inputs was trained in four ways:
 1. on clean data;
 2. on faulty data prepared by a quick script that coerces text, sorts,
    averages duplicates, resamples and fills forward;
-3. by the same script after the same unit fix the agent applied;
-4. by the framework, after the agent's one fix to the blocking unit error.
+3. by the same script after the same unit fix;
+4. by the framework, after the same unit fix resolves its one blocking error.
+
+The unit fix stands in for the agent's decision on the blocking error. It was
+coded by the authors (readings above 50 converted from degF to degC).
 
 All four are scored against the clean target over the same test period. To
 show how much a different random seed moves the result, the clean-data model

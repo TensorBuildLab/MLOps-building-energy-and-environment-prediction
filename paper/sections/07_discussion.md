@@ -6,8 +6,8 @@ The experiments separate four places where checks can make a difference.
 
 **Evaluation protocol: large effect.** A random split understated error on
 every task tested (Section 6.1), by a margin larger than most differences
-between models in this study. This is the protocol of our 2024 study and a
-common one in published building-ML work. None of the pilot agents used it:
+between models in this study. This is the protocol of our 2024 study. None
+of the pilot agents used it:
 all eight split in time order unprompted, although their prompts announced a
 leakage check. The framework's contribution here is to make the time-ordered
 protocol, and the strongest baseline, the default for whoever uses it,
@@ -22,14 +22,15 @@ pipeline that always reports its best model would have deployed all of them. For
 **Fault handling: small, consistent effect.** On real data with planted
 faults, the framework's standard handling made the result on faulty data
 match the result on clean data. A quick script was 1.6–1.9 ppm worse in MAE,
-and three to five times less stable between seeds (Section 6.3). The
+and three to five times less stable in RMSE between seeds (Section 6.3). The
 difference is real but small in absolute terms. The detectors also miss
 things: a stuck meter at its idle floor half the time, and a dead meter that
 only a cross-sensor check could reveal.
 
 **Capable agents: no measurable effect on accuracy.** Capable agents, told
-that their work would be checked for leakage, built equally accurate,
-leak-free models with or without the framework (Section 6.5). They found as
+that their work would be checked for leakage, built leak-free models of
+similar accuracy with or without the framework (Section 6.5), with no
+consistent difference in either direction. They found as
 many planted faults, and wrote their own causality tests. The framework arm
 cost more tokens, tool calls and time. For RQ5, the answer is that with
 capable, primed agents the framework did not change accuracy or leakage.
@@ -51,8 +52,9 @@ open question. The pilot was not designed to answer it.
 ### 7.2 Lifecycle: monitoring helps; persistence is the bar
 
 Monitoring with gated retraining clearly beat a model left alone (Section
-6.4). It did not beat persistence for district heating, and simple monthly
-retraining did better on both tasks. Three lessons follow.
+6.4). For district heating it only matched persistence on the mean and lost
+to it in five of eight months, and simple monthly retraining did better on
+both tasks. Three lessons follow.
 
 **A drift check must compare with a baseline, not only with the model's own
 past error.** In summer the district-heating load barely changes, so
@@ -80,9 +82,9 @@ measure that benefit.
 
 ### 7.3 Judgment stays with the agent
 
-The checks directed judgment rather than replacing it. On the real data,
-every judgment call in the case studies was prompted by a warning and
-settled with evidence that is now in the record. Examples:
+The checks directed judgment rather than replacing it. Each of the
+judgment calls below was prompted by a warning and settled with evidence that
+is now in the record:
 - a CO2 sensor floor;
 - change-of-value logging, recognised from the share of unchanged steps;
 - outdoor humidity saturating on tropical nights;
@@ -94,9 +96,10 @@ and train on a weather station that repeated one value for 37 hours.
 
 The dead chilled-water meter shows the limit of this division of labour. The
 case-study agent, following the skill, did not look for contradictions
-between related points. The independent pilot agents, without the framework's
-checks to lean on, all did. A guardrail that reports no problem can make an
-agent less curious. The skill now asks the agent to check related points
+between related points. All four independent T2 pilot agents found it, two
+with the framework and two without. One possible explanation is that a check
+that reports no problem makes an agent less curious, but the pilot cannot
+show this. The skill now asks the agent to check related points
 against each other, and cross-sensor checks are the natural next guardrail.
 
 ### 7.4 Threats to validity
@@ -145,7 +148,7 @@ against each other, and cross-sensor checks are the natural next guardrail.
   up to the forecast time only.
 - **The models and searches were deliberately ordinary.** Stronger models,
   including probabilistic, deep and foundation models [Emami et al. 2023],
-  would beat the baselines more often.
+  might beat the baselines more often.
 
 ### 7.5 What the error gaps mean in operation
 

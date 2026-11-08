@@ -6,14 +6,15 @@ Machine-learning models of building energy use are well established
 [Amasyali and El-Gohary 2018] and are a standard ingredient of data-driven
 control [Maddalena et al. 2020]. Indoor environment and occupancy are
 predicted with the same tools: occupancy from light, temperature, humidity
-and CO2 [Candanedo and Feldheim 2016], and indoor CO2 a few hours ahead from
-a year of office data [Kallio et al. 2021]. Large benchmarks exist for load
+and CO2 [Candanedo and Feldheim 2016], and indoor CO2 up to 15 minutes ahead
+from a year of office data [Kallio et al. 2021]. Large benchmarks exist for load
 forecasting [Emami et al. 2023; Miller et al. 2020]. What remains expensive is
 the work around each model: understanding a new building's data, cleaning it,
-and evaluating and maintaining the model. Reviews of preprocessing for
-building operational data [Fan et al. 2021] and of fault detection [Kim and
-Katipamula 2018] show how much of that work concerns faulty sensors and data
-problems rather than modeling.
+and evaluating and maintaining the model. A review of preprocessing for
+building operational data [Fan et al. 2021] shows how much of that work
+concerns faulty sensors and data problems rather than modeling, and fault
+detection in building systems is a research field of its own [Kim and
+Katipamula 2018].
 
 ### 2.2 Automated and LLM-generated pipelines for buildings
 
@@ -29,9 +30,10 @@ and to coordinate specialist agents with many tools for building operations
 templates to have an LLM write modeling code [Khadka and Zhang 2024]. These
 studies mostly evaluate whether generated code runs, how accurate the
 resulting model is on a held-out split, or whether tools are selected
-correctly. They leave two questions largely open: how to make an agent's
-result on real, messy data checkable, and how to operate the resulting
-models over time.
+correctly. Zhang et al. [2024a] also retrain on a sliding window so that the
+model adapts over time. Two questions remain largely open: how to make an
+agent's result on real, messy data checkable, and how to monitor, gate and
+roll back the resulting models in operation.
 
 ### 2.3 Agents for machine-learning engineering
 
@@ -63,11 +65,14 @@ cover parts of this lifecycle (Table 1):
 
 Darts, for example, separates past from future covariates, which prevents one
 form of look-ahead. Model cards document a model's intended use and
-evaluation [Mitchell et al. 2019]. On evaluation, cross-validation for time
-series must respect temporal dependence [Bergmeir and Benítez 2012]. Data
+evaluation [Mitchell et al. 2019]. On evaluation, Bergmeir and Benítez [2012]
+recommend blocked cross-validation for time series, although in their
+experiments the theoretical flaws of standard cross-validation had little
+practical effect. Standard k-fold cross-validation is valid for purely
+autoregressive models with uncorrelated errors [Bergmeir et al. 2018]. Data
 leakage, including leakage from random splits and from preprocessing on the
-full dataset, is a leading cause of irreproducible machine-learning results
-across sciences [Kapoor and Narayanan 2023].
+full dataset, is a widespread cause of irreproducible machine-learning
+results across sciences [Kapoor and Narayanan 2023].
 
 **Table 1.** What existing tools provide and what this work adds. "Partly":
 possible with rules or configuration the user writes; "n.r.": not reported.
@@ -81,6 +86,7 @@ possible with rules or configuration the user writes; "n.r.": not reported.
 | Time-ordered evaluation and backtesting | no | no | no | yes | n.r. | yes |
 | Strongest no-ML baseline as the reference, and as a promotion gate | no | no | no | partly | no | yes |
 | Model registry with gated promotion and rollback | no | yes | no | no | no | yes |
+| Retraining over time (scheduled, or on a drift alarm) | no | no | partly | partly | yes | yes |
 | Drift and live-data monitoring | partly | no | yes | no | no | yes |
 | Written for an LLM agent to drive (declarations, skill file) | no | no | no | no | partly | yes |
 

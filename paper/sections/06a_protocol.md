@@ -17,7 +17,7 @@ protocol differs. The per-task results are in Table B1 (Appendix B).
 a higher RMSE than shuffled cross-validation on all 22 tasks. The median
 ratio was 1.36 (interquartile range 1.26–1.44; range 1.02–2.46). In other
 words, the random split of our 2024 study would have understated RMSE by a
-median of 27%, and by more than 10% on 21 of the 22 tasks. The median R²
+median of 27% (range 2–59%), and by more than 10% on 21 of the 22 tasks. The median R²
 fell from 0.92 to 0.86. The largest gaps were for:
 - the virtual people counters in both rooms (ratios 2.46 and 1.86). Their
   inputs at the same moment make neighbouring rows near-duplicates; R² fell
@@ -28,13 +28,16 @@ fell from 0.92 to 0.86. The largest gaps were for:
 With shuffling, a test row's neighbours a few minutes earlier and later are
 in the training set, so the model only has to interpolate between them. The
 smallest gap (1.02) was for a plug load the model could hardly predict under
-either protocol (R² 0.13 and 0.10).
+either protocol (R² 0.13 and 0.10). Standard cross-validation is valid for
+purely autoregressive models with uncorrelated errors [Bergmeir et al. 2018];
+these gaps arise because neighbouring 5- to 15-minute rows, and inputs
+measured at the same moment, are near-duplicates of each other.
 
 **Feature selection on all rows added no measurable optimism.** In the full
 2024 recipe, features are first selected on all rows. On these tasks that
 made shuffled cross-validation slightly *less* optimistic (median ratio to
-shuffled alone 1.04; range 1.00–1.31), because dropping features removed
-information the forest could otherwise interpolate from. Selection leakage
+shuffled alone 1.04; range 1.00–1.31), probably because dropping features
+removed information the forest could otherwise interpolate from. Selection leakage
 remains a risk in principle [Kapoor and Narayanan 2023], but here the random
 split did all the damage.
 

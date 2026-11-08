@@ -22,12 +22,13 @@ challenger would have served from January, after the experiment ended:
   and inputs outside their training range. A challenger trained on data to
   the end of May beat the champion on rows neither had seen (RMSE 0.58 vs
   1.01 kW) and was promoted.
-- **November.** With the heating back on, the summer-trained model drifted
+- **November.** With the heating back on, the model trained to the end of May drifted
   (5.4 times its test-time error). It was replaced at the end of the month.
 
 Monitoring with gated retraining cut the mean monthly RMSE from 2.28 kW
-(static) to 1.53 kW. It did not beat persistence (1.56 kW), and it was worse
-than persistence in five of the six months from May to October:
+(static) to 1.53 kW, a reduction of 33%. It matched persistence on the mean
+(1.56 kW) but lost to it in five of the eight months, all between May and
+October:
 - With the heating off, the load barely changes, so "same as an hour ago"
   is nearly perfect.
 - The drift check compared the model only with its own test-time error, not
@@ -44,15 +45,16 @@ month in which the model lost to it) would have given 1.50 kW.
 moving outside their training range, before accuracy had degraded, and both
 challengers were promoted. The December challenger lost to the champion on
 unseen rows (29.5 vs 28.7 ppm) and was not promoted, as designed.
-- **Production model.** It averaged 33.5 ppm, against 37.4 ppm static and
-  36.1 ppm for persistence, and beat persistence in six of the eight months.
+- **Production model.** It averaged 33.5 ppm, against 37.4 ppm static (10%
+  lower) and 36.1 ppm for persistence, and beat persistence in six of the eight months.
 - **Monthly retraining** reached 32.3 ppm.
 - **The fallback rule** would have made CO2 worse (34.5 ppm), because a month
   lost to persistence was followed by a month won.
 
 **Answer to RQ4.** Monitoring with gated retraining clearly beat a model left
-alone. It did not beat persistence for district heating, and it did worse
-than simple monthly retraining on both tasks. With clean data, how often a
+alone. For district heating it only matched persistence on the mean (1.53 vs
+1.56 kW) and lost to it in five of eight months, and it did worse than simple
+monthly retraining on both tasks. With clean data, how often a
 model is retrained mattered more than the gates. The gates exist for the
 months when a fault or an unusual period would otherwise be trained into
 production, and two clean trajectories contain too few such months to show

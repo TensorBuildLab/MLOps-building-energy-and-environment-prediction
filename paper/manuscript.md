@@ -8,9 +8,9 @@
 
 - An LLM agent reads messy building data; a domain package applies fixed checks.
 - On 92 real-building tasks, ML beat the strongest simple rule in about half.
-- A random split understated forecast error by a median 27% on the same rows.
+- A random split understated prediction error by a median 27% on the same rows.
 - Monitoring beat a static model, but scheduled retraining did better still.
-- Capable agents built equally good models with or without the framework.
+- In a small pilot, agents told to be rigorous did as well without the framework.
 
 ## Abstract
 
@@ -27,14 +27,14 @@ thermal load, temperature, CO2, humidity, PM2.5, occupancy) and in a
 formative pilot with eight independent agent runs. Ordinary models beat the
 strongest simple rule significantly in 52% of tasks, and 45% failed the
 promotion gates. A random split, the protocol of our 2024 study, understated
-error by a median of 27% on the same rows. With planted faults, the
-framework reproduced clean-data accuracy, whereas a quick script was 9% worse
-in mean absolute error, though not in RMSE. Over eight months, monitoring
+error by a median of 27% on the same rows. With faults planted in one CO2
+task, the framework reproduced clean-data accuracy, whereas a quick script was
+9% worse in mean absolute error, though not in RMSE. Over eight months, monitoring
 with gated retraining cut error by 10–33% against a static model, but monthly
 retraining did better and persistence matched it for district heating.
-Independent agents told to be rigorous built equally accurate, leak-free
-models with or without the framework, at higher cost with it, and found a
-dead meter our own agent had missed. The framework's value lies in making
+In a small pilot, independent agents told to be rigorous built leak-free
+models of similar accuracy with or without the framework, at higher cost with
+it, and found a dead meter our own agent had missed. The framework's value lies in making
 rigorous evaluation the default, in comparable records and in the operating
 lifecycle, not in out-modeling a capable agent.
 
@@ -49,9 +49,9 @@ operation:
 - indoor-environment management needs to know where CO2 or temperature is heading.
 
 Machine-learning models for these tasks are well studied [Amasyali and
-El-Gohary 2018]. They are rarely deployed at scale, because each building needs
-its own model, and building one takes a data scientist days of work on data
-that is different every time. Point names such as `RM204_ZN_T` or `AI-3.PV`
+El-Gohary 2018], but they are rarely applied in practice [Zhang et al. 2024b].
+Each building needs its own model, and building one takes skilled effort on
+data that are different every time. Point names such as `RM204_ZN_T` or `AI-3.PV`
 must be decoded. Units are mixed. Exports contain text in number columns,
 placeholder values, stuck sensors and gaps, in formats that vary by vendor.
 
@@ -63,7 +63,7 @@ lifecycle let GPT-4 produce runnable code for a simulated small office in 34 of
 - code that runs is not the same as a model that is right;
 - the generated pipelines split the time series at random and selected features
   on the full dataset, both of which can let test information leak into
-  training [Bergmeir and Benítez 2012; Kapoor and Narayanan 2023];
+  training [Kapoor and Narayanan 2023];
 - the study used one simulated building and stopped before deployment.
 
 LLM agents have since become able to write and run analysis code on their own,
@@ -130,14 +130,15 @@ Machine-learning models of building energy use are well established
 [Amasyali and El-Gohary 2018] and are a standard ingredient of data-driven
 control [Maddalena et al. 2020]. Indoor environment and occupancy are
 predicted with the same tools: occupancy from light, temperature, humidity
-and CO2 [Candanedo and Feldheim 2016], and indoor CO2 a few hours ahead from
-a year of office data [Kallio et al. 2021]. Large benchmarks exist for load
+and CO2 [Candanedo and Feldheim 2016], and indoor CO2 up to 15 minutes ahead
+from a year of office data [Kallio et al. 2021]. Large benchmarks exist for load
 forecasting [Emami et al. 2023; Miller et al. 2020]. What remains expensive is
 the work around each model: understanding a new building's data, cleaning it,
-and evaluating and maintaining the model. Reviews of preprocessing for
-building operational data [Fan et al. 2021] and of fault detection [Kim and
-Katipamula 2018] show how much of that work concerns faulty sensors and data
-problems rather than modeling.
+and evaluating and maintaining the model. A review of preprocessing for
+building operational data [Fan et al. 2021] shows how much of that work
+concerns faulty sensors and data problems rather than modeling, and fault
+detection in building systems is a research field of its own [Kim and
+Katipamula 2018].
 
 ### 2.2 Automated and LLM-generated pipelines for buildings
 
@@ -153,9 +154,10 @@ and to coordinate specialist agents with many tools for building operations
 templates to have an LLM write modeling code [Khadka and Zhang 2024]. These
 studies mostly evaluate whether generated code runs, how accurate the
 resulting model is on a held-out split, or whether tools are selected
-correctly. They leave two questions largely open: how to make an agent's
-result on real, messy data checkable, and how to operate the resulting
-models over time.
+correctly. Zhang et al. [2024a] also retrain on a sliding window so that the
+model adapts over time. Two questions remain largely open: how to make an
+agent's result on real, messy data checkable, and how to monitor, gate and
+roll back the resulting models in operation.
 
 ### 2.3 Agents for machine-learning engineering
 
@@ -187,11 +189,14 @@ cover parts of this lifecycle (Table 1):
 
 Darts, for example, separates past from future covariates, which prevents one
 form of look-ahead. Model cards document a model's intended use and
-evaluation [Mitchell et al. 2019]. On evaluation, cross-validation for time
-series must respect temporal dependence [Bergmeir and Benítez 2012]. Data
+evaluation [Mitchell et al. 2019]. On evaluation, Bergmeir and Benítez [2012]
+recommend blocked cross-validation for time series, although in their
+experiments the theoretical flaws of standard cross-validation had little
+practical effect. Standard k-fold cross-validation is valid for purely
+autoregressive models with uncorrelated errors [Bergmeir et al. 2018]. Data
 leakage, including leakage from random splits and from preprocessing on the
-full dataset, is a leading cause of irreproducible machine-learning results
-across sciences [Kapoor and Narayanan 2023].
+full dataset, is a widespread cause of irreproducible machine-learning
+results across sciences [Kapoor and Narayanan 2023].
 
 **Table 1.** What existing tools provide and what this work adds. "Partly":
 possible with rules or configuration the user writes; "n.r.": not reported.
@@ -205,6 +210,7 @@ possible with rules or configuration the user writes; "n.r.": not reported.
 | Time-ordered evaluation and backtesting | no | no | no | yes | n.r. | yes |
 | Strongest no-ML baseline as the reference, and as a promotion gate | no | no | no | partly | no | yes |
 | Model registry with gated promotion and rollback | no | yes | no | no | no | yes |
+| Retraining over time (scheduled, or on a drift alarm) | no | no | partly | partly | yes | yes |
 | Drift and live-data monitoring | partly | no | yes | no | no | yes |
 | Written for an LLM agent to drive (declarations, skill file) | no | no | no | no | partly | yes |
 
@@ -667,8 +673,11 @@ inputs was trained in four ways:
 1. on clean data;
 2. on faulty data prepared by a quick script that coerces text, sorts,
    averages duplicates, resamples and fills forward;
-3. by the same script after the same unit fix the agent applied;
-4. by the framework, after the agent's one fix to the blocking unit error.
+3. by the same script after the same unit fix;
+4. by the framework, after the same unit fix resolves its one blocking error.
+
+The unit fix stands in for the agent's decision on the blocking error. It was
+coded by the authors (readings above 50 converted from degF to degC).
 
 All four are scored against the clean target over the same test period. To
 show how much a different random seed moves the result, the clean-data model
@@ -752,7 +761,7 @@ protocol differs. The per-task results are in Table B1 (Appendix B).
 a higher RMSE than shuffled cross-validation on all 22 tasks. The median
 ratio was 1.36 (interquartile range 1.26–1.44; range 1.02–2.46). In other
 words, the random split of our 2024 study would have understated RMSE by a
-median of 27%, and by more than 10% on 21 of the 22 tasks. The median R²
+median of 27% (range 2–59%), and by more than 10% on 21 of the 22 tasks. The median R²
 fell from 0.92 to 0.86. The largest gaps were for:
 - the virtual people counters in both rooms (ratios 2.46 and 1.86). Their
   inputs at the same moment make neighbouring rows near-duplicates; R² fell
@@ -763,13 +772,16 @@ fell from 0.92 to 0.86. The largest gaps were for:
 With shuffling, a test row's neighbours a few minutes earlier and later are
 in the training set, so the model only has to interpolate between them. The
 smallest gap (1.02) was for a plug load the model could hardly predict under
-either protocol (R² 0.13 and 0.10).
+either protocol (R² 0.13 and 0.10). Standard cross-validation is valid for
+purely autoregressive models with uncorrelated errors [Bergmeir et al. 2018];
+these gaps arise because neighbouring 5- to 15-minute rows, and inputs
+measured at the same moment, are near-duplicates of each other.
 
 **Feature selection on all rows added no measurable optimism.** In the full
 2024 recipe, features are first selected on all rows. On these tasks that
 made shuffled cross-validation slightly *less* optimistic (median ratio to
-shuffled alone 1.04; range 1.00–1.31), because dropping features removed
-information the forest could otherwise interpolate from. Selection leakage
+shuffled alone 1.04; range 1.00–1.31), probably because dropping features
+removed information the forest could otherwise interpolate from. Selection leakage
 remains a risk in principle [Kapoor and Narayanan 2023], but here the random
 split did all the damage.
 
@@ -849,8 +861,8 @@ the framework recommended the simple rule.
   hourly criteria: all 3 Aalborg building-level meters, 16 of 20 BDG2
   buildings, but only 4 of 10 ROBOD room meters. The six ROBOD failures are
   room-level chilled-water and plug meters with small, intermittent loads,
-  for which CV(RMSE) is large whatever the model (127–570% in the worst
-  three).
+  for which CV(RMSE) is large whatever the model (218–511% on hourly
+  values in the worst three).
 
 **By dataset.** Aalborg had the highest share of models significantly better
 than the baseline (20 of 27), and ROBOD the lowest (17 of 45). ROBOD's rooms
@@ -969,20 +981,20 @@ this dataset (Section 5.2).
 **Cost.** Table 11 compares the same random forest on the same inputs,
 trained four ways. Table 12 gives paired tests.
 
-- **Framework.** Trained on faulty data with the framework, after the agent's
-  one fix to the blocking unit error, the model reproduced the clean-data
+- **Framework.** Trained on faulty data with the framework, after the unit
+  fix resolved its one blocking error, the model reproduced the clean-data
   result in every seed. Its MAE was 19.8 ± 0.2 ppm, against 19.9 ± 0.3 ppm on
   clean data.
 - **Quick script.** The same model trained by a quick script had an MAE of
-  21.6 ± 1.7 ppm, 1.9 ppm worse in the median paired seed (Wilcoxon
-  *p* = 0.010).
-- **Quick script with the same unit fix.** Giving the script the agent's unit
+  21.6 ± 1.7 ppm: 9% higher on average, and 1.9 ppm worse in the median
+  paired seed (Wilcoxon *p* = 0.010).
+- **Quick script with the same unit fix.** Giving the script the same unit
   fix changed almost nothing: MAE 21.6 ± 1.8 ppm, 1.6 ppm worse than the
   framework (*p* = 0.010).
 
 The gain therefore came from the framework's standard handling of the other
 faults: masking the placeholder values, text, spikes and stuck stretches, and
-not filling the outage. It did not come from the one decision the agent made.
+not filling the outage. It did not come from the one decision left to the agent.
 The unit fix mattered little here, probably because room temperature carries
 little information about CO2 an hour ahead. On a target that depends on the
 switched input, it would matter more.
@@ -1069,12 +1081,13 @@ challenger would have served from January, after the experiment ended:
   and inputs outside their training range. A challenger trained on data to
   the end of May beat the champion on rows neither had seen (RMSE 0.58 vs
   1.01 kW) and was promoted.
-- **November.** With the heating back on, the summer-trained model drifted
+- **November.** With the heating back on, the model trained to the end of May drifted
   (5.4 times its test-time error). It was replaced at the end of the month.
 
 Monitoring with gated retraining cut the mean monthly RMSE from 2.28 kW
-(static) to 1.53 kW. It did not beat persistence (1.56 kW), and it was worse
-than persistence in five of the six months from May to October:
+(static) to 1.53 kW, a reduction of 33%. It matched persistence on the mean
+(1.56 kW) but lost to it in five of the eight months, all between May and
+October:
 - With the heating off, the load barely changes, so "same as an hour ago"
   is nearly perfect.
 - The drift check compared the model only with its own test-time error, not
@@ -1091,15 +1104,16 @@ month in which the model lost to it) would have given 1.50 kW.
 moving outside their training range, before accuracy had degraded, and both
 challengers were promoted. The December challenger lost to the champion on
 unseen rows (29.5 vs 28.7 ppm) and was not promoted, as designed.
-- **Production model.** It averaged 33.5 ppm, against 37.4 ppm static and
-  36.1 ppm for persistence, and beat persistence in six of the eight months.
+- **Production model.** It averaged 33.5 ppm, against 37.4 ppm static (10%
+  lower) and 36.1 ppm for persistence, and beat persistence in six of the eight months.
 - **Monthly retraining** reached 32.3 ppm.
 - **The fallback rule** would have made CO2 worse (34.5 ppm), because a month
   lost to persistence was followed by a month won.
 
 **Answer to RQ4.** Monitoring with gated retraining clearly beat a model left
-alone. It did not beat persistence for district heating, and it did worse
-than simple monthly retraining on both tasks. With clean data, how often a
+alone. For district heating it only matched persistence on the mean (1.53 vs
+1.56 kW) and lost to it in five of eight months, and it did worse than simple
+monthly retraining on both tasks. With clean data, how often a
 model is retrained mattered more than the gates. The gates exist for the
 months when a fault or an unusual period would otherwise be trained into
 production, and two clean trajectories contain too few such months to show
@@ -1226,8 +1240,8 @@ The experiments separate four places where checks can make a difference.
 
 **Evaluation protocol: large effect.** A random split understated error on
 every task tested (Section 6.1), by a margin larger than most differences
-between models in this study. This is the protocol of our 2024 study and a
-common one in published building-ML work. None of the pilot agents used it:
+between models in this study. This is the protocol of our 2024 study. None
+of the pilot agents used it:
 all eight split in time order unprompted, although their prompts announced a
 leakage check. The framework's contribution here is to make the time-ordered
 protocol, and the strongest baseline, the default for whoever uses it,
@@ -1242,14 +1256,15 @@ pipeline that always reports its best model would have deployed all of them. For
 **Fault handling: small, consistent effect.** On real data with planted
 faults, the framework's standard handling made the result on faulty data
 match the result on clean data. A quick script was 1.6–1.9 ppm worse in MAE,
-and three to five times less stable between seeds (Section 6.3). The
+and three to five times less stable in RMSE between seeds (Section 6.3). The
 difference is real but small in absolute terms. The detectors also miss
 things: a stuck meter at its idle floor half the time, and a dead meter that
 only a cross-sensor check could reveal.
 
 **Capable agents: no measurable effect on accuracy.** Capable agents, told
-that their work would be checked for leakage, built equally accurate,
-leak-free models with or without the framework (Section 6.5). They found as
+that their work would be checked for leakage, built leak-free models of
+similar accuracy with or without the framework (Section 6.5), with no
+consistent difference in either direction. They found as
 many planted faults, and wrote their own causality tests. The framework arm
 cost more tokens, tool calls and time. For RQ5, the answer is that with
 capable, primed agents the framework did not change accuracy or leakage.
@@ -1271,8 +1286,9 @@ open question. The pilot was not designed to answer it.
 ### 7.2 Lifecycle: monitoring helps; persistence is the bar
 
 Monitoring with gated retraining clearly beat a model left alone (Section
-6.4). It did not beat persistence for district heating, and simple monthly
-retraining did better on both tasks. Three lessons follow.
+6.4). For district heating it only matched persistence on the mean and lost
+to it in five of eight months, and simple monthly retraining did better on
+both tasks. Three lessons follow.
 
 **A drift check must compare with a baseline, not only with the model's own
 past error.** In summer the district-heating load barely changes, so
@@ -1300,9 +1316,9 @@ measure that benefit.
 
 ### 7.3 Judgment stays with the agent
 
-The checks directed judgment rather than replacing it. On the real data,
-every judgment call in the case studies was prompted by a warning and
-settled with evidence that is now in the record. Examples:
+The checks directed judgment rather than replacing it. Each of the
+judgment calls below was prompted by a warning and settled with evidence that
+is now in the record:
 - a CO2 sensor floor;
 - change-of-value logging, recognised from the share of unchanged steps;
 - outdoor humidity saturating on tropical nights;
@@ -1314,9 +1330,10 @@ and train on a weather station that repeated one value for 37 hours.
 
 The dead chilled-water meter shows the limit of this division of labour. The
 case-study agent, following the skill, did not look for contradictions
-between related points. The independent pilot agents, without the framework's
-checks to lean on, all did. A guardrail that reports no problem can make an
-agent less curious. The skill now asks the agent to check related points
+between related points. All four independent T2 pilot agents found it, two
+with the framework and two without. One possible explanation is that a check
+that reports no problem makes an agent less curious, but the pilot cannot
+show this. The skill now asks the agent to check related points
 against each other, and cross-sensor checks are the natural next guardrail.
 
 ### 7.4 Threats to validity
@@ -1365,7 +1382,7 @@ against each other, and cross-sensor checks are the natural next guardrail.
   up to the forecast time only.
 - **The models and searches were deliberately ordinary.** Stronger models,
   including probabilistic, deep and foundation models [Emami et al. 2023],
-  would beat the baselines more often.
+  might beat the baselines more often.
 
 ### 7.5 What the error gaps mean in operation
 
@@ -1425,16 +1442,20 @@ eight independent agent runs. The answers to the five research questions are:
   added no measurable optimism.
 - **RQ3 (faults).** The checks detected six of eight planted fault types in
   every seed, spikes in nine seeds of ten and a stuck meter at its idle floor
-  in five. With them, accuracy on faulty data matched clean data. A quick
-  script was 1.6–1.9 ppm worse in MAE, with or without the agent's unit fix,
-  and three to five times less stable between seeds. RMSE did not differ.
+  in five; these rates are partly in-sample, because detectors were revised
+  on the same dataset. On the one CO2 task with planted faults, accuracy with
+  the checks matched clean data. A quick script was 1.6–1.9 ppm worse in MAE,
+  with or without the same unit fix, and three to five times less stable in
+  RMSE between seeds. Mean RMSE did not differ.
 - **RQ4 (lifecycle).** Monitoring with gated retraining beat a static model
-  by 10–33% in mean monthly RMSE. It did not beat persistence for district
-  heating, and simple monthly retraining did better on both tasks. Retraining
+  by 10–33% in mean monthly RMSE. For district heating it only matched
+  persistence on the mean (1.53 vs 1.56 kW) and lost to it in five of eight
+  months, and simple monthly retraining did better on both tasks. Retraining
   should be scheduled, and persistence monitored alongside the model.
-- **RQ5 (independent agents).** Capable agents, told to be rigorous, built
-  equally accurate, leak-free models with or without the framework, and found
-  as many planted faults. The framework arm cost more. All four agents that
+- **RQ5 (independent agents).** In a pilot with one run per cell, capable
+  agents told to be rigorous built leak-free models of similar accuracy with
+  or without the framework, with no consistent difference in either
+  direction, and found as many planted faults. The framework arm cost more. All four agents that
   saw the dead chilled-water meter found it; our own case-study agent, relying
   on the checks, had missed it.
 
@@ -1510,13 +1531,14 @@ All entries were checked against Crossref, arXiv, the publisher or the software'
 - Balaji, B., Bhattacharya, A., Fierro, G., Gao, J., Gluck, J., Hong, D., Johansen, A., Koh, J., Ploennigs, J., Agarwal, Y., Berges, M., Culler, D., Gupta, R., Kjærgaard, M.B., Srivastava, M., Whitehouse, K., 2016. Brick: Towards a unified metadata schema for buildings. In: Proceedings of the 3rd ACM International Conference on Systems for Energy-Efficient Built Environments (BuildSys '16), pp. 41–50. https://doi.org/10.1145/2993422.2993577
 - Bantilan, N., 2020. pandera: Statistical data validation of pandas dataframes. In: Proceedings of the 19th Python in Science Conference (SciPy 2020), pp. 116–124. https://doi.org/10.25080/Majora-342d178e-010
 - Bergmeir, C., Benítez, J.M., 2012. On the use of cross-validation for time series predictor evaluation. Information Sciences 191, 192–213. https://doi.org/10.1016/j.ins.2011.12.028
+- Bergmeir, C., Hyndman, R.J., Koo, B., 2018. A note on the validity of cross-validation for evaluating autoregressive time series prediction. Computational Statistics & Data Analysis 120, 70–83. https://doi.org/10.1016/j.csda.2017.11.003
 - Breck, E., Cai, S., Nielsen, E., Salib, M., Sculley, D., 2017. The ML test score: A rubric for ML production readiness and technical debt reduction. In: 2017 IEEE International Conference on Big Data, pp. 1123–1132. https://doi.org/10.1109/BigData.2017.8258038
 - Breck, E., Polyzotis, N., Roy, S., Whang, S.E., Zinkevich, M., 2019. Data validation for machine learning. In: Proceedings of Machine Learning and Systems 1 (SysML 2019), pp. 334–347.
 - Brier, G.W., 1950. Verification of forecasts expressed in terms of probability. Monthly Weather Review 78 (1), 1–3. https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2
 - Candanedo, L.M., Feldheim, V., 2016. Accurate occupancy detection of an office room from light, temperature, humidity and CO2 measurements using statistical learning models. Energy and Buildings 112, 28–39. https://doi.org/10.1016/j.enbuild.2015.11.071
 - Chan, J.S., Chowdhury, N., Jaffe, O., Aung, J., Sherburn, D., Mays, E., Starace, G., Liu, K., Maksin, L., Patwardhan, T., Madry, A., Weng, L., 2025. MLE-bench: Evaluating machine learning agents on machine learning engineering. In: International Conference on Learning Representations (ICLR 2025), pp. 50466–50494. arXiv:2410.07095
 - Diebold, F.X., Mariano, R.S., 1995. Comparing predictive accuracy. Journal of Business & Economic Statistics 13 (3), 253–263. https://doi.org/10.1080/07350015.1995.10524599
-- Emami, P., Sahu, A., Graf, P., 2023. BuildingsBench: A large-scale dataset of 900K buildings and benchmark for short-term load forecasting. In: Advances in Neural Information Processing Systems 36, Datasets and Benchmarks Track, pp. 19823–19857. arXiv:2307.00142
+- Emami, P., Sahu, A., Graf, P., 2023. BuildingsBench: A large-scale dataset of 900K buildings and benchmark for short-term load forecasting. In: Advances in Neural Information Processing Systems 36, Datasets and Benchmarks Track, pp. 19823–19857. https://doi.org/10.52202/075280-0871 (arXiv:2307.00142)
 - Evidently AI, 2026. Evidently: open-source ML and LLM evaluation and observability framework (software, Apache-2.0). https://github.com/evidentlyai/evidently (accessed 29 October 2026)
 - Fan, C., Chen, M., Wang, X., Wang, J., Huang, B., 2021. A review on data preprocessing techniques toward efficient and reliable knowledge discovery from building operational data. Frontiers in Energy Research 9, 652801. https://doi.org/10.3389/fenrg.2021.652801
 - Gong, A., Campbell, J., 2026. Great Expectations (software). Zenodo. https://doi.org/10.5281/zenodo.5683574 (all versions; accessed 29 October 2026)
@@ -1527,14 +1549,14 @@ All entries were checked against Crossref, arXiv, the publisher or the software'
 - Jiang, Z., Xu, W., Dong, B., 2026. OptAgent: an Agentic AI framework for Intelligent Building Operations. arXiv:2601.20005. https://doi.org/10.48550/arXiv.2601.20005
 - Kallio, J., Tervonen, J., Räsänen, P., Mäkynen, R., Koivusaari, J., Peltola, J., 2021. Forecasting office indoor CO2 concentration using machine learning with a one-year dataset. Building and Environment 187, 107409. https://doi.org/10.1016/j.buildenv.2020.107409
 - Kapoor, S., Narayanan, A., 2023. Leakage and the reproducibility crisis in machine-learning-based science. Patterns 4 (9), 100804. https://doi.org/10.1016/j.patter.2023.100804
-- Khadka, S., Zhang, L., 2024. Scaling data-driven building energy modelling using large language models. arXiv:2407.03469 (also ASHRAE 2024 Annual Conference, paper IN-24-C-009). https://doi.org/10.48550/arXiv.2407.03469
+- Khadka, S., Zhang, L., 2024. Scaling data-driven building energy modelling using large language models. arXiv:2407.03469, https://doi.org/10.48550/arXiv.2407.03469 (also ASHRAE 2024 Annual Conference, paper IN-24-C-009, https://doi.org/10.63044/s24kha09)
 - Kim, W., Katipamula, S., 2018. A review of fault detection and diagnostics methods for building systems. Science and Technology for the Built Environment 24 (1), 3–21. https://doi.org/10.1080/23744731.2017.1318008
 - Kreuzberger, D., Kühl, N., Hirschl, S., 2023. Machine Learning Operations (MLOps): Overview, definition, and architecture. IEEE Access 11, 31866–31879. https://doi.org/10.1109/ACCESS.2023.3262138
 - Kuprieiev, R., et al. (the DVC team and contributors), 2026. DVC: Data Version Control (software). Zenodo. https://doi.org/10.5281/zenodo.3677553 (all versions; accessed 29 October 2026)
 - Luo, N., Wang, Z., Blum, D., Weyandt, C., Bourassa, N., Piette, M.A., Hong, T., 2022. A three-year dataset supporting research on building energy management and occupancy analytics. Scientific Data 9, 156. https://doi.org/10.1038/s41597-022-01257-x
 - Löning, M., Bagnall, A., Ganesh, S., Kazakov, V., Lines, J., Király, F.J., 2019. sktime: A unified interface for machine learning with time series. arXiv:1909.07872. https://arxiv.org/abs/1909.07872
 - Maddalena, E.T., Lian, Y., Jones, C.N., 2020. Data-driven methods for building control — A review and promising future directions. Control Engineering Practice 95, 104211. https://doi.org/10.1016/j.conengprac.2019.104211
-- Melgaard, S.P., Johra, H., Nyborg, V.Ø., Marszal-Pomianowska, A., Jensen, R.L., Kantas, C., Larsen, O.K., Hu, Y., Frandsen, K.M., Larsen, T.S., Svidt, K., Andersen, K.H., Leiria, D., Schaffer, M., Frandsen, M., Veit, M., Ussing, L.F., Lindhard, S.M., Pomianowski, M.Z., Rohde, L., Hansen, A.R., Heiselberg, P.K., 2024. Detailed operational building data for six office rooms in Denmark. Data in Brief 54, 110326. https://doi.org/10.1016/j.dib.2024.110326 (data: https://doi.org/10.5281/zenodo.10673763)
+- Melgaard, S.P., Johra, H., Nyborg, V.Ø., Marszal-Pomianowska, A., Jensen, R.L., Kantas, C., Larsen, O.K., Hu, Y., Frandsen, K.M., Larsen, T.S., Svidt, K., Andersen, K.H., Leiria, D., Schaffer, M., Frandsen, M., Veit, M., Ussing, L.F., Lindhard, S.M., Pomianowski, M.Z., Rohde, L., Hansen, A.R., Heiselberg, P.K., 2024. Detailed operational building data for six office rooms in Denmark: Occupancy, indoor environment, heating, ventilation, lighting and room control monitoring with sub-hourly temporal resolution. Data in Brief 54, 110326. https://doi.org/10.1016/j.dib.2024.110326 (data: https://doi.org/10.5281/zenodo.10673763)
 - Miller, C., Kathirgamanathan, A., Picchetti, B., Arjunan, P., Park, J.Y., Nagy, Z., Raftery, P., Hobson, B.W., Shi, Z., Meggers, F., 2020. The Building Data Genome Project 2, energy meter data from the ASHRAE Great Energy Predictor III competition. Scientific Data 7, 368. https://doi.org/10.1038/s41597-020-00712-x
 - Mitchell, M., Wu, S., Zaldivar, A., Barnes, P., Vasserman, L., Hutchinson, B., Spitzer, E., Raji, I.D., Gebru, T., 2019. Model cards for model reporting. In: Proceedings of the Conference on Fairness, Accountability, and Transparency (FAT* '19), pp. 220–229. https://doi.org/10.1145/3287560.3287596
 - Schelter, S., Lange, D., Schmidt, P., Celikel, M., Biessmann, F., Grafberger, A., 2018. Automating large-scale data quality verification. Proceedings of the VLDB Endowment 11 (12), 1781–1794. https://doi.org/10.14778/3229863.3229867

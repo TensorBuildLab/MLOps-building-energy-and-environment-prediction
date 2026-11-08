@@ -21,20 +21,20 @@ this dataset (Section 5.2).
 **Cost.** Table 11 compares the same random forest on the same inputs,
 trained four ways. Table 12 gives paired tests.
 
-- **Framework.** Trained on faulty data with the framework, after the agent's
-  one fix to the blocking unit error, the model reproduced the clean-data
+- **Framework.** Trained on faulty data with the framework, after the unit
+  fix resolved its one blocking error, the model reproduced the clean-data
   result in every seed. Its MAE was 19.8 ± 0.2 ppm, against 19.9 ± 0.3 ppm on
   clean data.
 - **Quick script.** The same model trained by a quick script had an MAE of
-  21.6 ± 1.7 ppm, 1.9 ppm worse in the median paired seed (Wilcoxon
-  *p* = 0.010).
-- **Quick script with the same unit fix.** Giving the script the agent's unit
+  21.6 ± 1.7 ppm: 9% higher on average, and 1.9 ppm worse in the median
+  paired seed (Wilcoxon *p* = 0.010).
+- **Quick script with the same unit fix.** Giving the script the same unit
   fix changed almost nothing: MAE 21.6 ± 1.8 ppm, 1.6 ppm worse than the
   framework (*p* = 0.010).
 
 The gain therefore came from the framework's standard handling of the other
 faults: masking the placeholder values, text, spikes and stuck stretches, and
-not filling the outage. It did not come from the one decision the agent made.
+not filling the outage. It did not come from the one decision left to the agent.
 The unit fix mattered little here, probably because room temperature carries
 little information about CO2 an hour ahead. On a target that depends on the
 switched input, it would matter more.
