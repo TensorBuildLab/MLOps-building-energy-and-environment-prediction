@@ -1,5 +1,9 @@
 """Assemble the manuscript and the supplementary material, then build the Word files.
 
+Retired on 2026-11-08: the Word masters paper/Manuscript.docx and paper/Supplementary_Material.docx are now the
+paper and are edited in Word. The Markdown in paper/sections/ and paper/supplementary/ is the version they were
+created from; this script still rebuilds it, into paper/build/ only, and never touches the masters.
+
     python paper/build.py            # Markdown only: paper/build/paper.md, paper/build/supplementary.md
     python paper/build.py --docx     # also Word files, with md2docx from the manuscript-template skill
 

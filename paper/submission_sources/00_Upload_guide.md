@@ -7,7 +7,7 @@ Article**. Review is single anonymized, so the manuscript keeps the title page w
 | File | Upload as | Note |
 |---|---|---|
 | 01_Cover_Letter.docx | Cover letter | Complete the date and the bracketed note first. |
-| 02_Manuscript.docx | Manuscript | Title page, highlights, abstract, text, tables, figures and declarations in one file. Citations are plain text; the EndNote-linked master is `paper/build/paper.docx`. |
+| 02_Manuscript.docx | Manuscript | Title page, highlights, abstract, text, tables, figures and declarations in one file. Citations are plain text; the EndNote-linked master is `paper/Manuscript.docx`. |
 | 03_Highlights.docx | Highlights | 5 bullets, at most 85 characters each. |
 | 04_Graphical_Abstract.tif | Graphical abstract | 3070 × 1181 px (at least 1328 px wide), readable at 13 cm. |
 | Figures/Fig1–7 *.tif | Figure | One file per figure, 1100 dpi; vector PDFs are in `paper/figures` if the editorial office asks for them. |
@@ -20,6 +20,7 @@ Article**. Review is single anonymized, so the manuscript keeps the title page w
 verify), the data statement (code on GitHub, archived release on Zenodo; the three datasets are public, with DOIs),
 and the competing-interest declaration.
 
-**Before uploading, complete the bracketed items** in the manuscript (CRediT, competing interests, Zenodo DOI,
-generative-AI statement, funding and acknowledgements) and the cover letter, then rebuild with
-`python paper/build.py --docx` and `python paper/make_submission.py`.
+**Before uploading, complete the bracketed items** in `paper/Manuscript.docx` (CRediT, competing interests,
+Zenodo DOI, generative-AI statement, funding and acknowledgements) and in
+`paper/submission_sources/Cover_Letter.docx`. In Word, run EndNote > Update Citations and Bibliography and save;
+then rebuild this folder with `python paper/make_submission.py`.

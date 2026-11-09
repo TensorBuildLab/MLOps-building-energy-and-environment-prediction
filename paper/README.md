@@ -1,37 +1,43 @@
 # Paper
 
-**Where domain guardrails matter for LLM-agent-built prediction models in buildings:
-an open MLOps framework evaluated on real data** (draft, version 2 of arXiv:2407.03469).
+**Domain guardrails for data-driven building energy prediction: an agent-ready MLOps framework
+evaluated on real buildings** (for Applied Energy; extends arXiv:2407.03469).
 
-- [`manuscript.md`](manuscript.md): the assembled draft (generated; do not edit by hand).
-- `sections/`: the sections, edited by hand.
-- `tables/`, `figures/`: generated from the results by `case_studies/make_results.py` and
-  `paper/figure_framework.py`. Every number in the text comes from these tables or from the
-  result files in `case_studies/` and `benchmarks/pilot/`.
-- `references.md`: the reference list, checked against Crossref, arXiv or the publisher.
+## The paper is the Word file
 
-Rebuild everything after the case studies have run:
+Since 8 November 2026 the paper is written, revised and submitted in Word:
+
+- [`Manuscript.docx`](Manuscript.docx): the manuscript (title page, highlights, abstract, text, tables,
+  figures, declarations), with EndNote citation fields. Edit this file.
+- [`Supplementary_Material.docx`](Supplementary_Material.docx): the supplementary material.
+- `submission_sources/Cover_Letter.docx`: the cover letter (local only, not in the repository).
+
+The citations came from `refs.ris`, not from an EndNote library. In EndNote, use
+*Export Traveling Library* once to copy them into your library, choose the journal's output style and
+run *Update Citations and Bibliography*.
+
+## Building the submission files
 
 ```bash
-python case_studies/stats.py           # Diebold-Mariano tests, pilot statistics
-python case_studies/make_results.py    # tables and figures
-python paper/figure_framework.py       # Figure 1
-python paper/build.py                  # paper/manuscript.md
+python paper/make_submission.py
 ```
 
-## What changed from v1 (2024)
+writes the upload files to `submission/` (local only): it refreshes caption and cross-reference
+numbers in a copy (Word), flattens the citations in the uploaded manuscript, splits out the
+highlights, converts the figures to TIFF and renders a PDF preview. The masters are never modified.
+`submission_sources/00_Upload_guide.md` lists what to upload where.
 
-| v1 | v2 |
-|---|---|
-| Random train/test split on time series | Time-ordered split with a horizon gap; random-split error measured as a protocol comparison (RQ2) |
-| Feature selection on the full dataset | Inputs shifted by the horizon and audited; selection effect measured |
-| "Accuracy" = code runs without error | Skill against the strongest no-ML baseline, tests of the difference, promotion gates |
-| One simulated building, energy only | 92 tasks in 3 public real-building datasets (energy, thermal load, temperature, CO2, humidity, PM2.5, occupancy), including a 20-building portfolio |
-| No deployment | Registry, monitoring, gated retraining over eight months (RQ4) |
-| One LLM, results in chat links | Independent Claude Opus 5.5 and Sonnet 5.5 agents with and without the framework; prompts, deliverables and scores in the repository (RQ5) |
+## Numbers, tables and figures
 
-## Before submission (authors)
+Every number comes from the result files: `case_studies/results_v3/key_numbers.csv`, the tables in
+`tables/` and the figures in `figures/`, all written by `case_studies/analysis_v3.py` (Figure 1 and
+the graphical abstract by `figure_framework.py` and `figure_graphical_abstract.py`). If an analysis
+is re-run, update the affected table or figure in `Manuscript.docx` by hand; the upload TIFFs are
+made from `figures/*.png`.
 
-- Confirm the author list, affiliations and the Acknowledgements.
-- Choose the venue and run its author guidelines (highlights, abstract length, declarations).
-- Tag a release and archive it on Zenodo; put the DOI in the data-availability statement.
+## History
+
+The manuscript was drafted in Markdown (`sections/`, `supplementary/`, assembled by `build.py`, with
+`references.md` and `make_refs.py` producing `refs.ris`); `Manuscript.docx` was built from that
+version. The Markdown is kept as the record of how the paper was written and is no longer edited.
+`sections_v1/` holds the earlier draft.

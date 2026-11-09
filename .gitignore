@@ -37,3 +37,7 @@ paper/.factcheck_cache/
 submission/
 paper/submission_sources/cover_letter.md
 paper/submission_sources/05_Suggested_Reviewers.md
+paper/submission_sources/Cover_Letter.docx
+
+# Word lock files
+~$*.docx
